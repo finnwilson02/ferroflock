@@ -1,0 +1,3 @@
+/home/finn/squawkblock/squawkblock/tello_cpp/build/CMakeFiles/tello_record.dir
+/home/finn/squawkblock/squawkblock/tello_cpp/build/CMakeFiles/edit_cache.dir
+/home/finn/squawkblock/squawkblock/tello_cpp/build/CMakeFiles/rebuild_cache.dir

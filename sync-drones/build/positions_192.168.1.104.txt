@@ -1,0 +1,2 @@
+timestamp,tracker_id,x,y,z
+1740721012475,test_entry,0,0,0

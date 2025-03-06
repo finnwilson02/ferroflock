@@ -1,0 +1,3 @@
+/home/finn/squawkblock/squawkblock/sync-drones/build/CMakeFiles/drift_calibrator.dir
+/home/finn/squawkblock/squawkblock/sync-drones/build/CMakeFiles/edit_cache.dir
+/home/finn/squawkblock/squawkblock/sync-drones/build/CMakeFiles/rebuild_cache.dir

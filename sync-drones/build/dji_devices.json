@@ -1,0 +1,30 @@
+[
+  {
+    "ip": "192.168.1.104",
+    "mac": "34:D2:62:ED:F3:CE",
+    "manufacturer": "SZ DJI Technology",
+    "last_seen": "2025-02-28T13:41:20.875046",
+    "online": true
+  },
+  {
+    "ip": "192.168.1.106",
+    "mac": "34:D2:62:EE:01:B4",
+    "manufacturer": "SZ DJI Technology",
+    "last_seen": "2025-02-28T13:41:20.875079",
+    "online": true
+  },
+  {
+    "ip": "192.168.1.107",
+    "mac": "34:D2:62:EE:00:06",
+    "manufacturer": "SZ DJI Technology",
+    "last_seen": "2025-02-28T13:41:20.875094",
+    "online": true
+  },
+  {
+    "ip": "192.168.1.108",
+    "mac": "34:D2:62:ED:FF:BC",
+    "manufacturer": "SZ DJI Technology",
+    "last_seen": "2025-02-28T13:41:20.875105",
+    "online": true
+  }
+]

@@ -1,0 +1,34 @@
+# Build directories
+build/
+bin/
+
+# CMake files
+CMakeFiles/
+CMakeCache.txt
+cmake_install.cmake
+Makefile.cmake
+
+# Dependency files
+*.d
+
+# Compiled object files
+*.o
+*.obj
+
+# Executables
+*.exe
+*.out
+*.app
+drone_controller
+
+# Output files
+yaw_transform.txt
+
+# Temporary files
+*.swp
+*~
+.DS_Store
+
+# IDE files
+.vscode/
+.idea/

@@ -1,0 +1,3 @@
+/home/finn/squawkblock/squawkblock/vrpn/build/CMakeFiles/vrpn_viz.dir
+/home/finn/squawkblock/squawkblock/vrpn/build/CMakeFiles/edit_cache.dir
+/home/finn/squawkblock/squawkblock/vrpn/build/CMakeFiles/rebuild_cache.dir

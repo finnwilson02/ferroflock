@@ -1,0 +1,24 @@
+{
+    "trackers": {
+        "Bird 5": {
+            "tracker_id": "Bird5",
+            "tracker_num": 8,
+            "drone_ip": "192.168.1.107"
+        },
+        "Bird 3": {
+            "tracker_id": "Bird3",
+            "tracker_num": 6,
+            "drone_ip": "192.168.1.106"
+        },
+        "Bird 4": {
+            "tracker_id": "Bird4",
+            "tracker_num": 7,
+            "drone_ip": "192.168.1.104"
+        },
+        "Bird 1": {
+            "tracker_id": "Bird1",
+            "tracker_num": 4,
+            "drone_ip": "192.168.1.108"
+        }
+    }
+}

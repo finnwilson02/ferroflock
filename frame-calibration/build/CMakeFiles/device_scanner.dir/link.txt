@@ -1,0 +1,1 @@
+/usr/bin/c++ CMakeFiles/device_scanner.dir/src/device_scanner.cpp.o -o device_scanner 
