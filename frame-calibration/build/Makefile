@@ -57,10 +57,10 @@ RM = /usr/bin/cmake -E rm -f
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /home/finn/squawkblock/squawkblock/frame-calibration
+CMAKE_SOURCE_DIR = /home/finn/ferroflock/frame-calibration
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /home/finn/squawkblock/squawkblock/frame-calibration/build
+CMAKE_BINARY_DIR = /home/finn/ferroflock/frame-calibration/build
 
 #=============================================================================
 # Targets provided globally by CMake.
@@ -132,9 +132,9 @@ install/strip/fast: preinstall/fast
 
 # The main all target
 all: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/finn/squawkblock/squawkblock/frame-calibration/build/CMakeFiles /home/finn/squawkblock/squawkblock/frame-calibration/build//CMakeFiles/progress.marks
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/finn/ferroflock/frame-calibration/build/CMakeFiles /home/finn/ferroflock/frame-calibration/build//CMakeFiles/progress.marks
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 all
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/finn/squawkblock/squawkblock/frame-calibration/build/CMakeFiles 0
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/finn/ferroflock/frame-calibration/build/CMakeFiles 0
 .PHONY : all
 
 # The main clean target
@@ -187,6 +187,19 @@ frame_calibration/fast:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/frame_calibration.dir/build.make CMakeFiles/frame_calibration.dir/build
 .PHONY : frame_calibration/fast
 
+#=============================================================================
+# Target rules for targets named drone_control
+
+# Build rule for target.
+drone_control: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 drone_control
+.PHONY : drone_control
+
+# fast build rule for target.
+drone_control/fast:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/drone_control.dir/build.make CMakeFiles/drone_control.dir/build
+.PHONY : drone_control/fast
+
 frame_calibration.o: frame_calibration.cpp.o
 .PHONY : frame_calibration.o
 
@@ -235,6 +248,54 @@ src/device_scanner.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/device_scanner.dir/build.make CMakeFiles/device_scanner.dir/src/device_scanner.cpp.s
 .PHONY : src/device_scanner.cpp.s
 
+src/drone_control.o: src/drone_control.cpp.o
+.PHONY : src/drone_control.o
+
+# target to build an object file
+src/drone_control.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/drone_control.dir/build.make CMakeFiles/drone_control.dir/src/drone_control.cpp.o
+.PHONY : src/drone_control.cpp.o
+
+src/drone_control.i: src/drone_control.cpp.i
+.PHONY : src/drone_control.i
+
+# target to preprocess a source file
+src/drone_control.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/drone_control.dir/build.make CMakeFiles/drone_control.dir/src/drone_control.cpp.i
+.PHONY : src/drone_control.cpp.i
+
+src/drone_control.s: src/drone_control.cpp.s
+.PHONY : src/drone_control.s
+
+# target to generate assembly for a file
+src/drone_control.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/drone_control.dir/build.make CMakeFiles/drone_control.dir/src/drone_control.cpp.s
+.PHONY : src/drone_control.cpp.s
+
+src/optitrack_viz.o: src/optitrack_viz.cpp.o
+.PHONY : src/optitrack_viz.o
+
+# target to build an object file
+src/optitrack_viz.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/drone_control.dir/build.make CMakeFiles/drone_control.dir/src/optitrack_viz.cpp.o
+.PHONY : src/optitrack_viz.cpp.o
+
+src/optitrack_viz.i: src/optitrack_viz.cpp.i
+.PHONY : src/optitrack_viz.i
+
+# target to preprocess a source file
+src/optitrack_viz.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/drone_control.dir/build.make CMakeFiles/drone_control.dir/src/optitrack_viz.cpp.i
+.PHONY : src/optitrack_viz.cpp.i
+
+src/optitrack_viz.s: src/optitrack_viz.cpp.s
+.PHONY : src/optitrack_viz.s
+
+# target to generate assembly for a file
+src/optitrack_viz.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/drone_control.dir/build.make CMakeFiles/drone_control.dir/src/optitrack_viz.cpp.s
+.PHONY : src/optitrack_viz.cpp.s
+
 # Help Target
 help:
 	@echo "The following are some of the valid targets for this Makefile:"
@@ -248,6 +309,7 @@ help:
 	@echo "... list_install_components"
 	@echo "... rebuild_cache"
 	@echo "... device_scanner"
+	@echo "... drone_control"
 	@echo "... frame_calibration"
 	@echo "... frame_calibration.o"
 	@echo "... frame_calibration.i"
@@ -255,6 +317,12 @@ help:
 	@echo "... src/device_scanner.o"
 	@echo "... src/device_scanner.i"
 	@echo "... src/device_scanner.s"
+	@echo "... src/drone_control.o"
+	@echo "... src/drone_control.i"
+	@echo "... src/drone_control.s"
+	@echo "... src/optitrack_viz.o"
+	@echo "... src/optitrack_viz.i"
+	@echo "... src/optitrack_viz.s"
 .PHONY : help
 
 

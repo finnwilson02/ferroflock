@@ -4,7 +4,7 @@
 # compile CXX with /usr/bin/c++
 CXX_DEFINES = 
 
-CXX_INCLUDES = -I/home/finn/squawkblock/squawkblock/frame-calibration/../libs/vrpn -I/home/finn/squawkblock/squawkblock/frame-calibration/. -isystem /usr/include/opencv4
+CXX_INCLUDES = -I/home/finn/ferroflock/frame-calibration/../libs/vrpn -I/home/finn/ferroflock/frame-calibration/. -isystem /usr/include/opencv4
 
 CXX_FLAGS = -std=gnu++17
 

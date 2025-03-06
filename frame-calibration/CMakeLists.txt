@@ -20,6 +20,7 @@ include_directories(
 # Create executables
 add_executable(device_scanner src/device_scanner.cpp)
 add_executable(frame_calibration frame_calibration.cpp)
+add_executable(drone_control src/drone_control.cpp src/optitrack_viz.cpp)
 
 # Link libraries for device_scanner
 target_link_libraries(device_scanner)
@@ -33,10 +34,16 @@ target_link_libraries(frame_calibration
     pthread
 )
 
+# Link libraries for drone_control
+target_link_libraries(drone_control
+    PRIVATE
+    pthread
+)
+
 # No longer using nlohmann_json
 
 # Install targets
-install(TARGETS device_scanner frame_calibration DESTINATION bin)
+install(TARGETS device_scanner frame_calibration drone_control DESTINATION bin)
 
 # Copy Python scripts and configuration files
 file(COPY python/get_devices.py DESTINATION ${CMAKE_BINARY_DIR}/python)

@@ -1,8 +1,9 @@
-/home/finn/squawkblock/squawkblock/frame-calibration/build/CMakeFiles/device_scanner.dir
-/home/finn/squawkblock/squawkblock/frame-calibration/build/CMakeFiles/frame_calibration.dir
-/home/finn/squawkblock/squawkblock/frame-calibration/build/CMakeFiles/edit_cache.dir
-/home/finn/squawkblock/squawkblock/frame-calibration/build/CMakeFiles/rebuild_cache.dir
-/home/finn/squawkblock/squawkblock/frame-calibration/build/CMakeFiles/list_install_components.dir
-/home/finn/squawkblock/squawkblock/frame-calibration/build/CMakeFiles/install.dir
-/home/finn/squawkblock/squawkblock/frame-calibration/build/CMakeFiles/install/local.dir
-/home/finn/squawkblock/squawkblock/frame-calibration/build/CMakeFiles/install/strip.dir
+/home/finn/ferroflock/frame-calibration/build/CMakeFiles/device_scanner.dir
+/home/finn/ferroflock/frame-calibration/build/CMakeFiles/frame_calibration.dir
+/home/finn/ferroflock/frame-calibration/build/CMakeFiles/drone_control.dir
+/home/finn/ferroflock/frame-calibration/build/CMakeFiles/edit_cache.dir
+/home/finn/ferroflock/frame-calibration/build/CMakeFiles/rebuild_cache.dir
+/home/finn/ferroflock/frame-calibration/build/CMakeFiles/list_install_components.dir
+/home/finn/ferroflock/frame-calibration/build/CMakeFiles/install.dir
+/home/finn/ferroflock/frame-calibration/build/CMakeFiles/install/local.dir
+/home/finn/ferroflock/frame-calibration/build/CMakeFiles/install/strip.dir

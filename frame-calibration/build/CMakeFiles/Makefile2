@@ -54,10 +54,10 @@ RM = /usr/bin/cmake -E rm -f
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /home/finn/squawkblock/squawkblock/frame-calibration
+CMAKE_SOURCE_DIR = /home/finn/ferroflock/frame-calibration
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /home/finn/squawkblock/squawkblock/frame-calibration/build
+CMAKE_BINARY_DIR = /home/finn/ferroflock/frame-calibration/build
 
 #=============================================================================
 # Directory level rules for the build root directory
@@ -65,6 +65,7 @@ CMAKE_BINARY_DIR = /home/finn/squawkblock/squawkblock/frame-calibration/build
 # The main recursive "all" target.
 all: CMakeFiles/device_scanner.dir/all
 all: CMakeFiles/frame_calibration.dir/all
+all: CMakeFiles/drone_control.dir/all
 .PHONY : all
 
 # The main recursive "preinstall" target.
@@ -74,6 +75,7 @@ preinstall:
 # The main recursive "clean" target.
 clean: CMakeFiles/device_scanner.dir/clean
 clean: CMakeFiles/frame_calibration.dir/clean
+clean: CMakeFiles/drone_control.dir/clean
 .PHONY : clean
 
 #=============================================================================
@@ -83,14 +85,14 @@ clean: CMakeFiles/frame_calibration.dir/clean
 CMakeFiles/device_scanner.dir/all:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/device_scanner.dir/build.make CMakeFiles/device_scanner.dir/depend
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/device_scanner.dir/build.make CMakeFiles/device_scanner.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/finn/squawkblock/squawkblock/frame-calibration/build/CMakeFiles --progress-num=1,2 "Built target device_scanner"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/finn/ferroflock/frame-calibration/build/CMakeFiles --progress-num=1,2 "Built target device_scanner"
 .PHONY : CMakeFiles/device_scanner.dir/all
 
 # Build rule for subdir invocation for target.
 CMakeFiles/device_scanner.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/finn/squawkblock/squawkblock/frame-calibration/build/CMakeFiles 2
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/finn/ferroflock/frame-calibration/build/CMakeFiles 2
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 CMakeFiles/device_scanner.dir/all
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/finn/squawkblock/squawkblock/frame-calibration/build/CMakeFiles 0
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/finn/ferroflock/frame-calibration/build/CMakeFiles 0
 .PHONY : CMakeFiles/device_scanner.dir/rule
 
 # Convenience name for target.
@@ -109,14 +111,14 @@ CMakeFiles/device_scanner.dir/clean:
 CMakeFiles/frame_calibration.dir/all:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/frame_calibration.dir/build.make CMakeFiles/frame_calibration.dir/depend
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/frame_calibration.dir/build.make CMakeFiles/frame_calibration.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/finn/squawkblock/squawkblock/frame-calibration/build/CMakeFiles --progress-num=3,4 "Built target frame_calibration"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/finn/ferroflock/frame-calibration/build/CMakeFiles --progress-num=6,7 "Built target frame_calibration"
 .PHONY : CMakeFiles/frame_calibration.dir/all
 
 # Build rule for subdir invocation for target.
 CMakeFiles/frame_calibration.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/finn/squawkblock/squawkblock/frame-calibration/build/CMakeFiles 2
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/finn/ferroflock/frame-calibration/build/CMakeFiles 2
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 CMakeFiles/frame_calibration.dir/all
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/finn/squawkblock/squawkblock/frame-calibration/build/CMakeFiles 0
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/finn/ferroflock/frame-calibration/build/CMakeFiles 0
 .PHONY : CMakeFiles/frame_calibration.dir/rule
 
 # Convenience name for target.
@@ -127,6 +129,32 @@ frame_calibration: CMakeFiles/frame_calibration.dir/rule
 CMakeFiles/frame_calibration.dir/clean:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/frame_calibration.dir/build.make CMakeFiles/frame_calibration.dir/clean
 .PHONY : CMakeFiles/frame_calibration.dir/clean
+
+#=============================================================================
+# Target rules for target CMakeFiles/drone_control.dir
+
+# All Build rule for target.
+CMakeFiles/drone_control.dir/all:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/drone_control.dir/build.make CMakeFiles/drone_control.dir/depend
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/drone_control.dir/build.make CMakeFiles/drone_control.dir/build
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/finn/ferroflock/frame-calibration/build/CMakeFiles --progress-num=3,4,5 "Built target drone_control"
+.PHONY : CMakeFiles/drone_control.dir/all
+
+# Build rule for subdir invocation for target.
+CMakeFiles/drone_control.dir/rule: cmake_check_build_system
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/finn/ferroflock/frame-calibration/build/CMakeFiles 3
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 CMakeFiles/drone_control.dir/all
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/finn/ferroflock/frame-calibration/build/CMakeFiles 0
+.PHONY : CMakeFiles/drone_control.dir/rule
+
+# Convenience name for target.
+drone_control: CMakeFiles/drone_control.dir/rule
+.PHONY : drone_control
+
+# clean rule for target.
+CMakeFiles/drone_control.dir/clean:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/drone_control.dir/build.make CMakeFiles/drone_control.dir/clean
+.PHONY : CMakeFiles/drone_control.dir/clean
 
 #=============================================================================
 # Special targets to cleanup operation of make.

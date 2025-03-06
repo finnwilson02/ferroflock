@@ -8,7 +8,7 @@ set(CMAKE_DEPENDS_LANGUAGES
 
 # The set of dependency files which are needed:
 set(CMAKE_DEPENDS_DEPENDENCY_FILES
-  "/home/finn/squawkblock/squawkblock/frame-calibration/src/device_scanner.cpp" "CMakeFiles/device_scanner.dir/src/device_scanner.cpp.o" "gcc" "CMakeFiles/device_scanner.dir/src/device_scanner.cpp.o.d"
+  "/home/finn/ferroflock/frame-calibration/src/device_scanner.cpp" "CMakeFiles/device_scanner.dir/src/device_scanner.cpp.o" "gcc" "CMakeFiles/device_scanner.dir/src/device_scanner.cpp.o.d"
   )
 
 # Targets to which this target links which contain Fortran sources.

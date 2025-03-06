@@ -1,0 +1,1 @@
+/usr/bin/c++ CMakeFiles/drone_control.dir/src/drone_control.cpp.o CMakeFiles/drone_control.dir/src/optitrack_viz.cpp.o -o drone_control  -lpthread 

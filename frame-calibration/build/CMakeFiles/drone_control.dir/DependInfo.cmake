@@ -8,7 +8,8 @@ set(CMAKE_DEPENDS_LANGUAGES
 
 # The set of dependency files which are needed:
 set(CMAKE_DEPENDS_DEPENDENCY_FILES
-  "/home/finn/ferroflock/frame-calibration/frame_calibration.cpp" "CMakeFiles/frame_calibration.dir/frame_calibration.cpp.o" "gcc" "CMakeFiles/frame_calibration.dir/frame_calibration.cpp.o.d"
+  "/home/finn/ferroflock/frame-calibration/src/drone_control.cpp" "CMakeFiles/drone_control.dir/src/drone_control.cpp.o" "gcc" "CMakeFiles/drone_control.dir/src/drone_control.cpp.o.d"
+  "/home/finn/ferroflock/frame-calibration/src/optitrack_viz.cpp" "CMakeFiles/drone_control.dir/src/optitrack_viz.cpp.o" "gcc" "CMakeFiles/drone_control.dir/src/optitrack_viz.cpp.o.d"
   )
 
 # Targets to which this target links which contain Fortran sources.
