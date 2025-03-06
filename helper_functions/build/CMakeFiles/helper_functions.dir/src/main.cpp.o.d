@@ -429,4 +429,6 @@ CMakeFiles/helper_functions.dir/src/main.cpp.o: \
  /usr/local/include/vrpn_Assert.h \
  /home/finn/ferroflock/helper_functions/src/../include/menu.h \
  /home/finn/ferroflock/helper_functions/src/../include/optitrack.h \
- /home/finn/ferroflock/helper_functions/src/../include/tello_controller.h
+ /home/finn/ferroflock/helper_functions/src/../include/tello_controller.h \
+ /home/finn/ferroflock/helper_functions/src/../include/calibration.h \
+ /home/finn/ferroflock/helper_functions/src/../include/logger.h

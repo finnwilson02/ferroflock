@@ -3,6 +3,7 @@
 
 CMakeFiles/menu.dir/src/menu.cpp.o
  /home/finn/ferroflock/helper_functions/src/menu.cpp
+ /home/finn/ferroflock/helper_functions/include/calibration.h
  /home/finn/ferroflock/helper_functions/include/logger.h
  /home/finn/ferroflock/helper_functions/include/menu.h
  /home/finn/ferroflock/helper_functions/include/optitrack.h

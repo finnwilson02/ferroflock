@@ -9,6 +9,7 @@
 #include <mutex>
 #include "optitrack.h"
 #include "tello_controller.h"
+#include "calibration.h"
 
 // Menu option struct
 struct MenuOption {
@@ -72,6 +73,9 @@ private:
     
     // Reference to TelloController
     TelloController& tello_controller_;
+    
+    // Reference to Calibration system
+    Calibration* calibration_;
     
     // Map of option keys to MenuOption objects
     std::map<std::string, MenuOption> options_;

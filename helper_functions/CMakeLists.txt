@@ -29,6 +29,10 @@ set(OPTITRACK_SOURCES
     src/optitrack.cpp
 )
 
+set(CALIBRATION_SOURCES
+    src/calibration.cpp
+)
+
 set(MENU_SOURCES
     src/menu.cpp
 )
@@ -41,10 +45,16 @@ set(MAIN_SOURCES
 add_library(tello_controller ${TELLO_CONTROLLER_SOURCES})
 add_library(logger ${LOGGER_SOURCES})
 add_library(optitrack ${OPTITRACK_SOURCES})
+add_library(calibration ${CALIBRATION_SOURCES})
 add_library(menu ${MENU_SOURCES})
 
 # Create main executable
 add_executable(helper_functions ${MAIN_SOURCES})
+
+# Set dependencies for libraries
+target_link_libraries(optitrack PRIVATE logger ${OpenCV_LIBS} vrpn quat)
+target_link_libraries(calibration PRIVATE logger optitrack tello_controller)
+target_link_libraries(menu PRIVATE logger optitrack tello_controller calibration)
 
 # Link libraries to main executable
 target_link_libraries(helper_functions
@@ -52,6 +62,7 @@ target_link_libraries(helper_functions
     tello_controller
     logger
     optitrack
+    calibration
     menu
     ${OpenCV_LIBS}
     vrpn
@@ -62,5 +73,5 @@ target_link_libraries(helper_functions
 # Install targets
 install(TARGETS helper_functions DESTINATION bin)
 
-# Copy configuration files if needed
-file(COPY ../frame-calibration/dji_devices.json DESTINATION ${CMAKE_BINARY_DIR})
+# No need to copy configuration files to the build directory
+# Configuration files will be accessed relative to the executable

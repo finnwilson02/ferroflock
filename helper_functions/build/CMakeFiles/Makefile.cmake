@@ -53,6 +53,7 @@ set(CMAKE_DEPEND_INFO_FILES
   "CMakeFiles/tello_controller.dir/DependInfo.cmake"
   "CMakeFiles/logger.dir/DependInfo.cmake"
   "CMakeFiles/optitrack.dir/DependInfo.cmake"
+  "CMakeFiles/calibration.dir/DependInfo.cmake"
   "CMakeFiles/menu.dir/DependInfo.cmake"
   "CMakeFiles/helper_functions.dir/DependInfo.cmake"
   )

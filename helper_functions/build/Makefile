@@ -201,6 +201,19 @@ optitrack/fast:
 .PHONY : optitrack/fast
 
 #=============================================================================
+# Target rules for targets named calibration
+
+# Build rule for target.
+calibration: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 calibration
+.PHONY : calibration
+
+# fast build rule for target.
+calibration/fast:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/calibration.dir/build.make CMakeFiles/calibration.dir/build
+.PHONY : calibration/fast
+
+#=============================================================================
 # Target rules for targets named menu
 
 # Build rule for target.
@@ -225,6 +238,30 @@ helper_functions: cmake_check_build_system
 helper_functions/fast:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/helper_functions.dir/build.make CMakeFiles/helper_functions.dir/build
 .PHONY : helper_functions/fast
+
+src/calibration.o: src/calibration.cpp.o
+.PHONY : src/calibration.o
+
+# target to build an object file
+src/calibration.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/calibration.dir/build.make CMakeFiles/calibration.dir/src/calibration.cpp.o
+.PHONY : src/calibration.cpp.o
+
+src/calibration.i: src/calibration.cpp.i
+.PHONY : src/calibration.i
+
+# target to preprocess a source file
+src/calibration.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/calibration.dir/build.make CMakeFiles/calibration.dir/src/calibration.cpp.i
+.PHONY : src/calibration.cpp.i
+
+src/calibration.s: src/calibration.cpp.s
+.PHONY : src/calibration.s
+
+# target to generate assembly for a file
+src/calibration.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/calibration.dir/build.make CMakeFiles/calibration.dir/src/calibration.cpp.s
+.PHONY : src/calibration.cpp.s
 
 src/logger.o: src/logger.cpp.o
 .PHONY : src/logger.o
@@ -358,11 +395,15 @@ help:
 	@echo "... install/strip"
 	@echo "... list_install_components"
 	@echo "... rebuild_cache"
+	@echo "... calibration"
 	@echo "... helper_functions"
 	@echo "... logger"
 	@echo "... menu"
 	@echo "... optitrack"
 	@echo "... tello_controller"
+	@echo "... src/calibration.o"
+	@echo "... src/calibration.i"
+	@echo "... src/calibration.s"
 	@echo "... src/logger.o"
 	@echo "... src/logger.i"
 	@echo "... src/logger.s"

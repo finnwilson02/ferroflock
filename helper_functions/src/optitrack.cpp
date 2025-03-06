@@ -477,7 +477,8 @@ void OptiTrack::visualizationThreadFunc() {
         // Create visualization window with more robust error handling
         LOG_DEBUG("Creating OpenCV window - this will appear on the display");
         try {
-            cv::namedWindow("Tracker Visualization", cv::WINDOW_AUTOSIZE);
+            cv::namedWindow("Tracker Visualization", cv::WINDOW_NORMAL);
+            cv::setWindowProperty("Tracker Visualization", cv::WND_PROP_TOPMOST, 1);
             LOG_INFO("Visualization window created successfully");
         } catch (const cv::Exception& e) {
             LOG_ERROR("Failed to create visualization window: " + std::string(e.what()));
