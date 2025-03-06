@@ -24,6 +24,11 @@ void init_optitrack_viz();
 void update_optitrack_viz(double x, double y, double yaw);
 void stop_visualization();
 
+// Extern declarations for optitrack_viz.cpp functions
+extern double get_optitrack_x_for_name(const std::string& name);
+extern double get_optitrack_y_for_name(const std::string& name);
+extern double get_optitrack_yaw_for_name(const std::string& name);
+
 // Simple drone configuration structure
 struct DroneConfig {
     std::string id;
@@ -160,21 +165,20 @@ public:
     bool fly_and_log() {
         // Set up the flight timeline
         double timestamp = get_time();
-        double takeoff_end = timestamp + 2.0;  // 2s takeoff
-        double up_end = takeoff_end + 2.0;     // 2s upward
-        double forward_start = up_end;         // Forward starts
-        double forward_end = forward_start + 2.0; // 2s forward
-        double flight_end = forward_end + 1.0; // +1s after
+        double takeoff_end = timestamp + 2.0;         // 2s takeoff
+        double takeoff_wait_end = takeoff_end + 5.0;  // 5s wait after takeoff
+        double up_end = takeoff_wait_end + 2.0;       // 2s upward
+        double up_wait_end = up_end + 1.0;            // 1s wait after up phase
+        double forward_start = up_wait_end;           // Forward starts after wait
+        double forward_end = forward_start + 5.0;     // 5s forward (increased from 2s)
+        double forward_wait_end = forward_end + 1.0;  // 1s wait after forward
+        double flight_end = forward_wait_end + 1.0;   // +1s after
         
         // Create the flight data directory if it doesn't exist
         std::string data_dir = "data";
         std::filesystem::create_directories(data_dir);
 
         std::cout << "Starting flight sequence..." << std::endl;
-        std::cout << "Takeoff: 0-" << takeoff_end << "s" << std::endl;
-        std::cout << "Up flight: " << takeoff_end << "-" << up_end << "s" << std::endl;
-        std::cout << "Forward flight: " << forward_start << "-" << forward_end << "s" << std::endl;
-        std::cout << "Logging period: " << (forward_start - 1.0) << "-" << (forward_end + 1.0) << "s" << std::endl;
         std::cout << "Press Ctrl+C to abort flight (emergency stop)" << std::endl;
 
         // Emergency handler setup - static to be accessible from signal handler
@@ -193,25 +197,65 @@ public:
             // Main flight loop
             while ((timestamp = get_time()) < flight_end) {
                 double cmd_yaw = 0.0; // Forward = 0°
-                double opt_x = get_optitrack_x();
-                double opt_y = get_optitrack_y();
-                double opt_yaw = get_optitrack_yaw();
+                double opt_x = get_optitrack_x_for_name(optitrack_name_);
+                double opt_y = get_optitrack_y_for_name(optitrack_name_);
+                double opt_yaw = get_optitrack_yaw_for_name(optitrack_name_);
                 double imu_yaw = get_imu_yaw();
 
+                // Track the current phase to only print phase changes
+                static int current_phase = -1;
+                
                 // Fly drone according to the current flight phase
                 if (timestamp < takeoff_end) {
-                    send_command(0.0, 0.0, 1.0); // Takeoff (z up)
-                    std::cout << "Takeoff phase: " << (takeoff_end - timestamp) << "s remaining" << std::endl;
-                } else if (timestamp < up_end) {
-                    send_command(0.0, 0.0, 1.0); // Up
-                    std::cout << "Up phase: " << (up_end - timestamp) << "s remaining" << std::endl;
-                } else {
-                    send_command(1.0, 0.0, 0.0); // Forward (x forward)
-                    if (timestamp < forward_end) {
-                        std::cout << "Forward phase: " << (forward_end - timestamp) << "s remaining" << std::endl;
-                    } else {
-                        std::cout << "Extra logging period: " << (flight_end - timestamp) << "s remaining" << std::endl;
+                    // Phase 0: Takeoff
+                    if (current_phase != 0) {
+                        current_phase = 0;
+                        std::cout << "Taking off..." << std::endl;
                     }
+                    send_command(0.0, 0.0, 1.0); // Takeoff (z up)
+                } else if (timestamp < takeoff_wait_end) {
+                    // Phase 1: Wait after takeoff
+                    if (current_phase != 1) {
+                        current_phase = 1;
+                        std::cout << "Hovering after takeoff..." << std::endl;
+                    }
+                    send_command(0.0, 0.0, 0.0); // Hover after takeoff
+                } else if (timestamp < up_end) {
+                    // Phase 2: Up
+                    if (current_phase != 2) {
+                        current_phase = 2;
+                        std::cout << "Moving upward..." << std::endl;
+                    }
+                    send_command(0.0, 0.0, 1.0); // Up
+                } else if (timestamp < up_wait_end) {
+                    // Phase 3: Wait after up
+                    if (current_phase != 3) {
+                        current_phase = 3;
+                        std::cout << "Hovering after upward movement..." << std::endl;
+                    }
+                    send_command(0.0, 0.0, 0.0); // Hover after up phase
+                } else if (timestamp < forward_end) {
+                    // Phase 4: Forward
+                    if (current_phase != 4) {
+                        current_phase = 4;
+                        std::cout << "Moving forward..." << std::endl;
+                    }
+                    send_command(1.0, 0.0, 0.0); // Forward (x forward)
+                } else if (timestamp < forward_wait_end) {
+                    // Phase 5: Wait after forward
+                    if (current_phase != 5) {
+                        current_phase = 5;
+                        std::cout << "Hovering after forward movement..." << std::endl;
+                    }
+                    send_command(0.0, 0.0, 0.0); // Hover after forward phase
+                } else {
+                    // Phase 6: Extra logging
+                    if (current_phase != 6) {
+                        current_phase = 6;
+                        std::cout << "Finishing flight sequence..." << std::endl;
+                    }
+                    // Keep hovering during the extra logging period
+                    send_command(0.0, 0.0, 0.0);
                 }
 
                 // Log data during forward phase ±1s
@@ -229,7 +273,7 @@ public:
             // Flight sequence completed, now land the drone
             land();
             
-            std::cout << "Flight sequence completed. Data logged to flight_data.csv" << std::endl;
+            std::cout << "Flight complete." << std::endl;
             return true;
             
         } catch (const std::exception& e) {
@@ -257,51 +301,7 @@ private:
             std::chrono::system_clock::now().time_since_epoch()).count() / 1e6;
     }
 
-    // Custom functions to get OptiTrack data for this specific drone
-    double get_optitrack_x() { 
-        // Forward declare these functions from the optitrack_viz.cpp file
-        extern double get_optitrack_x_for_name(const std::string& name);
-        extern double get_optitrack_x();
-        
-        // Try to get data for this drone's specific OptiTrack name
-        double result = get_optitrack_x_for_name(optitrack_name_);
-        
-        // If no valid data, fall back to default method
-        if (result == 0.0) {
-            return ::get_optitrack_x();
-        }
-        return result;
-    }
-    
-    double get_optitrack_y() { 
-        // Forward declare these functions
-        extern double get_optitrack_y_for_name(const std::string& name);
-        extern double get_optitrack_y();
-        
-        // Try to get data for this drone's specific OptiTrack name
-        double result = get_optitrack_y_for_name(optitrack_name_);
-        
-        // If no valid data, fall back to default method
-        if (result == 0.0) {
-            return ::get_optitrack_y();
-        }
-        return result;
-    }
-    
-    double get_optitrack_yaw() { 
-        // Forward declare these functions
-        extern double get_optitrack_yaw_for_name(const std::string& name);
-        extern double get_optitrack_yaw();
-        
-        // Try to get data for this drone's specific OptiTrack name
-        double result = get_optitrack_yaw_for_name(optitrack_name_);
-        
-        // If no valid data, fall back to default method
-        if (result == 0.0) {
-            return ::get_optitrack_yaw();
-        }
-        return result;
-    }
+    // NOTE: OptiTrack functions are now accessed directly from optitrack_viz.cpp
     
     void state_receiver() {
         int sock = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
@@ -421,7 +421,7 @@ private:
         addr.sin_addr.s_addr = inet_addr(drone_ip_.c_str());
         sendto(command_sock_, command.c_str(), command.length(), 0, 
                (struct sockaddr*)&addr, sizeof(addr));
-        std::cout << "Sent command: " << command << std::endl;
+        // No longer printing each command
     }
     
     // Initialize drone for flight
@@ -429,22 +429,18 @@ private:
         std::cout << "Initializing drone..." << std::endl;
         send_command_to_drone("command");
         std::this_thread::sleep_for(std::chrono::milliseconds(500));
-        std::cout << "Drone initialized and ready for commands" << std::endl;
     }
     
     // Send takeoff command to the drone
     void takeoff() {
-        std::cout << "Sending takeoff command to drone..." << std::endl;
         send_command_to_drone("takeoff");
         std::this_thread::sleep_for(std::chrono::milliseconds(500));
-        std::cout << "Drone takeoff successful" << std::endl;
     }
     
     // Send land command to the drone
     void land() {
-        std::cout << "Sending land command to drone..." << std::endl;
+        std::cout << "Landing..." << std::endl;
         send_command_to_drone("land");
-        std::cout << "Drone landing initiated" << std::endl;
     }
     
     // Emergency stop for the drone
@@ -456,7 +452,7 @@ private:
 };
 
 // Function to reboot all drones
-void rebootAllDrones() {
+void rebootAllDrones(bool wait_for_reboot = true, bool send_land_first = false) {
     std::cout << "Rebooting all drones...\n";
     
     if (allDrones.empty()) {
@@ -464,12 +460,18 @@ void rebootAllDrones() {
         return;
     }
     
-    // Create sockets and send reboot commands to all drones simultaneously
+    // Create sockets and send reboot commands to all drones
     std::vector<int> sockets;
     for (const auto& drone : allDrones) {
-        std::cout << "Sending reboot command to drone " << drone.id 
-                  << " (IP: " << drone.ip 
-                  << ", OptiTrack: " << drone.optitrack_name << ")\n";
+        if (send_land_first) {
+            std::cout << "Sending land and reboot commands to drone " << drone.id 
+                    << " (IP: " << drone.ip 
+                    << ", OptiTrack: " << drone.optitrack_name << ")\n";
+        } else {
+            std::cout << "Sending reboot command to drone " << drone.id 
+                    << " (IP: " << drone.ip 
+                    << ", OptiTrack: " << drone.optitrack_name << ")\n";
+        }
         
         // Create socket for this drone
         int sock = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
@@ -478,36 +480,56 @@ void rebootAllDrones() {
             continue;
         }
         
-        // Send reboot command
         struct sockaddr_in addr;
         addr.sin_family = AF_INET;
         addr.sin_port = htons(8889); // Tello command port
         addr.sin_addr.s_addr = inet_addr(drone.ip.c_str());
         
-        std::string command = "reboot";
-        sendto(sock, command.c_str(), command.length(), 0, 
+        // Send land command first if requested (only when exiting)
+        if (send_land_first) {
+            std::string land_command = "land";
+            sendto(sock, land_command.c_str(), land_command.length(), 0,
+                  (struct sockaddr*)&addr, sizeof(addr));
+            
+            // Short delay to ensure land command is processed
+            std::this_thread::sleep_for(std::chrono::milliseconds(100));
+        }
+        
+        // Send reboot command
+        std::string reboot_command = "reboot";
+        sendto(sock, reboot_command.c_str(), reboot_command.length(), 0, 
                (struct sockaddr*)&addr, sizeof(addr));
         
-        // Save socket for cleanup
-        sockets.push_back(sock);
+        if (wait_for_reboot) {
+            // Save socket for cleanup later
+            sockets.push_back(sock);
+        } else {
+            // Close socket immediately if not waiting
+            close(sock);
+        }
     }
     
-    // Wait 10 seconds for all drones to reboot
-    std::cout << "All reboot commands sent. Waiting 10 seconds for drones to reboot...\n";
-    std::this_thread::sleep_for(std::chrono::seconds(10));
-    
-    // Close all sockets
-    for (int sock : sockets) {
-        close(sock);
+    if (wait_for_reboot) {
+        // Wait 10 seconds for all drones to reboot when explicitly requested
+        std::cout << "All reboot commands sent. Waiting 10 seconds for drones to reboot...\n";
+        std::this_thread::sleep_for(std::chrono::seconds(10));
+        
+        // Close all sockets
+        for (int sock : sockets) {
+            close(sock);
+        }
+        
+        std::cout << "All drones rebooted.\n";
+    } else {
+        std::cout << "All reboot commands sent.\n";
     }
-    
-    std::cout << "All drones rebooted.\n";
 }
 
 // Function to handle cleanup on program exit
 void cleanup() {
     std::cout << "Cleaning up before exit...\n";
-    rebootAllDrones();
+    // Don't wait for reboot when exiting, but send land command first
+    rebootAllDrones(false, true);
 }
 
 // Function to handle a flight with a selected drone
@@ -576,7 +598,8 @@ void displayMenu() {
     
     // Handle menu options
     if (input == "R") {
-        rebootAllDrones();
+        // When explicitly requesting reboot, wait for it to complete but don't land first
+        rebootAllDrones(true, false);
     } else if (input == "Q") {
         std::cout << "Exiting program...\n";
         exit(0); // This will trigger the atexit handler
