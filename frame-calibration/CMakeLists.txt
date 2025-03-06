@@ -37,6 +37,9 @@ target_link_libraries(frame_calibration
 # Link libraries for drone_control
 target_link_libraries(drone_control
     PRIVATE
+    ${OpenCV_LIBS}
+    vrpn
+    quat
     pthread
 )
 
