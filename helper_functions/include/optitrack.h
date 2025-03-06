@@ -46,6 +46,16 @@ public:
     OptiTrack();
     ~OptiTrack();
     
+    // Set the global instance for VRPN callbacks
+    static void setInstance(OptiTrack* instance) {
+        global_instance_ = instance;
+    }
+    
+    // Get the global instance for VRPN callbacks
+    static OptiTrack* getInstance() {
+        return global_instance_;
+    }
+    
     // Initialize OptiTrack system
     void initialize();
     
@@ -116,6 +126,9 @@ private:
     
     // VRPN callback function
     static void VRPN_CALLBACK handleTrackerData(void* userData, const vrpn_TRACKERCB t);
+    
+    // Global instance for VRPN callbacks
+    static OptiTrack* global_instance_;
     
     // Visualization thread function
     void visualizationThreadFunc();

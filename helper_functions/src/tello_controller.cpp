@@ -106,6 +106,7 @@ bool TelloController::TelloDevice::sendCommand(const std::string& cmd) {
     }
     
     std::cout << "[SUCCESS] Sent " << sent << " bytes to " << ip << std::endl;
+    std::cout << "[DEBUG] Command '" << clean_cmd << "' sent to " << ip << ", bytes: " << sent << std::endl;
     
     // Don't wait for responses from Tellos - they're unreliable
     // Just assume success if the send worked

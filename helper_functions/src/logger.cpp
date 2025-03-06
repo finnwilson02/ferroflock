@@ -3,7 +3,17 @@
 // Constructor
 Logger::Logger(const std::string& filename) {
     LOG_INFO("Initializing logger with file: " + filename);
-    open(filename);
+    
+    // Extract the base filename without the directory path
+    std::string base_filename = filename;
+    size_t pos = filename.find_last_of("/\\");
+    if (pos != std::string::npos) {
+        base_filename = filename.substr(pos + 1);
+    }
+    
+    std::string full_filename = "/home/finn/ferroflock/helper_functions/data/" + base_filename;
+    LOG_DEBUG("Full path for log file: " + full_filename);
+    open(full_filename);
 }
 
 // Destructor
@@ -173,9 +183,10 @@ std::string Logger::createUniqueFilename(const std::string& prefix, const std::s
 
 // Create a data directory if it doesn't exist
 bool Logger::createDataDirectory(const std::string& dir_path) {
+    std::string full_path = "/home/finn/ferroflock/helper_functions/data";
     try {
-        LOG_DEBUG("Creating directory: " + dir_path);
-        std::filesystem::create_directories(dir_path);
+        LOG_DEBUG("Creating directory: " + full_path);
+        std::filesystem::create_directories(full_path);
         LOG_DEBUG("Directory created/verified successfully");
         return true;
     } catch (const std::exception& e) {

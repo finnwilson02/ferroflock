@@ -69,6 +69,14 @@ void Calibration::calibrateDroneOrientation(DroneData& drone, int drone_idx, std
         return;
     }
     
+    // Check if the tracker is visible in OptiTrack before proceeding
+    if (!optitrack_.isTrackerActive(drone.tracker_id)) {
+        std::cout << "[ERROR] Tracker " << drone.tracker_id << " not visible in OptiTrack. Calibration may fail." << std::endl;
+        LOG_WARNING("Tracker " + drone.tracker_id + " not active before calibration");
+    } else {
+        std::cout << "[DEBUG] Tracker " << drone.tracker_id << " is visible, proceeding with calibration" << std::endl;
+    }
+    
     // Make sure data directory exists (relative to the executable)
     std::string data_dir = "../data";
     Logger::createDataDirectory(data_dir);
@@ -135,12 +143,24 @@ void Calibration::runCalibrationRoutine(
     std::function<void()> on_complete_callback) {
     
     try {
+        // Wait a moment for OptiTrack to detect the drone
+        std::this_thread::sleep_for(std::chrono::seconds(2));
+        
+        // Check if the tracker is visible before proceeding
+        if (!optitrack_.isTrackerActive(tracker_id)) {
+            std::cout << "[ERROR] Tracker " << tracker_id << " not visible before takeoff. Aborting." << std::endl;
+            calibration_in_progress_ = false;
+            if (on_complete_callback) on_complete_callback();
+            return;
+        }
+        
         // 1. Takeoff
         LOG_INFO("Calibration step 1: Taking off");
         std::cout << "Step 1: Taking off...\n";
         tello_controller_.sendCommand(drone_ip, "command");
         std::this_thread::sleep_for(std::chrono::milliseconds(500));
         tello_controller_.sendCommand(drone_ip, "takeoff");
+        std::this_thread::sleep_for(std::chrono::milliseconds(500));
         
         // Wait for takeoff to complete
         std::this_thread::sleep_for(std::chrono::seconds(5));
@@ -154,11 +174,15 @@ void Calibration::runCalibrationRoutine(
         takeoff_data.yaw_corrected = optitrack_.getYaw(tracker_id);
         takeoff_data.commanded_yaw = 0.0; // No command yet
         calibration_logger.logData(takeoff_data);
+        std::cout << "[DEBUG] Logged data for " << tracker_id << ": x=" << takeoff_data.x 
+                  << ", y=" << takeoff_data.y << ", z=" << takeoff_data.z 
+                  << ", yaw=" << takeoff_data.yaw_corrected << std::endl;
         
         // 2. Move upward for 3 seconds
         LOG_INFO("Calibration step 2: Moving upward for 3 seconds");
         std::cout << "Step 2: Moving upward for 3 seconds...\n";
         tello_controller_.sendCommand(drone_ip, "up 50");
+        std::this_thread::sleep_for(std::chrono::milliseconds(500));
         
         // Log positions while moving upward (30 samples over 3 seconds)
         for (int i = 0; i < 30; i++) {
@@ -171,6 +195,13 @@ void Calibration::runCalibrationRoutine(
             data.commanded_yaw = 0.0; // No yaw command
             calibration_logger.logData(data);
             
+            // Only print every 5th sample to avoid too much output
+            if (i % 5 == 0) {
+                std::cout << "[DEBUG] Logged data for " << tracker_id << ": x=" << data.x 
+                          << ", y=" << data.y << ", z=" << data.z 
+                          << ", yaw=" << data.yaw_corrected << std::endl;
+            }
+            
             std::this_thread::sleep_for(std::chrono::milliseconds(100));
         }
         
@@ -180,6 +211,7 @@ void Calibration::runCalibrationRoutine(
         LOG_INFO("Calibration step 3: Moving forward for 5 seconds");
         std::cout << "Step 3: Moving forward for 5 seconds...\n";
         tello_controller_.sendCommand(drone_ip, "forward 50");
+        std::this_thread::sleep_for(std::chrono::milliseconds(500));
         
         // Initialize variables to store yaw values
         std::vector<double> yaw_values;
@@ -201,6 +233,13 @@ void Calibration::runCalibrationRoutine(
                 yaw_values.push_back(data.yaw_corrected);
             }
             
+            // Only print every 10th sample to avoid too much output
+            if (i % 10 == 0) {
+                std::cout << "[DEBUG] Logged data for " << tracker_id << ": x=" << data.x 
+                          << ", y=" << data.y << ", z=" << data.z 
+                          << ", yaw=" << data.yaw_corrected << std::endl;
+            }
+            
             std::this_thread::sleep_for(std::chrono::milliseconds(100));
         }
         
@@ -208,11 +247,18 @@ void Calibration::runCalibrationRoutine(
         LOG_INFO("Calibration step 4: Landing");
         std::cout << "Step 4: Landing...\n";
         tello_controller_.sendCommand(drone_ip, "land");
+        std::this_thread::sleep_for(std::chrono::milliseconds(500));
         std::this_thread::sleep_for(std::chrono::seconds(5));
         
         // 5. Calculate yaw offset
         LOG_INFO("Calibration step 5: Calculating yaw offset");
         std::cout << "Step 5: Calculating yaw offset...\n";
+        
+        // Print debug info about collected yaw values
+        std::cout << "[DEBUG] Yaw values collected: " << yaw_values.size() << std::endl;
+        if (yaw_values.empty()) {
+            std::cout << "[ERROR] No yaw data collected for " << tracker_id << std::endl;
+        }
         
         // Calculate average yaw during forward flight
         double sum_sin = 0, sum_cos = 0;

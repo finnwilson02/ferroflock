@@ -3,11 +3,25 @@
 #include <algorithm>
 #include <cmath>
 
+// Initialize static member
+OptiTrack* OptiTrack::global_instance_ = nullptr;
+
 // Constructor
 OptiTrack::OptiTrack() {
     LOG_INFO("Initializing OptiTrack system");
     running_ = false;
     viz_initialized_ = false;
+    
+    // Override the const values with non-const references
+    const_cast<double&>(scale_) = 25.0;  // Reduced scale to keep markers on-screen
+    const_cast<double&>(offset_x_) = 0.0;
+    const_cast<double&>(offset_y_) = 0.0;
+    
+    // Set this instance as the global instance for callbacks
+    if (global_instance_ == nullptr) {
+        global_instance_ = this;
+        LOG_INFO("Set global OptiTrack instance for callbacks");
+    }
 }
 
 // Destructor
@@ -82,6 +96,8 @@ void OptiTrack::initializeTrackers() {
         
         tracker->register_change_handler(tracker_name, handleTrackerData);
         vrpn_trackers_.push_back({tracker_name, tracker});
+        
+        std::cout << "[DEBUG] Registered tracker: " << connection_string << std::endl;
         
         // Initialize tracker with empty path
         TrackerData td;
@@ -343,10 +359,9 @@ bool OptiTrack::isTrackerActive(const std::string& tracker_name) {
 
 // Convert world coordinates to screen coordinates for visualization
 cv::Point OptiTrack::worldToScreen(double x, double y, const cv::Point& center) {
-    return cv::Point(
-        center.x + static_cast<int>((x + offset_x_) * scale_),
-        center.y - static_cast<int>((y + offset_y_) * scale_)  // Flip Y for screen coordinates
-    );
+    int screen_x = center.x + static_cast<int>((x + offset_x_) * scale_);
+    int screen_y = center.y - static_cast<int>((y + offset_y_) * scale_);  // Flip Y for screen coordinates
+    return cv::Point(screen_x, screen_y);
 }
 
 // Convert quaternion to yaw angle
@@ -394,15 +409,12 @@ double OptiTrack::correctYawFlip(double measured_yaw, double previous_yaw) {
 void VRPN_CALLBACK OptiTrack::handleTrackerData(void* userData, const vrpn_TRACKERCB t) {
     std::string* name = static_cast<std::string*>(userData);
     
-    // This is a static method, so we need to get the OptiTrack instance
-    // We'll assume there's only one OptiTrack instance for now
-    static OptiTrack* optitrack_instance = nullptr;
+    // Get the global OptiTrack instance
+    OptiTrack* optitrack_instance = OptiTrack::global_instance_;
     
     if (!optitrack_instance) {
-        // Just update the data directly in the global tracker map
-        // This isn't ideal, but it allows us to avoid having to pass the OptiTrack instance
-        // to the callback
-        LOG_DEBUG("VRPN callback for " + *name + " - OptiTrack instance not set");
+        // No instance available
+        LOG_ERROR("VRPN callback for " + *name + " - No OptiTrack instance available");
         return;
     }
     
@@ -440,7 +452,7 @@ void VRPN_CALLBACK OptiTrack::handleTrackerData(void* userData, const vrpn_TRACK
     }
     
     // Add current position to path history (for visualization)
-    cv::Point center(500, 400); // Must match the center in visualization thread
+    cv::Point center(600, 450); // Matches 1200x900 visualization window
     cv::Point pos = optitrack_instance->worldToScreen(t.pos[0], t.pos[1], center);
     tracker.path.push_back(pos);
     
@@ -478,6 +490,7 @@ void OptiTrack::visualizationThreadFunc() {
         LOG_DEBUG("Creating OpenCV window - this will appear on the display");
         try {
             cv::namedWindow("Tracker Visualization", cv::WINDOW_NORMAL);
+            cv::resizeWindow("Tracker Visualization", 1200, 900); // Larger default size
             cv::setWindowProperty("Tracker Visualization", cv::WND_PROP_TOPMOST, 1);
             LOG_INFO("Visualization window created successfully");
         } catch (const cv::Exception& e) {
@@ -486,8 +499,8 @@ void OptiTrack::visualizationThreadFunc() {
         }
         
         // Create display buffer
-        cv::Mat display(800, 1000, CV_8UC3);  // Larger display
-        LOG_INFO("Visualization display buffer created successfully (800x1000)");
+        cv::Mat display(900, 1200, CV_8UC3);  // Match new window size
+        LOG_INFO("Visualization display buffer created successfully (1200x900)");
         
         int frame_count = 0;
         auto start_time = std::chrono::steady_clock::now();
@@ -518,7 +531,7 @@ void OptiTrack::visualizationThreadFunc() {
             display = cv::Scalar(0, 0, 0);
             
             // Draw grid
-            cv::Point center(display.cols/2, display.rows/2);
+            cv::Point center(600, 450); // Fixed center to match the one in callback
             const int grid_size = 10;
             
             // Draw coordinate grid
@@ -560,6 +573,8 @@ void OptiTrack::visualizationThreadFunc() {
                     tracker_to_drone[drone.tracker_id] = drone.name;
                 }
                 
+                // Tracker diagnostics removed
+                
                 // Collect and sort tracker names
                 std::vector<std::string> tracker_names;
                 for (const auto& t : trackers_) {
@@ -572,6 +587,8 @@ void OptiTrack::visualizationThreadFunc() {
                     const auto& tracker = trackers_[name];
                     auto time_diff = std::chrono::duration_cast<std::chrono::seconds>(
                         now - tracker.last_update).count();
+                    
+                    // Tracker status debug output removed
                     
                     // Status text
                     cv::Scalar status_color = time_diff < 3 ? cv::Scalar(0, 255, 0) : cv::Scalar(128, 128, 128);
@@ -586,9 +603,11 @@ void OptiTrack::visualizationThreadFunc() {
                     text_y += 20;
                     
                     // Only draw visible trackers
-                    if (time_diff < 3) {
-                        // Draw tracker position
+                    if (time_diff < 3 && tracker.updated) {
                         cv::Point pos = worldToScreen(tracker.x, tracker.y, center);
+                        cv::circle(display, pos, 10, tracker.color, -1);
+                        std::string pos_text = name + ": (" + std::to_string(tracker.x) + ", " + std::to_string(tracker.y) + ")";
+                        cv::putText(display, pos_text, pos + cv::Point(15, 5), cv::FONT_HERSHEY_SIMPLEX, 0.5, cv::Scalar(255, 255, 255));
                         
                         // Draw path history
                         if (tracker.path.size() > 1) {
@@ -617,14 +636,6 @@ void OptiTrack::visualizationThreadFunc() {
                         cv::Point arrowEnd(pos.x + static_cast<int>(vx * length), 
                                           pos.y - static_cast<int>(vy * length)); // Flip Y for screen coords
                         cv::arrowedLine(display, pos, arrowEnd, tracker.color, 2, cv::LINE_AA, 0, 0.3);
-                        
-                        // Draw position circle
-                        cv::circle(display, pos, 5, tracker.color, -1);
-                        
-                        // Draw position text
-                        std::string pos_text = name + " Z:" + std::to_string(tracker.z);
-                        cv::putText(display, pos_text, pos + cv::Point(10, 10), 
-                                  cv::FONT_HERSHEY_SIMPLEX, 0.5, tracker.color);
                         
                         // Draw yaw text
                         int raw_yaw_deg = static_cast<int>(tracker.last_raw_yaw * 180.0 / M_PI);
