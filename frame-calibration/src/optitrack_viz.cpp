@@ -298,6 +298,15 @@ void stop_visualization() {
     }
 }
 
+// Initialize the OptiTrack visualization
+void init_optitrack_viz() {
+    if (!viz_initialized) {
+        initialize_trackers();
+        running = true;
+        start_visualization();
+    }
+}
+
 // Main interface function that's called from drone_control.cpp
 void update_optitrack_viz(double x, double y, double yaw) {
     if (!viz_initialized) {

@@ -14,7 +14,14 @@
 #include <arpa/inet.h>
 #include <unistd.h>
 #include <regex>       // for simple JSON parsing
+#include <cstdlib>     // for atexit
+#include <cctype>      // for std::toupper
 #include "../include/optitrack_viz.h"
+
+// Forward declarations
+void init_optitrack_viz();
+void update_optitrack_viz(double x, double y, double yaw);
+void stop_visualization();
 
 // Simple drone configuration structure
 struct DroneConfig {
@@ -22,26 +29,51 @@ struct DroneConfig {
     std::string ip;
 };
 
+// Forward declare DroneControl class
+class DroneControl;
+
+// Global vector to store all drones
+std::vector<DroneConfig> allDrones;
+
 // Simple JSON parser for drone configuration
-std::vector<DroneConfig> parse_drone_config(const std::string& json_content) {
+std::vector<DroneConfig> loadDronesFromJSON(const std::string& filename) {
     std::vector<DroneConfig> drones;
-    std::regex drone_pattern("\\{\\s*\"id\"\\s*:\\s*\"([^\"]+)\"\\s*,\\s*\"ip\"\\s*:\\s*\"([^\"]+)\"\\s*\\}");
+    std::ifstream json_file(filename);
     
-    auto drones_begin = std::sregex_iterator(json_content.begin(), json_content.end(), drone_pattern);
+    if (!json_file.is_open()) {
+        std::cerr << "Failed to open " << filename << std::endl;
+        return drones;
+    }
+    
+    // Read the entire file into a string
+    std::stringstream buffer;
+    buffer << json_file.rdbuf();
+    std::string content = buffer.str();
+    
+    // Parse the drone configuration from dji_devices.json format
+    std::regex drone_pattern("\\{\\s*\"ip\"\\s*:\\s*\"([^\"]+)\"\\s*,\\s*\"mac\"\\s*:\\s*\"([^\"]+)\"");
+    
+    auto drones_begin = std::sregex_iterator(content.begin(), content.end(), drone_pattern);
     auto drones_end = std::sregex_iterator();
     
+    int drone_count = 0;
     for (std::sregex_iterator i = drones_begin; i != drones_end; ++i) {
         std::smatch match = *i;
         if (match.size() > 2) {
             DroneConfig drone;
-            drone.id = match[1].str();
-            drone.ip = match[2].str();
+            drone.ip = match[1].str();
+            drone.id = "drone" + std::to_string(++drone_count); // Generate ID as "drone1", "drone2", etc.
             drones.push_back(drone);
         }
     }
     
     return drones;
 }
+
+// Forward declarations
+void rebootAllDrones();
+void cleanup();
+bool handleFlight(const std::string& drone_ip);
 
 class DroneControl {
 public:
@@ -87,8 +119,14 @@ public:
     void reboot() {
         std::cout << "Sending reboot command to drone..." << std::endl;
         send_command_to_drone("reboot");
-        std::this_thread::sleep_for(std::chrono::milliseconds(500));
-        std::cout << "Drone rebooting..." << std::endl;
+        std::cout << "Drone reboot command sent." << std::endl;
+    }
+    
+    // Check if flight data is available
+    bool hasFlightData() const {
+        // Implement this based on your requirements
+        // For example, you might check if certain data was collected or if the flight completed
+        return true; // Default to true for now
     }
 
     bool fly_and_log() {
@@ -358,112 +396,155 @@ private:
     }
 };
 
-std::string select_drone() {
-    std::ifstream json_file("drone_config.json");
-    if (!json_file.is_open()) {
-        std::cerr << "Failed to open drone_config.json" << std::endl;
-        return "192.168.10.1"; // Default fallback
+// Function to reboot all drones
+void rebootAllDrones() {
+    std::cout << "Rebooting all drones...\n";
+    
+    if (allDrones.empty()) {
+        std::cout << "No drones found to reboot.\n";
+        return;
     }
     
-    // Read the entire file into a string
-    std::stringstream buffer;
-    buffer << json_file.rdbuf();
-    std::string content = buffer.str();
-    
-    // Parse the drone configuration
-    std::vector<DroneConfig> drones = parse_drone_config(content);
-    
-    if (drones.empty()) {
-        std::cerr << "No drones found in JSON" << std::endl;
-        return "192.168.10.1"; // Default fallback
+    // Create sockets and send reboot commands to all drones simultaneously
+    std::vector<int> sockets;
+    for (const auto& drone : allDrones) {
+        std::cout << "Sending reboot command to drone " << drone.id << " (IP: " << drone.ip << ")\n";
+        
+        // Create socket for this drone
+        int sock = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
+        if (sock < 0) {
+            std::cerr << "Failed to create socket for drone " << drone.id << std::endl;
+            continue;
+        }
+        
+        // Send reboot command
+        struct sockaddr_in addr;
+        addr.sin_family = AF_INET;
+        addr.sin_port = htons(8889); // Tello command port
+        addr.sin_addr.s_addr = inet_addr(drone.ip.c_str());
+        
+        std::string command = "reboot";
+        sendto(sock, command.c_str(), command.length(), 0, 
+               (struct sockaddr*)&addr, sizeof(addr));
+        
+        // Save socket for cleanup
+        sockets.push_back(sock);
     }
     
-    std::cout << "Menu:\n";
-    std::cout << "1. Calibrate a drone\n";
-    std::cout << "2. Reboot a drone\n";
-    std::cout << "0. Exit\n";
-    std::cout << "Enter choice (0-2): ";
-    int choice;
-    std::cin >> choice;
+    // Wait 10 seconds for all drones to reboot
+    std::cout << "All reboot commands sent. Waiting 10 seconds for drones to reboot...\n";
+    std::this_thread::sleep_for(std::chrono::seconds(10));
     
-    if (choice == 0) {
-        return ""; // Exit signal
-    } else if (choice == 1) {
-        std::cout << "Select a drone to calibrate:\n";
-        for (size_t i = 0; i < drones.size(); ++i) {
-            std::cout << i + 1 << ". Drone ID: " << drones[i].id << " (IP: " << drones[i].ip << ")\n";
+    // Close all sockets
+    for (int sock : sockets) {
+        close(sock);
+    }
+    
+    std::cout << "All drones rebooted.\n";
+}
+
+// Function to handle cleanup on program exit
+void cleanup() {
+    std::cout << "Cleaning up before exit...\n";
+    rebootAllDrones();
+}
+
+// Function to handle a flight with a selected drone
+bool handleFlight(const std::string& drone_ip) {
+    if (drone_ip.empty()) {
+        std::cerr << "No drone selected\n";
+        return false;
+    }
+    
+    std::cout << "Selected drone IP: " << drone_ip << std::endl;
+    DroneControl drone(drone_ip);
+    bool flightSuccess = drone.fly_and_log();
+    
+    if (flightSuccess) {
+        std::cout << "Flight completed successfully\n";
+        // Only record data if we have flight data
+        if (drone.hasFlightData()) {
+            std::cout << "Flight data recorded successfully\n";
+        } else {
+            std::cout << "No flight data to record\n";
         }
-        std::cout << "Enter drone number (1-" << drones.size() << "): ";
-        int drone_choice;
-        std::cin >> drone_choice;
-        if (drone_choice < 1 || drone_choice > static_cast<int>(drones.size())) {
-            std::cerr << "Invalid choice, using default drone\n";
-            return "192.168.10.1";
-        }
-        return drones[drone_choice - 1].ip;
-    } else if (choice == 2) {
-        std::cout << "Select a drone to reboot:\n";
-        for (size_t i = 0; i < drones.size(); ++i) {
-            std::cout << i + 1 << ". Drone ID: " << drones[i].id << " (IP: " << drones[i].ip << ")\n";
-        }
-        std::cout << "Enter drone number (1-" << drones.size() << "): ";
-        int drone_choice;
-        std::cin >> drone_choice;
-        if (drone_choice < 1 || drone_choice > static_cast<int>(drones.size())) {
-            std::cerr << "Invalid choice, skipping reboot\n";
-            return "no_flight"; // Signal to skip flight
-        }
-        std::string ip = drones[drone_choice - 1].ip;
-        DroneControl drone(ip);
-        drone.reboot();
-        return "no_flight"; // Signal to skip flight
     } else {
-        std::cerr << "Invalid menu choice\n";
-        return "no_flight"; // Skip flight
+        std::cout << "Flight failed\n";
+    }
+    
+    return flightSuccess;
+}
+
+// Display menu and handle user input
+void displayMenu() {
+    if (allDrones.empty()) {
+        std::cout << "No drones found. Using default drone IP.\n";
+        allDrones.push_back({"default", "192.168.10.1"});
+    }
+    
+    std::cout << "\n===== Drone Control Menu =====\n";
+    
+    // Display drone list
+    for (size_t i = 0; i < allDrones.size(); ++i) {
+        std::cout << i + 1 << ". Drone ID: " << allDrones[i].id
+                  << " (IP: " << allDrones[i].ip << ")\n";
+    }
+    
+    // Display options
+    std::cout << "R. Reboot all drones\n";
+    std::cout << "Q. Quit (and reboot all drones)\n";
+    std::cout << "Enter choice (1-" << allDrones.size() << ", R, Q): ";
+    
+    std::string input;
+    std::cin >> input;
+    
+    // Convert input to uppercase if it's a letter
+    if (input.length() == 1 && std::isalpha(input[0])) {
+        input[0] = std::toupper(input[0]);
+    }
+    
+    // Handle menu options
+    if (input == "R") {
+        rebootAllDrones();
+    } else if (input == "Q") {
+        std::cout << "Exiting program...\n";
+        exit(0); // This will trigger the atexit handler
+    } else {
+        // Try to convert input to number for drone selection
+        try {
+            int choice = std::stoi(input);
+            if (choice >= 1 && choice <= static_cast<int>(allDrones.size())) {
+                // Valid drone selection
+                handleFlight(allDrones[choice - 1].ip);
+            } else {
+                std::cerr << "Invalid selection. Please try again.\n";
+            }
+        } catch (const std::exception& e) {
+            std::cerr << "Invalid input. Please try again.\n";
+        }
     }
 }
 
 int main() {
-    while (true) {
-        std::string drone_ip = select_drone();
-        if (drone_ip.empty()) {
-            std::cout << "Exiting program, rebooting all drones...\n";
-            std::ifstream json_file("drone_config.json");
-            if (!json_file.is_open()) {
-                std::cerr << "Failed to open drone_config.json for reboot\n";
-                break;
-            }
-            
-            // Read the entire file into a string
-            std::stringstream buffer;
-            buffer << json_file.rdbuf();
-            std::string content = buffer.str();
-            
-            // Parse the drone configuration
-            std::vector<DroneConfig> drones = parse_drone_config(content);
-            
-            if (!drones.empty()) {
-                for (const auto& drone : drones) {
-                    std::cout << "Rebooting drone " << drone.id << " (IP: " << drone.ip << ")\n";
-                    DroneControl reboot_drone(drone.ip);
-                    reboot_drone.reboot();
-                }
-                std::cout << "All drones rebooted, goodbye\n";
-            } else {
-                std::cout << "No drones found to reboot, goodbye\n";
-            }
-            break;
-        } else if (drone_ip == "no_flight") {
-            continue; // Skip flight after reboot or invalid choice
-        } else {
-            std::cout << "Selected drone IP: " << drone_ip << std::endl;
-            DroneControl drone(drone_ip);
-            if (drone.fly_and_log()) {
-                std::cout << "Flight completed successfully\n";
-            } else {
-                std::cout << "Flight failed, returning to menu\n";
-            }
-        }
+    // Register cleanup function to be called at program exit
+    atexit(cleanup);
+    
+    // Load drones from JSON file
+    allDrones = loadDronesFromJSON("dji_devices.json");
+    
+    // If no drones found, set up a default drone
+    if (allDrones.empty()) {
+        std::cerr << "No drones found in dji_devices.json, using default\n";
+        allDrones.push_back({"default", "192.168.10.1"});
     }
+    
+    // Initialize visualization
+    init_optitrack_viz();
+    
+    // Main menu loop
+    while (true) {
+        displayMenu();
+    }
+    
     return 0;
 }

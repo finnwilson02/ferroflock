@@ -1,6 +1,9 @@
 #ifndef OPTITRACK_VIZ_H
 #define OPTITRACK_VIZ_H
 
+// Initialize the OptiTrack visualization
+void init_optitrack_viz();
+
 // Update the OptiTrack visualization with current position and orientation
 void update_optitrack_viz(double x, double y, double yaw);
 
