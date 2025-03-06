@@ -4,8 +4,13 @@
 CMakeFiles/drone_control.dir/src/drone_control.cpp.o: /home/finn/ferroflock/frame-calibration/src/drone_control.cpp \
   /home/finn/ferroflock/frame-calibration/include/optitrack_viz.h \
   /usr/include/alloca.h \
+  /usr/include/arpa/inet.h \
+  /usr/include/asm-generic/bitsperlong.h \
   /usr/include/asm-generic/errno-base.h \
   /usr/include/asm-generic/errno.h \
+  /usr/include/asm-generic/posix_types.h \
+  /usr/include/asm-generic/socket.h \
+  /usr/include/asm-generic/sockios.h \
   /usr/include/c++/13/algorithm \
   /usr/include/c++/13/backward/binders.h \
   /usr/include/c++/13/bit \
@@ -169,8 +174,11 @@ CMakeFiles/drone_control.dir/src/drone_control.cpp.o: /home/finn/ferroflock/fram
   /usr/include/libintl.h \
   /usr/include/linux/close_range.h \
   /usr/include/linux/errno.h \
+  /usr/include/linux/posix_types.h \
+  /usr/include/linux/stddef.h \
   /usr/include/locale.h \
   /usr/include/math.h \
+  /usr/include/netinet/in.h \
   /usr/include/pthread.h \
   /usr/include/sched.h \
   /usr/include/signal.h \
@@ -182,7 +190,12 @@ CMakeFiles/drone_control.dir/src/drone_control.cpp.o: /home/finn/ferroflock/fram
   /usr/include/unistd.h \
   /usr/include/wchar.h \
   /usr/include/wctype.h \
+  /usr/include/x86_64-linux-gnu/asm/bitsperlong.h \
   /usr/include/x86_64-linux-gnu/asm/errno.h \
+  /usr/include/x86_64-linux-gnu/asm/posix_types.h \
+  /usr/include/x86_64-linux-gnu/asm/posix_types_64.h \
+  /usr/include/x86_64-linux-gnu/asm/socket.h \
+  /usr/include/x86_64-linux-gnu/asm/sockios.h \
   /usr/include/x86_64-linux-gnu/bits/atomic_wide_counter.h \
   /usr/include/x86_64-linux-gnu/bits/byteswap.h \
   /usr/include/x86_64-linux-gnu/bits/confname.h \
@@ -198,6 +211,7 @@ CMakeFiles/drone_control.dir/src/drone_control.cpp.o: /home/finn/ferroflock/fram
   /usr/include/x86_64-linux-gnu/bits/fp-logb.h \
   /usr/include/x86_64-linux-gnu/bits/getopt_core.h \
   /usr/include/x86_64-linux-gnu/bits/getopt_posix.h \
+  /usr/include/x86_64-linux-gnu/bits/in.h \
   /usr/include/x86_64-linux-gnu/bits/iscanonical.h \
   /usr/include/x86_64-linux-gnu/bits/libc-header-start.h \
   /usr/include/x86_64-linux-gnu/bits/libm-simd-decl-stubs.h \
@@ -226,6 +240,9 @@ CMakeFiles/drone_control.dir/src/drone_control.cpp.o: /home/finn/ferroflock/fram
   /usr/include/x86_64-linux-gnu/bits/sigstack.h \
   /usr/include/x86_64-linux-gnu/bits/sigstksz.h \
   /usr/include/x86_64-linux-gnu/bits/sigthread.h \
+  /usr/include/x86_64-linux-gnu/bits/sockaddr.h \
+  /usr/include/x86_64-linux-gnu/bits/socket.h \
+  /usr/include/x86_64-linux-gnu/bits/socket_type.h \
   /usr/include/x86_64-linux-gnu/bits/ss_flags.h \
   /usr/include/x86_64-linux-gnu/bits/stdint-intn.h \
   /usr/include/x86_64-linux-gnu/bits/stdint-least.h \
@@ -262,7 +279,9 @@ CMakeFiles/drone_control.dir/src/drone_control.cpp.o: /home/finn/ferroflock/fram
   /usr/include/x86_64-linux-gnu/bits/types/stack_t.h \
   /usr/include/x86_64-linux-gnu/bits/types/struct_FILE.h \
   /usr/include/x86_64-linux-gnu/bits/types/struct___jmp_buf_tag.h \
+  /usr/include/x86_64-linux-gnu/bits/types/struct_iovec.h \
   /usr/include/x86_64-linux-gnu/bits/types/struct_itimerspec.h \
+  /usr/include/x86_64-linux-gnu/bits/types/struct_osockaddr.h \
   /usr/include/x86_64-linux-gnu/bits/types/struct_sched_param.h \
   /usr/include/x86_64-linux-gnu/bits/types/struct_sigstack.h \
   /usr/include/x86_64-linux-gnu/bits/types/struct_timespec.h \
@@ -300,6 +319,7 @@ CMakeFiles/drone_control.dir/src/drone_control.cpp.o: /home/finn/ferroflock/fram
   /usr/include/x86_64-linux-gnu/sys/cdefs.h \
   /usr/include/x86_64-linux-gnu/sys/select.h \
   /usr/include/x86_64-linux-gnu/sys/single_threaded.h \
+  /usr/include/x86_64-linux-gnu/sys/socket.h \
   /usr/include/x86_64-linux-gnu/sys/types.h \
   /usr/include/x86_64-linux-gnu/sys/ucontext.h \
   /usr/lib/gcc/x86_64-linux-gnu/13/include/stdarg.h \
@@ -766,8 +786,6 @@ CMakeFiles/drone_control.dir/src/optitrack_viz.cpp.o: /home/finn/ferroflock/fram
 
 /usr/include/x86_64-linux-gnu/bits/uio_lim.h:
 
-/usr/include/x86_64-linux-gnu/bits/socket.h:
-
 /usr/include/x86_64-linux-gnu/bits/semaphore.h:
 
 /usr/include/x86_64-linux-gnu/bits/local_lim.h:
@@ -785,12 +803,6 @@ CMakeFiles/drone_control.dir/src/optitrack_viz.cpp.o: /home/finn/ferroflock/fram
 /usr/include/opencv4/opencv2/stitching/detail/seam_finders.hpp:
 
 /usr/include/opencv4/opencv2/stitching/detail/blenders.hpp:
-
-/usr/include/x86_64-linux-gnu/bits/sockaddr.h:
-
-/usr/include/opencv4/opencv2/stitching/warpers.hpp:
-
-/usr/include/opencv4/opencv2/stitching.hpp:
 
 /usr/include/opencv4/opencv2/opencv_modules.hpp:
 
@@ -822,8 +834,6 @@ CMakeFiles/drone_control.dir/src/optitrack_viz.cpp.o: /home/finn/ferroflock/fram
 
 /usr/include/opencv4/opencv2/flann/index_testing.h:
 
-/usr/include/opencv4/opencv2/flann/hierarchical_clustering_index.h:
-
 /usr/include/opencv4/opencv2/flann/flann_base.hpp:
 
 /usr/include/opencv4/opencv2/flann/dynamic_bitset.h:
@@ -847,10 +857,6 @@ CMakeFiles/drone_control.dir/src/optitrack_viz.cpp.o: /home/finn/ferroflock/fram
 /usr/include/opencv4/opencv2/features2d.hpp:
 
 /usr/include/opencv4/opencv2/dnn/version.hpp:
-
-/usr/include/x86_64-linux-gnu/asm/bitsperlong.h:
-
-/usr/include/opencv4/opencv2/dnn/dnn.inl.hpp:
 
 /usr/include/string.h:
 
@@ -893,10 +899,6 @@ CMakeFiles/drone_control.dir/src/optitrack_viz.cpp.o: /home/finn/ferroflock/fram
 /usr/include/opencv4/opencv2/core/async.hpp:
 
 /usr/include/opencv4/opencv2/calib3d.hpp:
-
-/usr/include/netinet/in.h:
-
-/usr/include/linux/stddef.h:
 
 /usr/include/c++/13/stdlib.h:
 
@@ -959,16 +961,6 @@ CMakeFiles/drone_control.dir/src/optitrack_viz.cpp.o: /home/finn/ferroflock/fram
 /usr/include/c++/13/array:
 
 /usr/include/assert.h:
-
-/usr/include/asm-generic/sockios.h:
-
-/usr/include/opencv4/opencv2/stitching/detail/util.hpp:
-
-/usr/include/opencv4/opencv2/flann/lsh_index.h:
-
-/usr/include/asm-generic/socket.h:
-
-/usr/include/asm-generic/posix_types.h:
 
 /usr/lib/gcc/x86_64-linux-gnu/13/include/stdint.h:
 
@@ -1050,35 +1042,49 @@ CMakeFiles/drone_control.dir/src/optitrack_viz.cpp.o: /home/finn/ferroflock/fram
 
 /usr/include/x86_64-linux-gnu/bits/types/sigval_t.h:
 
-/usr/include/c++/13/istream:
+/usr/include/x86_64-linux-gnu/bits/types/siginfo_t.h:
 
-/usr/include/x86_64-linux-gnu/bits/types/struct_FILE.h:
+/usr/include/x86_64-linux-gnu/bits/types/struct_osockaddr.h:
 
-/usr/include/x86_64-linux-gnu/bits/libm-simd-decl-stubs.h:
+/usr/include/x86_64-linux-gnu/bits/types/sigevent_t.h:
+
+/usr/include/x86_64-linux-gnu/bits/types/locale_t.h:
+
+/usr/include/c++/13/bits/hashtable.h:
+
+/usr/include/x86_64-linux-gnu/bits/types/error_t.h:
+
+/usr/include/x86_64-linux-gnu/bits/types/struct___jmp_buf_tag.h:
+
+/usr/include/x86_64-linux-gnu/bits/types/clockid_t.h:
+
+/usr/lib/gcc/x86_64-linux-gnu/13/include/syslimits.h:
+
+/usr/include/x86_64-linux-gnu/bits/types/clock_t.h:
+
+/usr/include/x86_64-linux-gnu/bits/types/__sigval_t.h:
+
+/usr/include/x86_64-linux-gnu/bits/types/__mbstate_t.h:
+
+/usr/include/c++/13/bits/stl_multimap.h:
+
+/usr/include/x86_64-linux-gnu/bits/types/struct_sigstack.h:
+
+/usr/include/x86_64-linux-gnu/bits/types/__locale_t.h:
+
+/usr/include/x86_64-linux-gnu/bits/types/__fpos_t.h:
+
+/usr/include/x86_64-linux-gnu/bits/types/__fpos64_t.h:
 
 /usr/include/c++/13/bits/uses_allocator.h:
 
 /usr/include/c++/13/bits/postypes.h:
 
-/usr/include/x86_64-linux-gnu/bits/in.h:
-
-/usr/include/x86_64-linux-gnu/bits/mathcalls-narrow.h:
-
 /usr/include/c++/13/filesystem:
-
-/usr/include/opencv4/opencv2/core/cvstd.hpp:
-
-/usr/include/c++/13/iostream:
-
-/usr/include/x86_64-linux-gnu/bits/sigstksz.h:
 
 /usr/include/c++/13/ext/type_traits.h:
 
 /usr/include/c++/13/ext/string_conversions.h:
-
-/usr/include/asm-generic/bitsperlong.h:
-
-/usr/include/x86_64-linux-gnu/bits/types/sigset_t.h:
 
 /usr/include/c++/13/ext/concurrence.h:
 
@@ -1091,6 +1097,10 @@ CMakeFiles/drone_control.dir/src/optitrack_viz.cpp.o: /home/finn/ferroflock/fram
 /usr/include/opencv4/opencv2/dnn/dnn.hpp:
 
 /usr/include/c++/13/cctype:
+
+/usr/include/x86_64-linux-gnu/bits/types/sigset_t.h:
+
+/usr/include/asm-generic/bitsperlong.h:
 
 /usr/include/opencv4/opencv2/flann/lsh_table.h:
 
@@ -1109,6 +1119,12 @@ CMakeFiles/drone_control.dir/src/optitrack_viz.cpp.o: /home/finn/ferroflock/fram
 /usr/lib/gcc/x86_64-linux-gnu/13/include/xmmintrin.h:
 
 /usr/include/c++/13/fstream:
+
+/usr/include/opencv4/opencv2/flann/autotuned_index.h:
+
+/usr/include/x86_64-linux-gnu/bits/types/__sigset_t.h:
+
+/usr/include/c++/13/bits/charconv.h:
 
 /usr/include/c++/13/bits/fs_path.h:
 
@@ -1154,6 +1170,10 @@ CMakeFiles/drone_control.dir/src/optitrack_viz.cpp.o: /home/finn/ferroflock/fram
 
 /usr/include/c++/13/bits/uses_allocator_args.h:
 
+/usr/include/opencv4/opencv2/flann/hierarchical_clustering_index.h:
+
+/usr/include/arpa/inet.h:
+
 /usr/include/c++/13/pstl/glue_memory_defs.h:
 
 /usr/include/c++/13/exception:
@@ -1184,10 +1204,6 @@ CMakeFiles/drone_control.dir/src/optitrack_viz.cpp.o: /home/finn/ferroflock/fram
 
 /usr/include/x86_64-linux-gnu/bits/libc-header-start.h:
 
-/usr/include/opencv4/opencv2/core/cvstd_wrapper.hpp:
-
-/usr/include/c++/13/bits/stl_construct.h:
-
 /usr/include/c++/13/bits/stl_bvector.h:
 
 /usr/include/c++/13/unordered_map:
@@ -1206,10 +1222,6 @@ CMakeFiles/drone_control.dir/src/optitrack_viz.cpp.o: /home/finn/ferroflock/fram
 
 /usr/include/c++/13/bits/sstream.tcc:
 
-/usr/include/x86_64-linux-gnu/asm/posix_types.h:
-
-/usr/include/c++/13/cwctype:
-
 /usr/include/linux/limits.h:
 
 /usr/include/c++/13/ratio:
@@ -1226,6 +1238,40 @@ CMakeFiles/drone_control.dir/src/optitrack_viz.cpp.o: /home/finn/ferroflock/fram
 
 /usr/include/c++/13/bits/locale_facets.tcc:
 
+/usr/include/x86_64-linux-gnu/bits/struct_rwlock.h:
+
+/usr/include/c++/13/bits/quoted_string.h:
+
+/usr/include/c++/13/bits/predefined_ops.h:
+
+/usr/include/c++/13/bits/cxxabi_forced.h:
+
+/usr/include/c++/13/bits/fs_ops.h:
+
+/usr/include/c++/13/bits/stl_relops.h:
+
+/usr/include/x86_64-linux-gnu/bits/mathcalls.h:
+
+/usr/include/x86_64-linux-gnu/sys/socket.h:
+
+/usr/include/x86_64-linux-gnu/bits/types/struct_iovec.h:
+
+/usr/include/c++/13/bits/stl_vector.h:
+
+/usr/local/include/vrpn_BaseClass.h:
+
+/usr/include/c++/13/bits/stl_tempbuf.h:
+
+/usr/include/x86_64-linux-gnu/bits/pthread_stack_min-dynamic.h:
+
+/home/finn/ferroflock/frame-calibration/include/optitrack_viz.h:
+
+/usr/include/c++/13/bits/random.h:
+
+/usr/include/c++/13/bits/stl_tree.h:
+
+/usr/include/c++/13/bits/codecvt.h:
+
 /usr/include/linux/errno.h:
 
 /usr/include/c++/13/debug/debug.h:
@@ -1240,19 +1286,83 @@ CMakeFiles/drone_control.dir/src/optitrack_viz.cpp.o: /home/finn/ferroflock/fram
 
 /usr/include/x86_64-linux-gnu/bits/thread-shared-types.h:
 
-/usr/include/x86_64-linux-gnu/bits/struct_rwlock.h:
+/usr/include/asm-generic/sockios.h:
 
-/usr/include/opencv4/opencv2/flann/general.h:
+/usr/include/c++/13/bits/move.h:
 
-/usr/include/c++/13/bits/exception_ptr.h:
+/usr/include/c++/13/backward/binders.h:
 
-/usr/include/x86_64-linux-gnu/bits/sigaction.h:
+/usr/include/c++/13/bits/locale_facets.h:
 
-/usr/include/c++/13/bits/fs_fwd.h:
+/usr/include/opencv4/opencv2/core/mat.hpp:
 
-/usr/include/c++/13/bits/memoryfwd.h:
+/usr/include/x86_64-linux-gnu/bits/waitstatus.h:
 
-/usr/include/c++/13/bits/cxxabi_forced.h:
+/usr/include/c++/13/bits/exception_defines.h:
+
+/usr/include/x86_64-linux-gnu/bits/socket_type.h:
+
+/usr/include/c++/13/bits/localefwd.h:
+
+/usr/include/c++/13/bits/ptr_traits.h:
+
+/usr/include/linux/posix_types.h:
+
+/usr/include/c++/13/ext/aligned_buffer.h:
+
+/usr/include/locale.h:
+
+/usr/include/opencv4/opencv2/dnn/dnn.inl.hpp:
+
+/usr/include/x86_64-linux-gnu/asm/bitsperlong.h:
+
+/usr/include/c++/13/bits/utility.h:
+
+/usr/include/x86_64-linux-gnu/bits/pthreadtypes-arch.h:
+
+/usr/include/c++/13/list:
+
+/usr/include/c++/13/ext/alloc_traits.h:
+
+/usr/include/c++/13/new:
+
+/usr/include/c++/13/bits/alloc_traits.h:
+
+/usr/include/c++/13/bits/concept_check.h:
+
+/usr/include/x86_64-linux-gnu/bits/long-double.h:
+
+/usr/include/c++/13/bits/algorithmfwd.h:
+
+/usr/include/x86_64-linux-gnu/bits/fp-logb.h:
+
+/usr/include/wchar.h:
+
+/usr/include/c++/13/bits/shared_ptr_base.h:
+
+/usr/include/limits.h:
+
+/usr/include/c++/13/initializer_list:
+
+/usr/include/c++/13/bits/std_thread.h:
+
+/usr/include/c++/13/tr1/bessel_function.tcc:
+
+/usr/include/c++/13/bits/basic_ios.h:
+
+/usr/include/x86_64-linux-gnu/bits/time64.h:
+
+/usr/include/opencv4/opencv2/flann/kdtree_single_index.h:
+
+/usr/include/c++/13/bits/allocated_ptr.h:
+
+/usr/include/c++/13/bit:
+
+/usr/include/c++/13/bits/basic_string.tcc:
+
+/usr/include/x86_64-linux-gnu/bits/flt-eval-method.h:
+
+/usr/include/c++/13/bits/streambuf_iterator.h:
 
 /usr/include/opencv4/opencv2/core/cuda_types.hpp:
 
@@ -1270,33 +1380,33 @@ CMakeFiles/drone_control.dir/src/optitrack_viz.cpp.o: /home/finn/ferroflock/fram
 
 /usr/include/x86_64-linux-gnu/bits/types.h:
 
-/usr/include/c++/13/bits/move.h:
+/usr/include/opencv4/opencv2/core/cvstd_wrapper.hpp:
 
-/usr/include/c++/13/bits/stl_set.h:
+/usr/include/c++/13/bits/stl_construct.h:
 
-/usr/include/c++/13/bits/ostream_insert.h:
+/usr/include/asm-generic/posix_types.h:
 
-/usr/include/c++/13/bits/cxxabi_init_exception.h:
+/usr/include/x86_64-linux-gnu/bits/sigcontext.h:
 
-/usr/include/x86_64-linux-gnu/c++/13/bits/c++io.h:
+/usr/include/c++/13/tr1/special_function_util.h:
 
-/usr/include/c++/13/typeinfo:
+/usr/include/stdc-predef.h:
 
-/usr/include/c++/13/bits/exception.h:
+/usr/include/opencv4/opencv2/stitching/detail/util.hpp:
 
-/usr/include/c++/13/bits/memory_resource.h:
+/usr/include/opencv4/opencv2/flann/lsh_index.h:
 
-/usr/include/c++/13/streambuf:
+/usr/include/asm-generic/socket.h:
 
-/usr/include/opencv4/opencv2/flann/sampling.h:
+/usr/include/alloca.h:
 
-/usr/include/x86_64-linux-gnu/bits/stdlib-float.h:
+/usr/include/c++/13/bits/refwrap.h:
 
-/usr/include/c++/13/bits/fs_ops.h:
+/usr/include/c++/13/bits/fstream.tcc:
 
-/usr/include/c++/13/bits/stl_relops.h:
+/usr/include/opencv4/opencv2/flann/general.h:
 
-/usr/include/x86_64-linux-gnu/bits/mathcalls.h:
+/usr/include/c++/13/bits/exception_ptr.h:
 
 /usr/include/c++/13/bits/std_function.h:
 
@@ -1306,9 +1416,7 @@ CMakeFiles/drone_control.dir/src/optitrack_viz.cpp.o: /home/finn/ferroflock/fram
 
 /usr/include/c++/13/bits/char_traits.h:
 
-/usr/lib/gcc/x86_64-linux-gnu/13/include/syslimits.h:
-
-/usr/include/x86_64-linux-gnu/bits/types/clock_t.h:
+/usr/include/netinet/in.h:
 
 /usr/include/c++/13/bits/streambuf.tcc:
 
@@ -1328,41 +1436,9 @@ CMakeFiles/drone_control.dir/src/optitrack_viz.cpp.o: /home/finn/ferroflock/fram
 
 /usr/include/x86_64-linux-gnu/bits/endianness.h:
 
-/usr/include/x86_64-linux-gnu/asm/socket.h:
-
-/usr/include/x86_64-linux-gnu/sys/select.h:
-
-/usr/include/c++/13/cwchar:
-
-/usr/include/c++/13/bits/predefined_ops.h:
-
-/usr/include/c++/13/bits/concept_check.h:
-
-/usr/include/c++/13/bits/alloc_traits.h:
-
 /usr/include/c++/13/bits/istream.tcc:
 
 /usr/include/c++/13/bits/locale_conv.h:
-
-/usr/include/alloca.h:
-
-/usr/include/c++/13/bits/basic_string.tcc:
-
-/usr/include/opencv4/opencv2/flann/kdtree_single_index.h:
-
-/usr/include/c++/13/bits/allocated_ptr.h:
-
-/usr/include/c++/13/bit:
-
-/usr/include/c++/13/bits/refwrap.h:
-
-/usr/include/x86_64-linux-gnu/bits/types/__fpos_t.h:
-
-/usr/include/c++/13/bits/fstream.tcc:
-
-/usr/include/linux/posix_types.h:
-
-/usr/include/c++/13/bits/ptr_traits.h:
 
 /usr/lib/gcc/x86_64-linux-gnu/13/include/mmintrin.h:
 
@@ -1378,31 +1454,25 @@ CMakeFiles/drone_control.dir/src/optitrack_viz.cpp.o: /home/finn/ferroflock/fram
 
 /usr/include/x86_64-linux-gnu/bits/math-vector.h:
 
-/usr/include/c++/13/backward/binders.h:
+/usr/include/c++/13/bits/cxxabi_init_exception.h:
 
-/usr/include/c++/13/bits/locale_facets.h:
+/usr/include/x86_64-linux-gnu/c++/13/bits/c++io.h:
 
-/usr/include/opencv4/opencv2/core/mat.hpp:
+/usr/include/c++/13/typeinfo:
 
-/usr/include/x86_64-linux-gnu/bits/waitstatus.h:
+/usr/include/c++/13/bits/exception.h:
 
-/usr/include/c++/13/bits/exception_defines.h:
+/usr/include/c++/13/bits/memory_resource.h:
 
-/usr/include/x86_64-linux-gnu/bits/socket_type.h:
+/usr/include/c++/13/streambuf:
 
-/usr/include/c++/13/bits/localefwd.h:
+/usr/include/x86_64-linux-gnu/bits/types/sig_atomic_t.h:
 
-/usr/include/c++/13/bits/streambuf_iterator.h:
+/usr/include/x86_64-linux-gnu/bits/ss_flags.h:
 
-/usr/include/x86_64-linux-gnu/bits/flt-eval-method.h:
+/usr/include/opencv4/opencv2/flann/sampling.h:
 
-/usr/include/c++/13/ext/aligned_buffer.h:
-
-/usr/include/locale.h:
-
-/usr/include/c++/13/bits/utility.h:
-
-/usr/include/x86_64-linux-gnu/bits/pthreadtypes-arch.h:
+/usr/include/x86_64-linux-gnu/bits/stdlib-float.h:
 
 /usr/local/include/vrpn_Shared.h:
 
@@ -1410,47 +1480,29 @@ CMakeFiles/drone_control.dir/src/optitrack_viz.cpp.o: /home/finn/ferroflock/fram
 
 /usr/include/c++/13/pstl/execution_defs.h:
 
-/usr/include/wchar.h:
+/usr/include/linux/stddef.h:
 
-/usr/include/c++/13/bits/shared_ptr_base.h:
+/usr/include/c++/13/bits/stl_set.h:
 
-/usr/include/limits.h:
+/usr/include/c++/13/bits/ostream_insert.h:
 
-/usr/include/c++/13/initializer_list:
+/usr/include/x86_64-linux-gnu/bits/sigaction.h:
 
-/usr/include/c++/13/bits/std_thread.h:
+/usr/include/c++/13/bits/fs_fwd.h:
 
-/usr/include/c++/13/tr1/bessel_function.tcc:
+/usr/include/c++/13/bits/memoryfwd.h:
 
-/usr/include/c++/13/bits/basic_ios.h:
+/usr/include/opencv4/opencv2/core/cuda.hpp:
 
-/usr/include/x86_64-linux-gnu/bits/time64.h:
+/usr/include/x86_64-linux-gnu/bits/setjmp.h:
 
-/usr/include/x86_64-linux-gnu/bits/long-double.h:
+/usr/include/x86_64-linux-gnu/bits/getopt_posix.h:
 
-/usr/include/c++/13/bits/algorithmfwd.h:
-
-/usr/include/x86_64-linux-gnu/bits/fp-logb.h:
-
-/usr/include/c++/13/list:
-
-/usr/include/c++/13/ext/alloc_traits.h:
-
-/usr/include/c++/13/new:
-
-/usr/include/c++/13/ios:
-
-/usr/include/opencv4/opencv2/flann/logger.h:
-
-/usr/include/x86_64-linux-gnu/bits/types/wint_t.h:
-
-/usr/include/c++/13/limits:
+/usr/include/time.h:
 
 /usr/include/c++/13/bits/functional_hash.h:
 
 /usr/include/errno.h:
-
-/usr/include/x86_64-linux-gnu/bits/types/__sigval_t.h:
 
 /usr/include/opencv4/opencv2/flann/random.h:
 
@@ -1458,29 +1510,21 @@ CMakeFiles/drone_control.dir/src/optitrack_viz.cpp.o: /home/finn/ferroflock/fram
 
 /usr/include/c++/13/bits/ostream.tcc:
 
-/usr/include/c++/13/bits/quoted_string.h:
-
 /usr/include/c++/13/bits/uniform_int_dist.h:
 
 /usr/include/c++/13/bits/locale_classes.tcc:
 
-/usr/include/x86_64-linux-gnu/bits/ss_flags.h:
-
-/usr/include/x86_64-linux-gnu/bits/types/sig_atomic_t.h:
-
-/usr/include/x86_64-linux-gnu/bits/pthread_stack_min-dynamic.h:
-
-/home/finn/ferroflock/frame-calibration/include/optitrack_viz.h:
-
-/usr/local/include/vrpn_BaseClass.h:
-
-/usr/include/c++/13/bits/stl_tempbuf.h:
-
 /usr/include/c++/13/bits/fs_dir.h:
+
+/usr/include/x86_64-linux-gnu/bits/types/cookie_io_functions_t.h:
+
+/usr/include/c++/13/sstream:
 
 /usr/include/x86_64-linux-gnu/bits/confname.h:
 
 /usr/include/c++/13/bits/locale_facets_nonio.h:
+
+/usr/include/c++/13/bits/locale_facets_nonio.tcc:
 
 /usr/include/c++/13/bits/invoke.h:
 
@@ -1496,19 +1540,25 @@ CMakeFiles/drone_control.dir/src/optitrack_viz.cpp.o: /home/finn/ferroflock/fram
 
 /usr/include/c++/13/bits/parse_numbers.h:
 
-/usr/include/c++/13/bits/locale_facets_nonio.tcc:
+/usr/include/c++/13/ios:
 
-/usr/include/x86_64-linux-gnu/sys/socket.h:
+/usr/include/opencv4/opencv2/core/cvstd.hpp:
 
-/usr/include/x86_64-linux-gnu/bits/types/struct_iovec.h:
+/usr/include/c++/13/iostream:
 
-/usr/include/c++/13/bits/stl_vector.h:
+/usr/include/x86_64-linux-gnu/bits/sigstksz.h:
 
-/usr/include/c++/13/bits/stl_tree.h:
+/usr/include/c++/13/istream:
 
-/usr/include/c++/13/bits/codecvt.h:
+/usr/include/x86_64-linux-gnu/bits/types/struct_FILE.h:
 
-/usr/include/c++/13/bits/random.h:
+/usr/include/x86_64-linux-gnu/bits/libm-simd-decl-stubs.h:
+
+/usr/include/opencv4/opencv2/flann/logger.h:
+
+/usr/include/x86_64-linux-gnu/bits/types/wint_t.h:
+
+/usr/include/c++/13/limits:
 
 /usr/include/x86_64-linux-gnu/bits/posix1_lim.h:
 
@@ -1558,12 +1608,6 @@ CMakeFiles/drone_control.dir/src/optitrack_viz.cpp.o: /home/finn/ferroflock/fram
 
 /usr/include/c++/13/tr1/poly_hermite.tcc:
 
-/usr/include/x86_64-linux-gnu/bits/sigcontext.h:
-
-/usr/include/c++/13/tr1/special_function_util.h:
-
-/usr/include/stdc-predef.h:
-
 /usr/include/c++/13/cfloat:
 
 /usr/include/c++/13/bits/list.tcc:
@@ -1571,8 +1615,6 @@ CMakeFiles/drone_control.dir/src/optitrack_viz.cpp.o: /home/finn/ferroflock/fram
 /usr/include/c++/13/bits/nested_exception.h:
 
 /usr/include/c++/13/tuple:
-
-/usr/include/x86_64-linux-gnu/bits/types/siginfo_t.h:
 
 /usr/include/opencv4/opencv2/flann/miniflann.hpp:
 
@@ -1616,6 +1658,12 @@ CMakeFiles/drone_control.dir/src/optitrack_viz.cpp.o: /home/finn/ferroflock/fram
 
 /usr/include/stdlib.h:
 
+/usr/include/x86_64-linux-gnu/sys/select.h:
+
+/usr/include/c++/13/cwchar:
+
+/usr/include/x86_64-linux-gnu/asm/socket.h:
+
 /usr/include/unistd.h:
 
 /usr/include/x86_64-linux-gnu/c++/13/bits/gthr-default.h:
@@ -1625,6 +1673,16 @@ CMakeFiles/drone_control.dir/src/optitrack_viz.cpp.o: /home/finn/ferroflock/fram
 /usr/include/x86_64-linux-gnu/bits/stdint-uintn.h:
 
 /usr/include/x86_64-linux-gnu/asm/errno.h:
+
+/usr/include/c++/13/cwctype:
+
+/usr/include/x86_64-linux-gnu/asm/posix_types.h:
+
+/usr/include/x86_64-linux-gnu/bits/types/__FILE.h:
+
+/usr/include/math.h:
+
+/usr/include/x86_64-linux-gnu/asm/sockios.h:
 
 /usr/include/x86_64-linux-gnu/bits/atomic_wide_counter.h:
 
@@ -1652,6 +1710,10 @@ CMakeFiles/drone_control.dir/src/optitrack_viz.cpp.o: /home/finn/ferroflock/fram
 
 /usr/include/x86_64-linux-gnu/bits/getopt_core.h:
 
+/usr/include/x86_64-linux-gnu/bits/mathcalls-narrow.h:
+
+/usr/include/x86_64-linux-gnu/bits/in.h:
+
 /usr/include/opencv4/opencv2/flann/saving.h:
 
 /usr/include/c++/13/map:
@@ -1668,10 +1730,6 @@ CMakeFiles/drone_control.dir/src/optitrack_viz.cpp.o: /home/finn/ferroflock/fram
 
 /usr/include/x86_64-linux-gnu/bits/mathcalls-helper-functions.h:
 
-/usr/include/c++/13/bits/hashtable.h:
-
-/usr/include/x86_64-linux-gnu/bits/types/error_t.h:
-
 /usr/include/c++/13/climits:
 
 /usr/include/x86_64-linux-gnu/bits/posix_opt.h:
@@ -1679,16 +1737,6 @@ CMakeFiles/drone_control.dir/src/optitrack_viz.cpp.o: /home/finn/ferroflock/fram
 /usr/include/x86_64-linux-gnu/bits/pthreadtypes.h:
 
 /usr/include/x86_64-linux-gnu/bits/sched.h:
-
-/usr/include/opencv4/opencv2/core/cuda.hpp:
-
-/usr/include/time.h:
-
-/usr/include/x86_64-linux-gnu/bits/getopt_posix.h:
-
-/usr/include/x86_64-linux-gnu/bits/setjmp.h:
-
-/usr/include/x86_64-linux-gnu/bits/types/__fpos64_t.h:
 
 /usr/lib/gcc/x86_64-linux-gnu/13/include/stdarg.h:
 
@@ -1702,7 +1750,15 @@ CMakeFiles/drone_control.dir/src/optitrack_viz.cpp.o: /home/finn/ferroflock/fram
 
 /usr/include/x86_64-linux-gnu/bits/sigstack.h:
 
+/usr/include/x86_64-linux-gnu/bits/socket.h:
+
 /usr/include/x86_64-linux-gnu/bits/sigthread.h:
+
+/usr/include/opencv4/opencv2/stitching/warpers.hpp:
+
+/usr/include/opencv4/opencv2/stitching.hpp:
+
+/usr/include/x86_64-linux-gnu/bits/sockaddr.h:
 
 /usr/include/x86_64-linux-gnu/bits/select.h:
 
@@ -1715,37 +1771,3 @@ CMakeFiles/drone_control.dir/src/optitrack_viz.cpp.o: /home/finn/ferroflock/fram
 /usr/include/x86_64-linux-gnu/bits/stdio_lim.h:
 
 /usr/include/x86_64-linux-gnu/bits/timex.h:
-
-/usr/include/x86_64-linux-gnu/asm/sockios.h:
-
-/usr/include/math.h:
-
-/usr/include/x86_64-linux-gnu/bits/types/__FILE.h:
-
-/usr/include/c++/13/bits/stl_multimap.h:
-
-/usr/include/x86_64-linux-gnu/bits/types/struct_sigstack.h:
-
-/usr/include/x86_64-linux-gnu/bits/types/__locale_t.h:
-
-/usr/include/x86_64-linux-gnu/bits/types/__mbstate_t.h:
-
-/usr/include/opencv4/opencv2/flann/autotuned_index.h:
-
-/usr/include/c++/13/bits/charconv.h:
-
-/usr/include/x86_64-linux-gnu/bits/types/__sigset_t.h:
-
-/usr/include/x86_64-linux-gnu/bits/types/struct___jmp_buf_tag.h:
-
-/usr/include/x86_64-linux-gnu/bits/types/clockid_t.h:
-
-/usr/include/c++/13/sstream:
-
-/usr/include/x86_64-linux-gnu/bits/types/cookie_io_functions_t.h:
-
-/usr/include/x86_64-linux-gnu/bits/types/locale_t.h:
-
-/usr/include/x86_64-linux-gnu/bits/types/struct_osockaddr.h:
-
-/usr/include/x86_64-linux-gnu/bits/types/sigevent_t.h:
