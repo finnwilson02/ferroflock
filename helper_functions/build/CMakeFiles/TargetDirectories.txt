@@ -1,0 +1,11 @@
+/home/finn/ferroflock/helper_functions/build/CMakeFiles/tello_controller.dir
+/home/finn/ferroflock/helper_functions/build/CMakeFiles/logger.dir
+/home/finn/ferroflock/helper_functions/build/CMakeFiles/optitrack.dir
+/home/finn/ferroflock/helper_functions/build/CMakeFiles/menu.dir
+/home/finn/ferroflock/helper_functions/build/CMakeFiles/helper_functions.dir
+/home/finn/ferroflock/helper_functions/build/CMakeFiles/edit_cache.dir
+/home/finn/ferroflock/helper_functions/build/CMakeFiles/rebuild_cache.dir
+/home/finn/ferroflock/helper_functions/build/CMakeFiles/list_install_components.dir
+/home/finn/ferroflock/helper_functions/build/CMakeFiles/install.dir
+/home/finn/ferroflock/helper_functions/build/CMakeFiles/install/local.dir
+/home/finn/ferroflock/helper_functions/build/CMakeFiles/install/strip.dir

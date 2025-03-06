@@ -1,0 +1,2 @@
+/usr/bin/ar qc libtello_controller.a CMakeFiles/tello_controller.dir/src/tello_controller.cpp.o
+/usr/bin/ranlib libtello_controller.a

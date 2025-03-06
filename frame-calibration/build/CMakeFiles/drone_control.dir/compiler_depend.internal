@@ -134,6 +134,7 @@ CMakeFiles/drone_control.dir/src/drone_control.cpp.o
  /usr/include/c++/13/cstdint
  /usr/include/c++/13/cstdio
  /usr/include/c++/13/cstdlib
+ /usr/include/c++/13/cstring
  /usr/include/c++/13/ctime
  /usr/include/c++/13/cwchar
  /usr/include/c++/13/cwctype
@@ -213,6 +214,8 @@ CMakeFiles/drone_control.dir/src/drone_control.cpp.o
  /usr/include/stdint.h
  /usr/include/stdio.h
  /usr/include/stdlib.h
+ /usr/include/string.h
+ /usr/include/strings.h
  /usr/include/time.h
  /usr/include/unistd.h
  /usr/include/wchar.h

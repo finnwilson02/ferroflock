@@ -17,7 +17,14 @@
 #include <cstdlib>     // for atexit
 #include <cctype>      // for std::toupper
 #include <map>         // for std::map
+#include <cstring>
 #include "../include/optitrack_viz.h"
+
+// Logging functions
+#define LOG_INFO(msg) std::cout << "[DRONE_CONTROL][INFO] " << msg << std::endl
+#define LOG_ERROR(msg) std::cerr << "[DRONE_CONTROL][ERROR] " << msg << std::endl
+#define LOG_DEBUG(msg) std::cout << "[DRONE_CONTROL][DEBUG] " << msg << std::endl
+#define LOG_WARNING(msg) std::cout << "[DRONE_CONTROL][WARNING] " << msg << std::endl
 
 // Forward declarations
 void init_optitrack_viz();
@@ -111,40 +118,92 @@ class DroneControl {
 public:
     DroneControl(const std::string& drone_ip, const std::string& optitrack_name = "") 
         : drone_ip_(drone_ip), optitrack_name_(optitrack_name.empty() ? "Bird1" : optitrack_name) {
+        LOG_DEBUG("Creating DroneControl for IP: " + drone_ip_ + ", OptiTrack: " + optitrack_name_);
+        
+        // Open the flight data CSV file
+        LOG_DEBUG("Opening flight_data.csv for logging");
         file_.open("flight_data.csv", std::ios::app);
-        if (file_.tellp() == 0) {
-            file_ << "timestamp,commanded_yaw_deg,optitrack_x_m,optitrack_y_m,optitrack_yaw_deg,imu_yaw_deg\n";
-            file_.flush();
+        if (!file_.is_open()) {
+            LOG_ERROR("Failed to open flight_data.csv for writing");
+        } else {
+            LOG_DEBUG("Successfully opened flight_data.csv");
+            
+            // Write header if file is new
+            if (file_.tellp() == 0) {
+                LOG_DEBUG("Adding CSV header to flight_data.csv");
+                file_ << "timestamp,commanded_yaw_deg,optitrack_x_m,optitrack_y_m,optitrack_yaw_deg,imu_yaw_deg\n";
+                file_.flush();
+            }
         }
+        
+        // Create command socket
+        LOG_DEBUG("Creating UDP command socket");
         command_sock_ = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
         if (command_sock_ < 0) {
-            std::cerr << "Failed to create command socket" << std::endl;
+            LOG_ERROR("Failed to create command socket: " + std::string(strerror(errno)));
+        } else {
+            LOG_DEBUG("Command socket created successfully with descriptor: " + std::to_string(command_sock_));
         }
+        
+        // Start state receiver thread
+        LOG_DEBUG("Starting state receiver thread");
         state_receiver_thread_ = std::thread(&DroneControl::state_receiver, this);
+        LOG_DEBUG("DroneControl initialization complete");
     }
 
     ~DroneControl() {
+        LOG_DEBUG("DroneControl destructor called for IP: " + drone_ip_);
+        
+        // Close the flight data file
         if (file_.is_open()) {
+            LOG_DEBUG("Closing flight_data.csv");
             file_.close();
         }
         
+        // Stop and join the state receiver thread
+        LOG_DEBUG("Stopping state receiver thread");
         stop_state_receiver_ = true;
         if (state_receiver_thread_.joinable()) {
+            LOG_DEBUG("Joining state receiver thread");
             state_receiver_thread_.join();
         }
+        
+        // Close the command socket
         if (command_sock_ >= 0) {
+            LOG_DEBUG("Closing command socket: " + std::to_string(command_sock_));
             close(command_sock_);
         }
         
         // Clean up visualization
+        LOG_DEBUG("Stopping OptiTrack visualization");
         stop_visualization();
+        LOG_DEBUG("DroneControl cleanup complete");
     }
 
     void log(double timestamp, double cmd_yaw, double opt_x, double opt_y, double opt_yaw, double imu_yaw) {
         if (file_.is_open()) {
-            file_ << std::fixed << std::setprecision(6) << timestamp << "," << cmd_yaw << ","
-                  << opt_x << "," << opt_y << "," << opt_yaw << "," << imu_yaw << "\n";
-            if (++write_count_ % 10 == 0) file_.flush();
+            // Log data to CSV
+            file_ << std::fixed << std::setprecision(6) 
+                  << timestamp << "," 
+                  << cmd_yaw << ","
+                  << opt_x << "," 
+                  << opt_y << "," 
+                  << opt_yaw << "," 
+                  << imu_yaw << "\n";
+            
+            // Flush every 10 writes
+            if (++write_count_ % 10 == 0) {
+                LOG_DEBUG("Flushing flight_data.csv after " + std::to_string(write_count_) + " writes");
+                file_.flush();
+                
+                // Check for file errors after flush
+                if (file_.fail()) {
+                    LOG_ERROR("Error detected after flushing flight_data.csv");
+                    file_.clear(); // Clear error flags to continue writing
+                }
+            }
+        } else {
+            LOG_ERROR("Cannot log data - flight_data.csv is not open");
         }
     }
     
@@ -163,8 +222,12 @@ public:
     }
 
     bool fly_and_log() {
+        LOG_INFO("Starting fly_and_log for drone IP: " + drone_ip_ + ", OptiTrack: " + optitrack_name_);
+        
         // Set up the flight timeline
         double timestamp = get_time();
+        LOG_DEBUG("Start time: " + std::to_string(timestamp));
+        
         double takeoff_end = timestamp + 2.0;         // 2s takeoff
         double takeoff_wait_end = takeoff_end + 5.0;  // 5s wait after takeoff
         double up_end = takeoff_wait_end + 2.0;       // 2s upward
@@ -174,32 +237,60 @@ public:
         double forward_wait_end = forward_end + 1.0;  // 1s wait after forward
         double flight_end = forward_wait_end + 1.0;   // +1s after
         
+        LOG_DEBUG("Flight timeline: takeoff_end=" + std::to_string(takeoff_end) + 
+                 ", takeoff_wait_end=" + std::to_string(takeoff_wait_end) + 
+                 ", up_end=" + std::to_string(up_end) + 
+                 ", up_wait_end=" + std::to_string(up_wait_end) + 
+                 ", forward_start=" + std::to_string(forward_start) + 
+                 ", forward_end=" + std::to_string(forward_end) + 
+                 ", forward_wait_end=" + std::to_string(forward_wait_end) + 
+                 ", flight_end=" + std::to_string(flight_end));
+        
         // Create the flight data directory if it doesn't exist
         std::string data_dir = "data";
-        std::filesystem::create_directories(data_dir);
+        try {
+            LOG_DEBUG("Creating data directory: " + data_dir);
+            std::filesystem::create_directories(data_dir);
+            LOG_DEBUG("Data directory created/verified successfully");
+        } catch (const std::exception& e) {
+            LOG_ERROR("Failed to create data directory: " + std::string(e.what()));
+        }
 
         std::cout << "Starting flight sequence..." << std::endl;
         std::cout << "Press Ctrl+C to abort flight (emergency stop)" << std::endl;
 
+        LOG_INFO("Setting up emergency signal handler");
         // Emergency handler setup - static to be accessible from signal handler
         static DroneControl* emergency_instance = this;
         
         // Set up a signal handler for emergency stop
         std::signal(SIGINT, [](int signal) {
-            std::cout << "Received abort signal!" << std::endl;
+            LOG_INFO("Received abort signal (SIGINT)");
             if (emergency_instance) {
                 emergency_instance->emergency_stop();
             }
+            LOG_INFO("Exiting after emergency stop");
             std::exit(signal);
         });
         
+        LOG_INFO("Beginning flight execution");
         try {
+            int log_count = 0; // Count how many data points we log
+            
             // Main flight loop
             while ((timestamp = get_time()) < flight_end) {
                 double cmd_yaw = 0.0; // Forward = 0°
+                
+                LOG_DEBUG("Getting OptiTrack data at t=" + std::to_string(timestamp));
                 double opt_x = get_optitrack_x_for_name(optitrack_name_);
                 double opt_y = get_optitrack_y_for_name(optitrack_name_);
                 double opt_yaw = get_optitrack_yaw_for_name(optitrack_name_);
+                
+                // Check if we're getting valid OptiTrack data
+                if (opt_x == 0.0 && opt_y == 0.0) {
+                    LOG_WARNING("No OptiTrack data received for " + optitrack_name_ + " at t=" + std::to_string(timestamp));
+                }
+                
                 double imu_yaw = get_imu_yaw();
 
                 // Track the current phase to only print phase changes
@@ -260,7 +351,15 @@ public:
 
                 // Log data during forward phase ±1s
                 if (timestamp >= forward_start - 1.0 && timestamp <= forward_end + 1.0) {
+                    LOG_DEBUG("Logging data point at t=" + std::to_string(timestamp) + 
+                             ", forward_phase_time=" + std::to_string(timestamp - forward_start));
                     log(timestamp, cmd_yaw, opt_x, opt_y, opt_yaw, imu_yaw);
+                    log_count++;
+                    
+                    // Log position data quality
+                    if (opt_x == 0.0 && opt_y == 0.0) {
+                        LOG_WARNING("Logging potentially invalid OptiTrack data (zeros)");
+                    }
                 }
 
                 // Update visualization
@@ -271,15 +370,30 @@ public:
             }
             
             // Flight sequence completed, now land the drone
+            LOG_INFO("Flight sequence completed, landing drone");
             land();
             
+            // Make sure to flush any remaining log data
+            if (file_.is_open()) {
+                LOG_DEBUG("Final flush of flight_data.csv, wrote " + std::to_string(log_count) + " data points");
+                file_.flush();
+            }
+            
             std::cout << "Flight complete." << std::endl;
+            LOG_INFO("Flight successfully completed with " + std::to_string(log_count) + " logged data points");
             return true;
             
         } catch (const std::exception& e) {
             // If any exception occurs, attempt emergency landing
-            std::cerr << "ERROR during flight: " << e.what() << std::endl;
+            LOG_ERROR("Exception during flight: " + std::string(e.what()));
             emergency_stop();
+            
+            // Try to flush any data we have
+            if (file_.is_open()) {
+                LOG_DEBUG("Emergency flush of flight_data.csv after error");
+                file_.flush();
+            }
+            
             return false;
         }
     }
@@ -535,33 +649,58 @@ void cleanup() {
 // Function to handle a flight with a selected drone
 bool handleFlight(const std::string& drone_ip) {
     if (drone_ip.empty()) {
-        std::cerr << "No drone selected\n";
+        LOG_ERROR("No drone selected");
         return false;
     }
     
+    LOG_INFO("Preparing flight for drone IP: " + drone_ip);
+    
     // Find the optitrack_name for this drone IP
     std::string optitrack_name = "Bird1"; // Default
+    std::string drone_id = "unknown";
     for (const auto& drone : allDrones) {
         if (drone.ip == drone_ip) {
             optitrack_name = drone.optitrack_name;
+            drone_id = drone.id;
             break;
         }
     }
     
-    std::cout << "Selected drone IP: " << drone_ip << " (OptiTrack: " << optitrack_name << ")" << std::endl;
+    LOG_INFO("Selected drone ID: " + drone_id + ", IP: " + drone_ip + ", OptiTrack name: " + optitrack_name);
+    
+    // Check if OptiTrack can see this tracker before flight
+    bool tracker_visible = false;
+    double position_x = get_optitrack_x_for_name(optitrack_name);
+    double position_y = get_optitrack_y_for_name(optitrack_name);
+    double position_yaw = get_optitrack_yaw_for_name(optitrack_name);
+    
+    if (position_x != 0.0 || position_y != 0.0) {
+        tracker_visible = true;
+        LOG_INFO("OptiTrack tracking confirmed for " + optitrack_name + 
+                 ". Position: x=" + std::to_string(position_x) + 
+                 ", y=" + std::to_string(position_y) + 
+                 ", yaw=" + std::to_string(position_yaw));
+    } else {
+        LOG_WARNING("OptiTrack cannot see tracker " + optitrack_name + 
+                  ". Drone position may not be tracked correctly!");
+    }
+    
+    LOG_INFO("Creating drone control object for " + drone_ip);
     DroneControl drone(drone_ip, optitrack_name);
+    
+    LOG_INFO("Starting flight sequence for drone " + drone_id + " (" + drone_ip + ")");
     bool flightSuccess = drone.fly_and_log();
     
     if (flightSuccess) {
-        std::cout << "Flight completed successfully\n";
+        LOG_INFO("Flight completed successfully for drone " + drone_id);
         // Only record data if we have flight data
         if (drone.hasFlightData()) {
-            std::cout << "Flight data recorded successfully\n";
+            LOG_INFO("Flight data recorded successfully to flight_data.csv");
         } else {
-            std::cout << "No flight data to record\n";
+            LOG_WARNING("No flight data to record for drone " + drone_id);
         }
     } else {
-        std::cout << "Flight failed\n";
+        LOG_ERROR("Flight failed for drone " + drone_id);
     }
     
     return flightSuccess;
@@ -620,22 +759,31 @@ void displayMenu() {
 }
 
 int main() {
+    LOG_INFO("Starting drone control program");
+    
     // Register cleanup function to be called at program exit
     atexit(cleanup);
+    LOG_DEBUG("Registered cleanup handler");
     
     // Load drones from JSON file
+    LOG_INFO("Loading drones from dji_devices.json");
     allDrones = loadDronesFromJSON("dji_devices.json");
     
     // If no drones found, set up a default drone
     if (allDrones.empty()) {
-        std::cerr << "No drones found in dji_devices.json, using default\n";
+        LOG_WARNING("No drones found in dji_devices.json, using default");
         allDrones.push_back({"default", "192.168.10.1"});
+    } else {
+        LOG_INFO("Loaded " + std::to_string(allDrones.size()) + " drones");
     }
     
     // Initialize visualization
+    LOG_INFO("Initializing OptiTrack visualization");
     init_optitrack_viz();
+    LOG_INFO("OptiTrack visualization initialized");
     
     // Main menu loop
+    LOG_INFO("Entering main menu loop");
     while (true) {
         displayMenu();
     }

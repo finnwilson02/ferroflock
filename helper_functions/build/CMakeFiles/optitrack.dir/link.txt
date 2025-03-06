@@ -1,0 +1,2 @@
+/usr/bin/ar qc liboptitrack.a CMakeFiles/optitrack.dir/src/optitrack.cpp.o
+/usr/bin/ranlib liboptitrack.a

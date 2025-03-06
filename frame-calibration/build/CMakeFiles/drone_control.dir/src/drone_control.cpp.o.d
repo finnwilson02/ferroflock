@@ -284,5 +284,6 @@ CMakeFiles/drone_control.dir/src/drone_control.cpp.o: \
  /usr/include/c++/13/bits/regex_executor.h \
  /usr/include/c++/13/bits/regex_executor.tcc /usr/include/c++/13/map \
  /usr/include/c++/13/bits/stl_multimap.h \
- /usr/include/c++/13/bits/erase_if.h \
+ /usr/include/c++/13/bits/erase_if.h /usr/include/c++/13/cstring \
+ /usr/include/string.h /usr/include/strings.h \
  /home/finn/ferroflock/frame-calibration/src/../include/optitrack_viz.h
