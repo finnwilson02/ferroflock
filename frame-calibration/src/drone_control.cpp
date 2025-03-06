@@ -13,11 +13,12 @@
 #include <sys/socket.h>
 #include <arpa/inet.h>
 #include <unistd.h>
+#include <nlohmann/json.hpp>
 #include "../include/optitrack_viz.h"
 
 class DroneControl {
 public:
-    DroneControl() {
+    DroneControl(const std::string& drone_ip) : drone_ip_(drone_ip) {
         file_.open("flight_data.csv", std::ios::app);
         if (file_.tellp() == 0) {
             file_ << "timestamp,commanded_yaw_deg,optitrack_x_m,optitrack_y_m,optitrack_yaw_deg,imu_yaw_deg\n";
@@ -55,7 +56,7 @@ public:
         }
     }
 
-    void fly_and_log() {
+    bool fly_and_log() {
         // Set up the flight timeline
         double timestamp = get_time();
         double takeoff_end = timestamp + 2.0;  // 2s takeoff
@@ -128,14 +129,13 @@ public:
             land();
             
             std::cout << "Flight sequence completed. Data logged to flight_data.csv" << std::endl;
-            
-            // Wait a bit for the landing to complete
-            std::this_thread::sleep_for(std::chrono::seconds(3));
+            return true;
             
         } catch (const std::exception& e) {
             // If any exception occurs, attempt emergency landing
             std::cerr << "ERROR during flight: " << e.what() << std::endl;
             emergency_stop();
+            return false;
         }
     }
 
@@ -321,10 +321,120 @@ private:
         send_command_to_drone("emergency");
         std::cout << "Drone motors stopped" << std::endl;
     }
+    
+    // Reboot the drone
+    void reboot() {
+        std::cout << "Sending reboot command to drone..." << std::endl;
+        send_command_to_drone("reboot");
+        std::this_thread::sleep_for(std::chrono::milliseconds(500));
+        std::cout << "Drone rebooting..." << std::endl;
+    }
 };
 
+std::string select_drone() {
+    std::ifstream json_file("drone_config.json");
+    if (!json_file.is_open()) {
+        std::cerr << "Failed to open drone_config.json" << std::endl;
+        return "192.168.10.1";
+    }
+    nlohmann::json config;
+    try {
+        json_file >> config;
+    } catch (const nlohmann::json::parse_error& e) {
+        std::cerr << "JSON parse error: " << e.what() << std::endl;
+        return "192.168.10.1";
+    }
+    auto drones = config["drones"];
+    if (!drones.is_array() || drones.empty()) {
+        std::cerr << "No drones found in JSON" << std::endl;
+        return "192.168.10.1";
+    }
+    std::cout << "Menu:\n";
+    std::cout << "1. Calibrate a drone\n";
+    std::cout << "2. Reboot a drone\n";
+    std::cout << "0. Exit\n";
+    std::cout << "Enter choice (0-2): ";
+    int choice;
+    std::cin >> choice;
+    if (choice == 0) {
+        return ""; // Exit signal
+    } else if (choice == 1) {
+        std::cout << "Select a drone to calibrate:\n";
+        for (size_t i = 0; i < drones.size(); ++i) {
+            std::string id = drones[i]["id"].get<std::string>();
+            std::string ip = drones[i]["ip"].get<std::string>();
+            std::cout << i + 1 << ". Drone ID: " << id << " (IP: " << ip << ")\n";
+        }
+        std::cout << "Enter drone number (1-" << drones.size() << "): ";
+        int drone_choice;
+        std::cin >> drone_choice;
+        if (drone_choice < 1 || drone_choice > static_cast<int>(drones.size())) {
+            std::cerr << "Invalid choice, using default drone\n";
+            return "192.168.10.1";
+        }
+        return drones[drone_choice - 1]["ip"].get<std::string>();
+    } else if (choice == 2) {
+        std::cout << "Select a drone to reboot:\n";
+        for (size_t i = 0; i < drones.size(); ++i) {
+            std::string id = drones[i]["id"].get<std::string>();
+            std::string ip = drones[i]["ip"].get<std::string>();
+            std::cout << i + 1 << ". Drone ID: " << id << " (IP: " << ip << ")\n";
+        }
+        std::cout << "Enter drone number (1-" << drones.size() << "): ";
+        int drone_choice;
+        std::cin >> drone_choice;
+        if (drone_choice < 1 || drone_choice > static_cast<int>(drones.size())) {
+            std::cerr << "Invalid choice, skipping reboot\n";
+            return "no_flight"; // Signal to skip flight
+        }
+        std::string ip = drones[drone_choice - 1]["ip"].get<std::string>();
+        DroneControl drone(ip);
+        drone.reboot();
+        return "no_flight"; // Signal to skip flight
+    } else {
+        std::cerr << "Invalid menu choice\n";
+        return "no_flight"; // Skip flight
+    }
+}
+
 int main() {
-    DroneControl drone;
-    drone.fly_and_log();
+    while (true) {
+        std::string drone_ip = select_drone();
+        if (drone_ip.empty()) {
+            std::cout << "Exiting program, rebooting all drones...\n";
+            std::ifstream json_file("drone_config.json");
+            if (!json_file.is_open()) {
+                std::cerr << "Failed to open drone_config.json for reboot\n";
+                break;
+            }
+            nlohmann::json config;
+            try {
+                json_file >> config;
+            } catch (const nlohmann::json::parse_error& e) {
+                std::cerr << "JSON parse error during exit: " << e.what() << std::endl;
+                break;
+            }
+            auto drones = config["drones"];
+            if (drones.is_array() && !drones.empty()) {
+                for (const auto& drone : drones) {
+                    std::string ip = drone["ip"].get<std::string>();
+                    DroneControl reboot_drone(ip);
+                    reboot_drone.reboot();
+                }
+            }
+            std::cout << "All drones rebooted, goodbye\n";
+            break;
+        } else if (drone_ip == "no_flight") {
+            continue; // Skip flight after reboot or invalid choice
+        } else {
+            std::cout << "Selected drone IP: " << drone_ip << std::endl;
+            DroneControl drone(drone_ip);
+            if (drone.fly_and_log()) {
+                std::cout << "Flight completed successfully\n";
+            } else {
+                std::cout << "Flight failed, returning to menu\n";
+            }
+        }
+    }
     return 0;
 }
