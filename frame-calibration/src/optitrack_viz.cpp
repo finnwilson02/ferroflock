@@ -318,6 +318,24 @@ void update_optitrack_viz(double x, double y, double yaw) {
     // std::cout << "OptiTrack visualization updated: x=" << x << ", y=" << y << ", yaw=" << yaw << std::endl;
 }
 
+// Get OptiTrack X position for a specific named tracker
+double get_optitrack_x_for_name(const std::string& name) {
+    std::lock_guard<std::mutex> lock(g_mutex);
+    
+    // Check if the named tracker exists
+    if (g_trackers.find(name) != g_trackers.end()) {
+        const auto& tracker = g_trackers[name];
+        auto now = std::chrono::system_clock::now();
+        auto time_diff = std::chrono::duration_cast<std::chrono::seconds>(now - tracker.last_update).count();
+        
+        if (time_diff < 3 && tracker.updated) {
+            return tracker.x;
+        }
+    }
+    
+    return 0.0; // Default if tracker not found or not active
+}
+
 // Get OptiTrack X position from the "Bird1" tracker (or first available)
 double get_optitrack_x() {
     std::lock_guard<std::mutex> lock(g_mutex);
@@ -347,6 +365,24 @@ double get_optitrack_x() {
     return 0.0; // Default if no trackers available
 }
 
+// Get OptiTrack Y position for a specific named tracker
+double get_optitrack_y_for_name(const std::string& name) {
+    std::lock_guard<std::mutex> lock(g_mutex);
+    
+    // Check if the named tracker exists
+    if (g_trackers.find(name) != g_trackers.end()) {
+        const auto& tracker = g_trackers[name];
+        auto now = std::chrono::system_clock::now();
+        auto time_diff = std::chrono::duration_cast<std::chrono::seconds>(now - tracker.last_update).count();
+        
+        if (time_diff < 3 && tracker.updated) {
+            return tracker.y;
+        }
+    }
+    
+    return 0.0; // Default if tracker not found or not active
+}
+
 // Get OptiTrack Y position from the "Bird1" tracker (or first available)
 double get_optitrack_y() {
     std::lock_guard<std::mutex> lock(g_mutex);
@@ -374,6 +410,26 @@ double get_optitrack_y() {
     }
     
     return 0.0; // Default if no trackers available
+}
+
+// Get OptiTrack yaw for a specific named tracker
+double get_optitrack_yaw_for_name(const std::string& name) {
+    std::lock_guard<std::mutex> lock(g_mutex);
+    
+    // Check if the named tracker exists
+    if (g_trackers.find(name) != g_trackers.end()) {
+        const auto& tracker = g_trackers[name];
+        auto now = std::chrono::system_clock::now();
+        auto time_diff = std::chrono::duration_cast<std::chrono::seconds>(now - tracker.last_update).count();
+        
+        if (time_diff < 3 && tracker.updated) {
+            // Convert quaternion to yaw in degrees
+            double yaw_rad = quaternionToYaw(tracker.qw, tracker.qx, tracker.qy, tracker.qz);
+            return yaw_rad * 180.0 / M_PI; // Convert to degrees
+        }
+    }
+    
+    return 0.0; // Default if tracker not found or not active
 }
 
 // Get OptiTrack yaw from the "Bird1" tracker (or first available)

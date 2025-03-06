@@ -4,27 +4,31 @@
     "mac": "34:D2:62:ED:F3:CE",
     "manufacturer": "SZ DJI Technology",
     "last_seen": "2025-02-28T16:44:04.201393",
-    "online": true
+    "online": true,
+    "optitrack_name": "Bird4"
   },
   {
     "ip": "192.168.1.106",
     "mac": "34:D2:62:EE:01:B4",
     "manufacturer": "SZ DJI Technology",
     "last_seen": "2025-02-28T16:44:04.201402",
-    "online": true
+    "online": true,
+    "optitrack_name": "Bird3"
   },
   {
     "ip": "192.168.1.107",
     "mac": "34:D2:62:EE:00:06",
     "manufacturer": "SZ DJI Technology",
     "last_seen": "2025-02-28T16:44:04.201404",
-    "online": true
+    "online": true,
+    "optitrack_name": "Bird5"
   },
   {
     "ip": "192.168.1.108",
     "mac": "34:D2:62:ED:FF:BC",
     "manufacturer": "SZ DJI Technology",
     "last_seen": "2025-02-28T16:44:04.201406",
-    "online": true
+    "online": true,
+    "optitrack_name": "Bird1"
   }
 ]

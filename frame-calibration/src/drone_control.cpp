@@ -16,6 +16,7 @@
 #include <regex>       // for simple JSON parsing
 #include <cstdlib>     // for atexit
 #include <cctype>      // for std::toupper
+#include <map>         // for std::map
 #include "../include/optitrack_viz.h"
 
 // Forward declarations
@@ -27,6 +28,7 @@ void stop_visualization();
 struct DroneConfig {
     std::string id;
     std::string ip;
+    std::string optitrack_name; // Added OptiTrack rigid body name
 };
 
 // Forward declare DroneControl class
@@ -45,26 +47,51 @@ std::vector<DroneConfig> loadDronesFromJSON(const std::string& filename) {
         return drones;
     }
     
+    // Create hardcoded mappings based on the IP addresses that match the requirements
+    // Bird5 (107), Bird3 (106), Bird4 (104), Bird1 (108)
+    std::map<std::string, std::string> ipToOptitrackMap = {
+        {"192.168.1.107", "Bird5"},
+        {"192.168.1.106", "Bird3"},
+        {"192.168.1.104", "Bird4"},
+        {"192.168.1.108", "Bird1"}
+    };
+    
     // Read the entire file into a string
     std::stringstream buffer;
     buffer << json_file.rdbuf();
     std::string content = buffer.str();
     
-    // Parse the drone configuration from dji_devices.json format
-    std::regex drone_pattern("\\{\\s*\"ip\"\\s*:\\s*\"([^\"]+)\"\\s*,\\s*\"mac\"\\s*:\\s*\"([^\"]+)\"");
+    // Just parse IP addresses from the file
+    std::regex ip_pattern("\"ip\"\\s*:\\s*\"([^\"]+)\"");
     
-    auto drones_begin = std::sregex_iterator(content.begin(), content.end(), drone_pattern);
-    auto drones_end = std::sregex_iterator();
+    auto ips_begin = std::sregex_iterator(content.begin(), content.end(), ip_pattern);
+    auto ips_end = std::sregex_iterator();
     
     int drone_count = 0;
-    for (std::sregex_iterator i = drones_begin; i != drones_end; ++i) {
+    for (std::sregex_iterator i = ips_begin; i != ips_end; ++i) {
         std::smatch match = *i;
-        if (match.size() > 2) {
+        if (match.size() > 1) {
+            std::string ip = match[1].str();
             DroneConfig drone;
-            drone.ip = match[1].str();
-            drone.id = "drone" + std::to_string(++drone_count); // Generate ID as "drone1", "drone2", etc.
+            drone.ip = ip;
+            drone.id = "drone" + std::to_string(++drone_count);
+            
+            // Assign OptiTrack name based on IP
+            if (ipToOptitrackMap.find(ip) != ipToOptitrackMap.end()) {
+                drone.optitrack_name = ipToOptitrackMap[ip];
+            } else {
+                drone.optitrack_name = "Bird" + std::to_string(drone_count);
+            }
+            
+            std::cout << "Loaded drone: IP=" << drone.ip 
+                      << ", ID=" << drone.id
+                      << ", OptiTrack Name=" << drone.optitrack_name << std::endl;
             drones.push_back(drone);
         }
+    }
+    
+    if (drones.empty()) {
+        std::cerr << "No drones found in JSON" << std::endl;
     }
     
     return drones;
@@ -77,7 +104,8 @@ bool handleFlight(const std::string& drone_ip);
 
 class DroneControl {
 public:
-    DroneControl(const std::string& drone_ip) : drone_ip_(drone_ip) {
+    DroneControl(const std::string& drone_ip, const std::string& optitrack_name = "") 
+        : drone_ip_(drone_ip), optitrack_name_(optitrack_name.empty() ? "Bird1" : optitrack_name) {
         file_.open("flight_data.csv", std::ios::app);
         if (file_.tellp() == 0) {
             file_ << "timestamp,commanded_yaw_deg,optitrack_x_m,optitrack_y_m,optitrack_yaw_deg,imu_yaw_deg\n";
@@ -218,6 +246,7 @@ private:
     
     int command_sock_ = -1;              // Persistent socket for sending commands
     std::string drone_ip_ = "192.168.10.1"; // Tello IP
+    std::string optitrack_name_ = "Bird1"; // OptiTrack rigid body name
     int command_port_ = 8889;           // Tello command port
     double current_yaw_ = 0.0;          // Real-time IMU yaw from state messages
     std::thread state_receiver_thread_; // Thread for receiving state messages
@@ -228,20 +257,50 @@ private:
             std::chrono::system_clock::now().time_since_epoch()).count() / 1e6;
     }
 
-    // OptiTrack functions implemented in optitrack_viz.cpp
+    // Custom functions to get OptiTrack data for this specific drone
     double get_optitrack_x() { 
-        // This now uses the real OptiTrack tracking data
-        return ::get_optitrack_x(); 
+        // Forward declare these functions from the optitrack_viz.cpp file
+        extern double get_optitrack_x_for_name(const std::string& name);
+        extern double get_optitrack_x();
+        
+        // Try to get data for this drone's specific OptiTrack name
+        double result = get_optitrack_x_for_name(optitrack_name_);
+        
+        // If no valid data, fall back to default method
+        if (result == 0.0) {
+            return ::get_optitrack_x();
+        }
+        return result;
     }
     
     double get_optitrack_y() { 
-        // This now uses the real OptiTrack tracking data
-        return ::get_optitrack_y(); 
+        // Forward declare these functions
+        extern double get_optitrack_y_for_name(const std::string& name);
+        extern double get_optitrack_y();
+        
+        // Try to get data for this drone's specific OptiTrack name
+        double result = get_optitrack_y_for_name(optitrack_name_);
+        
+        // If no valid data, fall back to default method
+        if (result == 0.0) {
+            return ::get_optitrack_y();
+        }
+        return result;
     }
     
     double get_optitrack_yaw() { 
-        // This now uses the real OptiTrack tracking data
-        return ::get_optitrack_yaw(); 
+        // Forward declare these functions
+        extern double get_optitrack_yaw_for_name(const std::string& name);
+        extern double get_optitrack_yaw();
+        
+        // Try to get data for this drone's specific OptiTrack name
+        double result = get_optitrack_yaw_for_name(optitrack_name_);
+        
+        // If no valid data, fall back to default method
+        if (result == 0.0) {
+            return ::get_optitrack_yaw();
+        }
+        return result;
     }
     
     void state_receiver() {
@@ -326,15 +385,15 @@ private:
             return;
         }
         
-        // Scale inputs to appropriate ranges for Tello drones (-100 to 100)
-        int x_scaled = static_cast<int>(x * 100);
-        int y_scaled = static_cast<int>(y * 100);
-        int z_scaled = static_cast<int>(z * 100);
+        // Scale inputs to half speed (-50 to 50 instead of -100 to 100)
+        int x_scaled = static_cast<int>(x * 50);
+        int y_scaled = static_cast<int>(y * 50);
+        int z_scaled = static_cast<int>(z * 50);
         
         // Clamp values to valid range
-        x_scaled = std::max(-100, std::min(100, x_scaled));
-        y_scaled = std::max(-100, std::min(100, y_scaled));
-        z_scaled = std::max(-100, std::min(100, z_scaled));
+        x_scaled = std::max(-50, std::min(50, x_scaled));
+        y_scaled = std::max(-50, std::min(50, y_scaled));
+        z_scaled = std::max(-50, std::min(50, z_scaled));
         
         // Use rc command for Tello drones: 
         // rc <left-right> <forward-backward> <up-down> <yaw>
@@ -408,7 +467,9 @@ void rebootAllDrones() {
     // Create sockets and send reboot commands to all drones simultaneously
     std::vector<int> sockets;
     for (const auto& drone : allDrones) {
-        std::cout << "Sending reboot command to drone " << drone.id << " (IP: " << drone.ip << ")\n";
+        std::cout << "Sending reboot command to drone " << drone.id 
+                  << " (IP: " << drone.ip 
+                  << ", OptiTrack: " << drone.optitrack_name << ")\n";
         
         // Create socket for this drone
         int sock = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
@@ -456,8 +517,17 @@ bool handleFlight(const std::string& drone_ip) {
         return false;
     }
     
-    std::cout << "Selected drone IP: " << drone_ip << std::endl;
-    DroneControl drone(drone_ip);
+    // Find the optitrack_name for this drone IP
+    std::string optitrack_name = "Bird1"; // Default
+    for (const auto& drone : allDrones) {
+        if (drone.ip == drone_ip) {
+            optitrack_name = drone.optitrack_name;
+            break;
+        }
+    }
+    
+    std::cout << "Selected drone IP: " << drone_ip << " (OptiTrack: " << optitrack_name << ")" << std::endl;
+    DroneControl drone(drone_ip, optitrack_name);
     bool flightSuccess = drone.fly_and_log();
     
     if (flightSuccess) {
@@ -487,7 +557,8 @@ void displayMenu() {
     // Display drone list
     for (size_t i = 0; i < allDrones.size(); ++i) {
         std::cout << i + 1 << ". Drone ID: " << allDrones[i].id
-                  << " (IP: " << allDrones[i].ip << ")\n";
+                  << " (IP: " << allDrones[i].ip 
+                  << ", OptiTrack: " << allDrones[i].optitrack_name << ")\n";
     }
     
     // Display options
