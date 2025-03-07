@@ -23,7 +23,7 @@
 
 // Constructor
 Menu::Menu(OptiTrack& optitrack, TelloController& tello_controller)
-    : optitrack_(optitrack), tello_controller_(tello_controller) {
+    : optitrack_(optitrack), tello_controller_(tello_controller), keyboard_control_(nullptr) {
     LOG_INFO("Initializing menu system");
     
     // Create calibration module
@@ -357,6 +357,29 @@ void Menu::defineDefaultActions() {
     addOption("4", "Calibrate drone orientation", [this]() { handleCalibrateDrone(); });
     addOption("5", "Reboot all drones", [this]() { handleRebootAllDrones(); });
     addOption("Q", "Quit", [this]() { handleExit(); });
+    
+    /*
+    // Keyboard control option - commented out for future integration
+    addOption("K", "Start Keyboard Control", [this]() {
+        // Initialize keyboard control if it doesn't exist yet
+        if (!keyboard_control_) {
+            keyboard_control_ = std::make_unique<KeyboardControl>(tello_controller_);
+        }
+        
+        // Start keyboard control
+        std::cout << "Starting keyboard control mode..." << std::endl;
+        keyboard_control_->start();
+        
+        // Wait for keyboard control to finish (this blocks until keyboard control exits)
+        // Note: The keyboard control loop will run until the user presses 'q'
+        std::cout << "Keyboard control mode ended. Press Enter to continue..." << std::endl;
+        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+        std::cin.get();
+        
+        // Return to main menu
+        display();
+    }, "Control drones with keyboard input");
+    */
 }
 
 // Function to reboot all drones

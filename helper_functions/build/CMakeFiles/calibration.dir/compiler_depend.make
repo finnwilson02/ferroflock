@@ -6,6 +6,7 @@ CMakeFiles/calibration.dir/src/calibration.cpp.o: /home/finn/ferroflock/helper_f
   /home/finn/ferroflock/helper_functions/include/logger.h \
   /home/finn/ferroflock/helper_functions/include/optitrack.h \
   /home/finn/ferroflock/helper_functions/include/tello_controller.h \
+  /home/finn/ferroflock/helper_functions/include/tello_imu_handler.h \
   /usr/include/alloca.h \
   /usr/include/arpa/inet.h \
   /usr/include/asm-generic/bitsperlong.h \
@@ -17,6 +18,7 @@ CMakeFiles/calibration.dir/src/calibration.cpp.o: /home/finn/ferroflock/helper_f
   /usr/include/assert.h \
   /usr/include/c++/13/algorithm \
   /usr/include/c++/13/array \
+  /usr/include/c++/13/atomic \
   /usr/include/c++/13/backward/auto_ptr.h \
   /usr/include/c++/13/backward/binders.h \
   /usr/include/c++/13/bit \
@@ -755,15 +757,7 @@ CMakeFiles/calibration.dir/src/calibration.cpp.o: /home/finn/ferroflock/helper_f
 
 /usr/include/opencv4/opencv2/dnn.hpp:
 
-/usr/include/x86_64-linux-gnu/bits/pthreadtypes-arch.h:
-
-/usr/include/c++/13/bits/utility.h:
-
-/usr/include/c++/13/bits/stl_function.h:
-
-/usr/include/opencv4/opencv2/objdetect.hpp:
-
-/usr/include/c++/13/tr1/beta_function.tcc:
+/usr/include/opencv4/opencv2/core/version.hpp:
 
 /usr/include/opencv4/opencv2/flann/hierarchical_clustering_index.h:
 
@@ -867,6 +861,16 @@ CMakeFiles/calibration.dir/src/calibration.cpp.o: /home/finn/ferroflock/helper_f
 
 /usr/include/c++/13/bits/ostream.tcc:
 
+/usr/include/c++/13/bits/stl_function.h:
+
+/usr/include/x86_64-linux-gnu/bits/pthreadtypes-arch.h:
+
+/usr/include/c++/13/bits/utility.h:
+
+/usr/include/opencv4/opencv2/objdetect.hpp:
+
+/usr/include/c++/13/tr1/beta_function.tcc:
+
 /usr/include/c++/13/bits/move.h:
 
 /usr/include/asm-generic/sockios.h:
@@ -883,33 +887,15 @@ CMakeFiles/calibration.dir/src/calibration.cpp.o: /home/finn/ferroflock/helper_f
 
 /usr/include/c++/13/bits/locale_facets.h:
 
+/usr/include/x86_64-linux-gnu/bits/timesize.h:
+
+/usr/include/c++/13/bits/locale_classes.h:
+
+/usr/include/c++/13/bits/fs_ops.h:
+
 /usr/include/c++/13/bits/stl_queue.h:
 
 /usr/include/c++/13/bits/atomic_lockfree_defines.h:
-
-/usr/include/x86_64-linux-gnu/bits/types/__locale_t.h:
-
-/usr/include/c++/13/bits/stl_multimap.h:
-
-/usr/include/c++/13/bits/locale_conv.h:
-
-/usr/include/c++/13/bits/istream.tcc:
-
-/usr/include/opencv4/opencv2/flann/general.h:
-
-/usr/include/c++/13/bits/exception_ptr.h:
-
-/usr/include/c++/13/bits/vector.tcc:
-
-/usr/include/c++/13/optional:
-
-/usr/include/c++/13/bits/uniform_int_dist.h:
-
-/usr/include/c++/13/bits/locale_classes.tcc:
-
-/usr/include/c++/13/backward/binders.h:
-
-/usr/include/c++/13/bits/std_mutex.h:
 
 /usr/include/x86_64-linux-gnu/bits/long-double.h:
 
@@ -948,6 +934,8 @@ CMakeFiles/calibration.dir/src/calibration.cpp.o: /home/finn/ferroflock/helper_f
 /usr/include/opencv4/opencv2/flann/lsh_table.h:
 
 /usr/include/c++/13/tr1/gamma.tcc:
+
+/usr/include/c++/13/bits/std_mutex.h:
 
 /usr/include/asm-generic/posix_types.h:
 
@@ -1009,6 +997,24 @@ CMakeFiles/calibration.dir/src/calibration.cpp.o: /home/finn/ferroflock/helper_f
 
 /usr/include/c++/13/bits/codecvt.h:
 
+/usr/include/c++/13/backward/binders.h:
+
+/usr/include/x86_64-linux-gnu/bits/types/__locale_t.h:
+
+/usr/include/c++/13/bits/stl_multimap.h:
+
+/usr/include/c++/13/bits/locale_conv.h:
+
+/usr/include/c++/13/bits/istream.tcc:
+
+/usr/include/opencv4/opencv2/flann/general.h:
+
+/usr/include/c++/13/bits/exception_ptr.h:
+
+/usr/include/c++/13/bits/uniform_int_dist.h:
+
+/usr/include/c++/13/bits/locale_classes.tcc:
+
 /usr/local/include/vrpn_Shared.h:
 
 /usr/include/c++/13/bits/basic_ios.tcc:
@@ -1047,12 +1053,6 @@ CMakeFiles/calibration.dir/src/calibration.cpp.o: /home/finn/ferroflock/helper_f
 
 /usr/include/c++/13/chrono:
 
-/usr/include/c++/13/bits/fs_ops.h:
-
-/usr/include/x86_64-linux-gnu/bits/timesize.h:
-
-/usr/include/c++/13/bits/locale_classes.h:
-
 /usr/include/assert.h:
 
 /usr/include/opencv4/opencv2/core/optim.hpp:
@@ -1085,6 +1085,8 @@ CMakeFiles/calibration.dir/src/calibration.cpp.o: /home/finn/ferroflock/helper_f
 
 /usr/include/c++/13/bits/specfun.h:
 
+/usr/include/c++/13/atomic:
+
 /usr/include/c++/13/bits/basic_string.h:
 
 /usr/include/c++/13/tr1/poly_laguerre.tcc:
@@ -1104,6 +1106,10 @@ CMakeFiles/calibration.dir/src/calibration.cpp.o: /home/finn/ferroflock/helper_f
 /usr/include/c++/13/bits/hashtable_policy.h:
 
 /usr/include/netinet/in.h:
+
+/usr/include/opencv4/opencv2/core/vsx_utils.hpp:
+
+/usr/include/c++/13/bits/deque.tcc:
 
 /usr/include/opencv4/opencv2/core/traits.hpp:
 
@@ -1170,6 +1176,10 @@ CMakeFiles/calibration.dir/src/calibration.cpp.o: /home/finn/ferroflock/helper_f
 /usr/include/opencv4/opencv2/flann/random.h:
 
 /usr/include/c++/13/bits/ios_base.h:
+
+/usr/include/c++/13/optional:
+
+/usr/include/c++/13/bits/vector.tcc:
 
 /usr/include/opencv4/opencv2/video.hpp:
 
@@ -1283,6 +1293,8 @@ CMakeFiles/calibration.dir/src/calibration.cpp.o: /home/finn/ferroflock/helper_f
 
 /usr/include/opencv4/opencv2/core/affine.hpp:
 
+/home/finn/ferroflock/helper_functions/include/tello_imu_handler.h:
+
 /usr/include/opencv4/opencv2/core/fast_math.hpp:
 
 /usr/include/x86_64-linux-gnu/bits/stdint-intn.h:
@@ -1344,8 +1356,6 @@ CMakeFiles/calibration.dir/src/calibration.cpp.o: /home/finn/ferroflock/helper_f
 /usr/include/opencv4/opencv2/flann/miniflann.hpp:
 
 /usr/include/c++/13/vector:
-
-/usr/include/opencv4/opencv2/core/version.hpp:
 
 /usr/lib/gcc/x86_64-linux-gnu/13/include/float.h:
 
@@ -1430,7 +1440,3 @@ CMakeFiles/calibration.dir/src/calibration.cpp.o: /home/finn/ferroflock/helper_f
 /usr/include/opencv4/opencv2/core/operations.hpp:
 
 /usr/include/opencv4/opencv2/core/saturate.hpp:
-
-/usr/include/c++/13/bits/deque.tcc:
-
-/usr/include/opencv4/opencv2/core/vsx_utils.hpp:

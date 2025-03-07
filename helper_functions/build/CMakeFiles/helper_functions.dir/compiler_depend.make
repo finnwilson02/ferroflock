@@ -3,10 +3,12 @@
 
 CMakeFiles/helper_functions.dir/src/main.cpp.o: /home/finn/ferroflock/helper_functions/src/main.cpp \
   /home/finn/ferroflock/helper_functions/include/calibration.h \
+  /home/finn/ferroflock/helper_functions/include/keyboard_control.h \
   /home/finn/ferroflock/helper_functions/include/logger.h \
   /home/finn/ferroflock/helper_functions/include/menu.h \
   /home/finn/ferroflock/helper_functions/include/optitrack.h \
   /home/finn/ferroflock/helper_functions/include/tello_controller.h \
+  /home/finn/ferroflock/helper_functions/include/tello_imu_handler.h \
   /usr/include/alloca.h \
   /usr/include/arpa/inet.h \
   /usr/include/asm-generic/bitsperlong.h \
@@ -18,6 +20,7 @@ CMakeFiles/helper_functions.dir/src/main.cpp.o: /home/finn/ferroflock/helper_fun
   /usr/include/assert.h \
   /usr/include/c++/13/algorithm \
   /usr/include/c++/13/array \
+  /usr/include/c++/13/atomic \
   /usr/include/c++/13/backward/auto_ptr.h \
   /usr/include/c++/13/backward/binders.h \
   /usr/include/c++/13/bit \
@@ -336,6 +339,7 @@ CMakeFiles/helper_functions.dir/src/main.cpp.o: /home/finn/ferroflock/helper_fun
   /usr/include/stdlib.h \
   /usr/include/string.h \
   /usr/include/strings.h \
+  /usr/include/termios.h \
   /usr/include/time.h \
   /usr/include/unistd.h \
   /usr/include/wchar.h \
@@ -409,6 +413,16 @@ CMakeFiles/helper_functions.dir/src/main.cpp.o: /home/finn/ferroflock/helper_fun
   /usr/include/x86_64-linux-gnu/bits/struct_mutex.h \
   /usr/include/x86_64-linux-gnu/bits/struct_rwlock.h \
   /usr/include/x86_64-linux-gnu/bits/struct_stat.h \
+  /usr/include/x86_64-linux-gnu/bits/termios-baud.h \
+  /usr/include/x86_64-linux-gnu/bits/termios-c_cc.h \
+  /usr/include/x86_64-linux-gnu/bits/termios-c_cflag.h \
+  /usr/include/x86_64-linux-gnu/bits/termios-c_iflag.h \
+  /usr/include/x86_64-linux-gnu/bits/termios-c_lflag.h \
+  /usr/include/x86_64-linux-gnu/bits/termios-c_oflag.h \
+  /usr/include/x86_64-linux-gnu/bits/termios-misc.h \
+  /usr/include/x86_64-linux-gnu/bits/termios-struct.h \
+  /usr/include/x86_64-linux-gnu/bits/termios-tcflow.h \
+  /usr/include/x86_64-linux-gnu/bits/termios.h \
   /usr/include/x86_64-linux-gnu/bits/thread-shared-types.h \
   /usr/include/x86_64-linux-gnu/bits/time.h \
   /usr/include/x86_64-linux-gnu/bits/time64.h \
@@ -480,6 +494,7 @@ CMakeFiles/helper_functions.dir/src/main.cpp.o: /home/finn/ferroflock/helper_fun
   /usr/include/x86_64-linux-gnu/sys/single_threaded.h \
   /usr/include/x86_64-linux-gnu/sys/socket.h \
   /usr/include/x86_64-linux-gnu/sys/time.h \
+  /usr/include/x86_64-linux-gnu/sys/ttydefaults.h \
   /usr/include/x86_64-linux-gnu/sys/types.h \
   /usr/include/x86_64-linux-gnu/sys/ucontext.h \
   /usr/lib/gcc/x86_64-linux-gnu/13/include/emmintrin.h \
@@ -561,8 +576,6 @@ CMakeFiles/helper_functions.dir/src/main.cpp.o: /home/finn/ferroflock/helper_fun
 
 /usr/include/x86_64-linux-gnu/bits/types/timer_t.h:
 
-/usr/include/x86_64-linux-gnu/bits/types/time_t.h:
-
 /usr/include/x86_64-linux-gnu/bits/types/struct_itimerspec.h:
 
 /usr/include/x86_64-linux-gnu/bits/types/stack_t.h:
@@ -596,6 +609,16 @@ CMakeFiles/helper_functions.dir/src/main.cpp.o: /home/finn/ferroflock/helper_fun
 /usr/include/x86_64-linux-gnu/bits/types.h:
 
 /usr/include/x86_64-linux-gnu/bits/time64.h:
+
+/usr/include/x86_64-linux-gnu/bits/termios.h:
+
+/usr/include/x86_64-linux-gnu/bits/types/time_t.h:
+
+/usr/include/x86_64-linux-gnu/bits/termios-struct.h:
+
+/usr/include/x86_64-linux-gnu/bits/termios-c_iflag.h:
+
+/usr/include/x86_64-linux-gnu/bits/termios-baud.h:
 
 /usr/include/x86_64-linux-gnu/bits/struct_stat.h:
 
@@ -654,6 +677,8 @@ CMakeFiles/helper_functions.dir/src/main.cpp.o: /home/finn/ferroflock/helper_fun
 /usr/include/x86_64-linux-gnu/bits/math-vector.h:
 
 /usr/include/x86_64-linux-gnu/bits/local_lim.h:
+
+/usr/include/x86_64-linux-gnu/sys/ttydefaults.h:
 
 /usr/include/x86_64-linux-gnu/bits/types/struct_FILE.h:
 
@@ -773,6 +798,8 @@ CMakeFiles/helper_functions.dir/src/main.cpp.o: /home/finn/ferroflock/helper_fun
 
 /usr/include/opencv4/opencv2/flann/index_testing.h:
 
+/usr/include/x86_64-linux-gnu/bits/termios-misc.h:
+
 /usr/include/opencv4/opencv2/flann/flann_base.hpp:
 
 /usr/include/opencv4/opencv2/flann/dynamic_bitset.h:
@@ -807,21 +834,11 @@ CMakeFiles/helper_functions.dir/src/main.cpp.o: /home/finn/ferroflock/helper_fun
 
 /usr/include/opencv4/opencv2/dnn.hpp:
 
-/usr/include/x86_64-linux-gnu/bits/pthreadtypes-arch.h:
+/usr/include/opencv4/opencv2/core/version.hpp:
 
-/usr/include/c++/13/bits/utility.h:
+/usr/include/x86_64-linux-gnu/bits/mathcalls-helper-functions.h:
 
-/usr/include/c++/13/bits/stl_function.h:
-
-/usr/include/opencv4/opencv2/objdetect.hpp:
-
-/usr/include/c++/13/tr1/beta_function.tcc:
-
-/usr/include/opencv4/opencv2/flann/hierarchical_clustering_index.h:
-
-/usr/include/arpa/inet.h:
-
-/usr/include/c++/13/bits/atomic_base.h:
+/usr/include/opencv4/opencv2/core/utility.hpp:
 
 /usr/include/x86_64-linux-gnu/bits/types/mbstate_t.h:
 
@@ -838,10 +855,6 @@ CMakeFiles/helper_functions.dir/src/main.cpp.o: /home/finn/ferroflock/helper_fun
 /usr/include/c++/13/bits/unordered_map.h:
 
 /usr/include/c++/13/bits/quoted_string.h:
-
-/usr/include/c++/13/bits/new_allocator.h:
-
-/usr/include/c++/13/bits/stl_uninitialized.h:
 
 /usr/include/x86_64-linux-gnu/bits/types/sigval_t.h:
 
@@ -879,12 +892,6 @@ CMakeFiles/helper_functions.dir/src/main.cpp.o: /home/finn/ferroflock/helper_fun
 
 /usr/include/c++/13/cstddef:
 
-/usr/include/c++/13/bits/uses_allocator.h:
-
-/usr/include/c++/13/bits/postypes.h:
-
-/usr/include/c++/13/bits/stl_multiset.h:
-
 /usr/include/c++/13/cstdint:
 
 /usr/include/c++/13/cstdlib:
@@ -909,15 +916,31 @@ CMakeFiles/helper_functions.dir/src/main.cpp.o: /home/finn/ferroflock/helper_fun
 
 /usr/include/c++/13/bits/locale_facets.tcc:
 
-/usr/include/c++/13/bits/std_abs.h:
-
-/usr/include/c++/13/bits/parse_numbers.h:
-
 /usr/include/c++/13/bits/stl_set.h:
 
 /usr/include/c++/13/bits/ostream_insert.h:
 
 /usr/include/c++/13/bits/ostream.tcc:
+
+/usr/include/c++/13/bits/stl_uninitialized.h:
+
+/usr/include/c++/13/bits/new_allocator.h:
+
+/usr/include/opencv4/opencv2/flann/hierarchical_clustering_index.h:
+
+/usr/include/arpa/inet.h:
+
+/usr/include/c++/13/bits/atomic_base.h:
+
+/usr/include/c++/13/bits/stl_function.h:
+
+/usr/include/x86_64-linux-gnu/bits/pthreadtypes-arch.h:
+
+/usr/include/c++/13/bits/utility.h:
+
+/usr/include/opencv4/opencv2/objdetect.hpp:
+
+/usr/include/c++/13/tr1/beta_function.tcc:
 
 /usr/include/c++/13/bits/move.h:
 
@@ -928,6 +951,16 @@ CMakeFiles/helper_functions.dir/src/main.cpp.o: /home/finn/ferroflock/helper_fun
 /usr/include/x86_64-linux-gnu/bits/sigaction.h:
 
 /usr/include/c++/13/bits/fs_fwd.h:
+
+/usr/include/c++/13/bits/postypes.h:
+
+/usr/include/c++/13/bits/parse_numbers.h:
+
+/usr/include/c++/13/bits/std_abs.h:
+
+/usr/include/c++/13/bits/stl_multiset.h:
+
+/usr/include/c++/13/bits/uses_allocator.h:
 
 /usr/include/c++/13/bits/locale_facets_nonio.tcc:
 
@@ -943,9 +976,11 @@ CMakeFiles/helper_functions.dir/src/main.cpp.o: /home/finn/ferroflock/helper_fun
 
 /usr/include/c++/13/bits/fs_ops.h:
 
-/usr/include/c++/13/bits/stl_queue.h:
+/usr/include/x86_64-linux-gnu/bits/termios-c_cflag.h:
 
-/usr/include/c++/13/bits/atomic_lockfree_defines.h:
+/usr/include/opencv4/opencv2/flann/random.h:
+
+/usr/include/c++/13/bits/ios_base.h:
 
 /usr/include/x86_64-linux-gnu/bits/long-double.h:
 
@@ -965,67 +1000,15 @@ CMakeFiles/helper_functions.dir/src/main.cpp.o: /home/finn/ferroflock/helper_fun
 
 /usr/include/c++/13/iosfwd:
 
-/usr/include/wchar.h:
-
-/usr/include/c++/13/bits/shared_ptr_base.h:
-
-/usr/include/c++/13/bits/basic_ios.h:
-
-/usr/include/x86_64-linux-gnu/bits/types/sigset_t.h:
-
-/usr/include/asm-generic/bitsperlong.h:
-
-/usr/include/opencv4/opencv2/dnn/dnn.hpp:
-
-/usr/include/c++/13/cctype:
-
-/usr/include/x86_64-linux-gnu/bits/types/struct_tm.h:
-
-/usr/include/c++/13/ext/atomicity.h:
-
-/usr/include/opencv4/opencv2/flann/lsh_table.h:
-
-/usr/include/c++/13/tr1/gamma.tcc:
-
 /usr/include/c++/13/bits/std_mutex.h:
 
 /usr/include/asm-generic/posix_types.h:
 
-/usr/include/c++/13/math.h:
+/home/finn/ferroflock/helper_functions/include/keyboard_control.h:
 
-/usr/include/c++/13/bits/unique_lock.h:
+/usr/include/c++/13/ctime:
 
-/usr/include/c++/13/mutex:
-
-/usr/include/x86_64-linux-gnu/bits/types/__sigset_t.h:
-
-/usr/include/opencv4/opencv2/flann/autotuned_index.h:
-
-/usr/include/c++/13/bits/charconv.h:
-
-/usr/include/x86_64-linux-gnu/bits/signum-arch.h:
-
-/usr/include/x86_64-linux-gnu/bits/errno.h:
-
-/usr/include/c++/13/bits/stl_pair.h:
-
-/usr/include/c++/13/bits/fs_path.h:
-
-/usr/include/c++/13/cstdio:
-
-/usr/lib/gcc/x86_64-linux-gnu/13/include/xmmintrin.h:
-
-/usr/include/c++/13/fstream:
-
-/usr/include/opencv4/opencv2/core/hal/interface.h:
-
-/usr/include/opencv4/opencv2/flann/kdtree_single_index.h:
-
-/usr/include/c++/13/bits/allocated_ptr.h:
-
-/usr/include/c++/13/bit:
-
-/usr/include/c++/13/bits/basic_string.tcc:
+/usr/include/c++/13/deque:
 
 /usr/include/x86_64-linux-gnu/bits/posix2_lim.h:
 
@@ -1050,6 +1033,8 @@ CMakeFiles/helper_functions.dir/src/main.cpp.o: /home/finn/ferroflock/helper_fun
 /usr/include/c++/13/bits/uniform_int_dist.h:
 
 /usr/include/c++/13/bits/locale_classes.tcc:
+
+/usr/include/x86_64-linux-gnu/bits/termios-c_oflag.h:
 
 /usr/include/c++/13/bits/stl_list.h:
 
@@ -1093,6 +1078,46 @@ CMakeFiles/helper_functions.dir/src/main.cpp.o: /home/finn/ferroflock/helper_fun
 
 /usr/include/opencv4/opencv2/core/types.hpp:
 
+/usr/include/c++/13/bits/stl_queue.h:
+
+/usr/include/c++/13/bits/atomic_lockfree_defines.h:
+
+/usr/include/c++/13/math.h:
+
+/usr/include/c++/13/bits/unique_lock.h:
+
+/usr/include/c++/13/mutex:
+
+/usr/include/opencv4/opencv2/flann/kdtree_single_index.h:
+
+/usr/include/c++/13/bits/allocated_ptr.h:
+
+/usr/include/c++/13/bit:
+
+/usr/include/c++/13/bits/basic_string.tcc:
+
+/usr/include/x86_64-linux-gnu/bits/types/__sigset_t.h:
+
+/usr/include/opencv4/opencv2/flann/autotuned_index.h:
+
+/usr/include/c++/13/bits/charconv.h:
+
+/usr/include/x86_64-linux-gnu/bits/signum-arch.h:
+
+/usr/include/x86_64-linux-gnu/bits/errno.h:
+
+/usr/include/c++/13/bits/stl_pair.h:
+
+/usr/include/c++/13/bits/fs_path.h:
+
+/usr/include/c++/13/cstdio:
+
+/usr/lib/gcc/x86_64-linux-gnu/13/include/xmmintrin.h:
+
+/usr/include/c++/13/fstream:
+
+/usr/include/opencv4/opencv2/core/hal/interface.h:
+
 /usr/local/include/vrpn_Shared.h:
 
 /usr/include/c++/13/bits/basic_ios.tcc:
@@ -1105,11 +1130,23 @@ CMakeFiles/helper_functions.dir/src/main.cpp.o: /home/finn/ferroflock/helper_fun
 
 /usr/include/c++/13/istream:
 
+/usr/include/opencv4/opencv2/stitching/detail/util.hpp:
+
+/usr/include/opencv4/opencv2/flann/lsh_index.h:
+
+/usr/include/asm-generic/socket.h:
+
+/usr/include/c++/13/bits/refwrap.h:
+
+/usr/include/c++/13/bits/fstream.tcc:
+
 /usr/include/x86_64-linux-gnu/bits/sigcontext.h:
 
 /usr/include/c++/13/tr1/special_function_util.h:
 
 /home/finn/ferroflock/helper_functions/include/optitrack.h:
+
+/usr/include/alloca.h:
 
 /usr/include/assert.h:
 
@@ -1117,31 +1154,41 @@ CMakeFiles/helper_functions.dir/src/main.cpp.o: /home/finn/ferroflock/helper_fun
 
 /usr/include/c++/13/backward/auto_ptr.h:
 
+/usr/include/x86_64-linux-gnu/bits/types/sigset_t.h:
+
+/usr/include/asm-generic/bitsperlong.h:
+
+/usr/include/opencv4/opencv2/dnn/dnn.hpp:
+
+/usr/include/c++/13/cctype:
+
+/usr/include/x86_64-linux-gnu/bits/types/struct_tm.h:
+
+/usr/include/c++/13/ext/atomicity.h:
+
+/usr/include/opencv4/opencv2/flann/lsh_table.h:
+
+/usr/include/c++/13/tr1/gamma.tcc:
+
+/usr/include/wchar.h:
+
+/usr/include/c++/13/bits/shared_ptr_base.h:
+
+/usr/include/c++/13/bits/basic_ios.h:
+
 /usr/include/c++/13/array:
-
-/usr/include/x86_64-linux-gnu/bits/mathcalls-helper-functions.h:
-
-/usr/include/opencv4/opencv2/core/utility.hpp:
 
 /usr/include/c++/13/bits/stl_iterator_base_funcs.h:
 
 /usr/include/asm-generic/errno-base.h:
 
-/usr/include/opencv4/opencv2/stitching/detail/util.hpp:
-
-/usr/include/opencv4/opencv2/flann/lsh_index.h:
-
-/usr/include/asm-generic/socket.h:
-
-/usr/include/alloca.h:
-
-/usr/include/c++/13/bits/refwrap.h:
-
-/usr/include/c++/13/bits/fstream.tcc:
-
 /usr/include/c++/13/bits/streambuf.tcc:
 
 /usr/include/c++/13/bits/specfun.h:
+
+/usr/include/c++/13/atomic:
+
+/usr/include/x86_64-linux-gnu/bits/termios-tcflow.h:
 
 /usr/include/c++/13/bits/basic_string.h:
 
@@ -1164,6 +1211,12 @@ CMakeFiles/helper_functions.dir/src/main.cpp.o: /home/finn/ferroflock/helper_fun
 /usr/include/c++/13/bits/hashtable_policy.h:
 
 /usr/include/netinet/in.h:
+
+/usr/include/x86_64-linux-gnu/bits/termios-c_lflag.h:
+
+/usr/include/opencv4/opencv2/core/vsx_utils.hpp:
+
+/usr/include/c++/13/bits/deque.tcc:
 
 /home/finn/ferroflock/helper_functions/src/main.cpp:
 
@@ -1229,10 +1282,6 @@ CMakeFiles/helper_functions.dir/src/main.cpp.o: /home/finn/ferroflock/helper_fun
 
 /usr/include/errno.h:
 
-/usr/include/opencv4/opencv2/flann/random.h:
-
-/usr/include/c++/13/bits/ios_base.h:
-
 /usr/include/c++/13/optional:
 
 /usr/include/c++/13/bits/vector.tcc:
@@ -1248,10 +1297,6 @@ CMakeFiles/helper_functions.dir/src/main.cpp.o: /home/finn/ferroflock/helper_fun
 /usr/include/c++/13/climits:
 
 /usr/include/c++/13/cmath:
-
-/usr/include/c++/13/ctime:
-
-/usr/include/c++/13/deque:
 
 /usr/include/c++/13/system_error:
 
@@ -1351,6 +1396,8 @@ CMakeFiles/helper_functions.dir/src/main.cpp.o: /home/finn/ferroflock/helper_fun
 
 /usr/include/opencv4/opencv2/core/affine.hpp:
 
+/home/finn/ferroflock/helper_functions/include/tello_imu_handler.h:
+
 /usr/include/opencv4/opencv2/core/fast_math.hpp:
 
 /usr/include/x86_64-linux-gnu/bits/stdint-intn.h:
@@ -1413,8 +1460,6 @@ CMakeFiles/helper_functions.dir/src/main.cpp.o: /home/finn/ferroflock/helper_fun
 
 /usr/include/c++/13/vector:
 
-/usr/include/opencv4/opencv2/core/version.hpp:
-
 /usr/lib/gcc/x86_64-linux-gnu/13/include/float.h:
 
 /usr/include/ctype.h:
@@ -1435,9 +1480,9 @@ CMakeFiles/helper_functions.dir/src/main.cpp.o: /home/finn/ferroflock/helper_fun
 
 /usr/include/opencv4/opencv2/core.hpp:
 
-/home/finn/ferroflock/helper_functions/include/tello_controller.h:
-
 /usr/include/c++/13/codecvt:
+
+/home/finn/ferroflock/helper_functions/include/tello_controller.h:
 
 /usr/include/opencv4/opencv2/core/base.hpp:
 
@@ -1483,11 +1528,15 @@ CMakeFiles/helper_functions.dir/src/main.cpp.o: /home/finn/ferroflock/helper_fun
 
 /usr/include/opencv4/opencv2/core/mat.hpp:
 
+/usr/include/x86_64-linux-gnu/bits/termios-c_cc.h:
+
 /usr/include/x86_64-linux-gnu/bits/endian.h:
 
 /usr/include/opencv4/opencv2/stitching/detail/motion_estimators.hpp:
 
 /usr/include/opencv4/opencv2/core/ovx.hpp:
+
+/usr/include/termios.h:
 
 /usr/include/opencv4/opencv2/core/mat.inl.hpp:
 
@@ -1498,7 +1547,3 @@ CMakeFiles/helper_functions.dir/src/main.cpp.o: /home/finn/ferroflock/helper_fun
 /usr/include/opencv4/opencv2/core/operations.hpp:
 
 /usr/include/opencv4/opencv2/core/saturate.hpp:
-
-/usr/include/c++/13/bits/deque.tcc:
-
-/usr/include/opencv4/opencv2/core/vsx_utils.hpp:

@@ -1,0 +1,2 @@
+/usr/bin/ar qc libkeyboard_control.a CMakeFiles/keyboard_control.dir/src/keyboard_control.cpp.o
+/usr/bin/ranlib libkeyboard_control.a

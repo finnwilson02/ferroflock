@@ -97,11 +97,10 @@ helper_functions: libtello_imu_handler.a
 helper_functions: liblogger.a
 helper_functions: liboptitrack.a
 helper_functions: libcalibration.a
+helper_functions: libkeyboard_control.a
 helper_functions: libmenu.a
 helper_functions: libcalibration.a
-helper_functions: libtello_controller.a
 helper_functions: liboptitrack.a
-helper_functions: liblogger.a
 helper_functions: /usr/lib/x86_64-linux-gnu/libopencv_stitching.so.4.6.0
 helper_functions: /usr/lib/x86_64-linux-gnu/libopencv_alphamat.so.4.6.0
 helper_functions: /usr/lib/x86_64-linux-gnu/libopencv_aruco.so.4.6.0
@@ -157,6 +156,9 @@ helper_functions: /usr/lib/x86_64-linux-gnu/libopencv_xphoto.so.4.6.0
 helper_functions: /usr/lib/x86_64-linux-gnu/libopencv_photo.so.4.6.0
 helper_functions: /usr/lib/x86_64-linux-gnu/libopencv_imgproc.so.4.6.0
 helper_functions: /usr/lib/x86_64-linux-gnu/libopencv_core.so.4.6.0
+helper_functions: libkeyboard_control.a
+helper_functions: libtello_controller.a
+helper_functions: liblogger.a
 helper_functions: CMakeFiles/helper_functions.dir/link.txt
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --bold --progress-dir=/home/finn/ferroflock/helper_functions/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Linking CXX executable helper_functions"
 	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/helper_functions.dir/link.txt --verbose=$(VERBOSE)

@@ -7,6 +7,7 @@ CMakeFiles/calibration.dir/src/calibration.cpp.o
  /home/finn/ferroflock/helper_functions/include/logger.h
  /home/finn/ferroflock/helper_functions/include/optitrack.h
  /home/finn/ferroflock/helper_functions/include/tello_controller.h
+ /home/finn/ferroflock/helper_functions/include/tello_imu_handler.h
  /usr/include/alloca.h
  /usr/include/arpa/inet.h
  /usr/include/asm-generic/bitsperlong.h
@@ -18,6 +19,7 @@ CMakeFiles/calibration.dir/src/calibration.cpp.o
  /usr/include/assert.h
  /usr/include/c++/13/algorithm
  /usr/include/c++/13/array
+ /usr/include/c++/13/atomic
  /usr/include/c++/13/backward/auto_ptr.h
  /usr/include/c++/13/backward/binders.h
  /usr/include/c++/13/bit

@@ -1,0 +1,1 @@
+/usr/bin/c++ CMakeFiles/test_keyboard_control.dir/tests/test_keyboard_control.cpp.o -o test_keyboard_control  libtello_controller.a liblogger.a libkeyboard_control.a -lpthread libtello_controller.a liblogger.a 

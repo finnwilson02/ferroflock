@@ -51,6 +51,9 @@ public:
     
     // Perform cleanup (land all drones, close sockets, etc.)
     void cleanup();
+    
+    // Send a command to all drones simultaneously
+    void sendCommandToAll(const std::string& command);
 
 private:
     // Private inner class to handle individual Tello devices

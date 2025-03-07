@@ -429,4 +429,16 @@ CMakeFiles/test_imu.dir/tests/test_imu.cpp.o: \
  /usr/local/include/vrpn_EndpointContainer.h \
  /usr/local/include/vrpn_Assert.h \
  /home/finn/ferroflock/helper_functions/tests/../include/calibration.h \
- /home/finn/ferroflock/helper_functions/tests/../include/logger.h
+ /home/finn/ferroflock/helper_functions/tests/../include/logger.h \
+ /home/finn/ferroflock/helper_functions/tests/../include/keyboard_control.h \
+ /usr/include/termios.h /usr/include/x86_64-linux-gnu/bits/termios.h \
+ /usr/include/x86_64-linux-gnu/bits/termios-struct.h \
+ /usr/include/x86_64-linux-gnu/bits/termios-c_cc.h \
+ /usr/include/x86_64-linux-gnu/bits/termios-c_iflag.h \
+ /usr/include/x86_64-linux-gnu/bits/termios-c_oflag.h \
+ /usr/include/x86_64-linux-gnu/bits/termios-baud.h \
+ /usr/include/x86_64-linux-gnu/bits/termios-c_cflag.h \
+ /usr/include/x86_64-linux-gnu/bits/termios-c_lflag.h \
+ /usr/include/x86_64-linux-gnu/bits/termios-tcflow.h \
+ /usr/include/x86_64-linux-gnu/bits/termios-misc.h \
+ /usr/include/x86_64-linux-gnu/sys/ttydefaults.h

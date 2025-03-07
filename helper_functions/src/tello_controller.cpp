@@ -368,3 +368,10 @@ void TelloController::cleanup() {
     
     std::cout << "All drones have been landed and rebooted" << std::endl;
 }
+
+// Send a command to all drones simultaneously
+void TelloController::sendCommandToAll(const std::string& command) {
+    for (auto& [ip, device] : devices) {
+        device.sendCommand(command);
+    }
+}

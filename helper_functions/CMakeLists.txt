@@ -37,6 +37,10 @@ set(CALIBRATION_SOURCES
     src/calibration.cpp
 )
 
+set(KEYBOARD_CONTROL_SOURCES
+    src/keyboard_control.cpp
+)
+
 set(MENU_SOURCES
     src/menu.cpp
 )
@@ -53,12 +57,17 @@ set(TEST_IMU_SOURCES
     tests/test_imu.cpp
 )
 
+set(TEST_KEYBOARD_CONTROL_SOURCES
+    tests/test_keyboard_control.cpp
+)
+
 # Create libraries
 add_library(tello_controller ${TELLO_CONTROLLER_SOURCES})
 add_library(tello_imu_handler ${TELLO_IMU_HANDLER_SOURCES})
 add_library(logger ${LOGGER_SOURCES})
 add_library(optitrack ${OPTITRACK_SOURCES})
 add_library(calibration ${CALIBRATION_SOURCES})
+add_library(keyboard_control ${KEYBOARD_CONTROL_SOURCES})
 add_library(menu ${MENU_SOURCES})
 
 # Create main executable
@@ -67,12 +76,14 @@ add_executable(helper_functions ${MAIN_SOURCES})
 # Create test executables
 add_executable(test_optitrack_logging ${TEST_OPTITRACK_LOGGING_SOURCES})
 add_executable(test_imu ${TEST_IMU_SOURCES})
+add_executable(test_keyboard_control ${TEST_KEYBOARD_CONTROL_SOURCES})
 
 # Set dependencies for libraries
 target_link_libraries(tello_imu_handler PRIVATE tello_controller)
 target_link_libraries(optitrack PRIVATE logger ${OpenCV_LIBS} vrpn quat)
 target_link_libraries(calibration PRIVATE logger optitrack tello_controller)
-target_link_libraries(menu PRIVATE logger optitrack tello_controller calibration)
+target_link_libraries(keyboard_control PRIVATE logger tello_controller)
+target_link_libraries(menu PRIVATE logger optitrack tello_controller calibration keyboard_control)
 
 # Link libraries to main executable
 target_link_libraries(helper_functions
@@ -82,6 +93,7 @@ target_link_libraries(helper_functions
     logger
     optitrack
     calibration
+    keyboard_control
     menu
     ${OpenCV_LIBS}
     vrpn
@@ -113,8 +125,17 @@ target_link_libraries(test_imu
     pthread
 )
 
+# Link libraries to test_keyboard_control
+target_link_libraries(test_keyboard_control
+    PRIVATE
+    tello_controller
+    logger
+    keyboard_control
+    pthread
+)
+
 # Install targets
-install(TARGETS helper_functions test_optitrack_logging test_imu DESTINATION bin)
+install(TARGETS helper_functions test_optitrack_logging test_imu test_keyboard_control DESTINATION bin)
 
 # No need to copy configuration files to the build directory
 # Configuration files will be accessed relative to the executable

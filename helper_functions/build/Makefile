@@ -227,6 +227,19 @@ calibration/fast:
 .PHONY : calibration/fast
 
 #=============================================================================
+# Target rules for targets named keyboard_control
+
+# Build rule for target.
+keyboard_control: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 keyboard_control
+.PHONY : keyboard_control
+
+# fast build rule for target.
+keyboard_control/fast:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/keyboard_control.dir/build.make CMakeFiles/keyboard_control.dir/build
+.PHONY : keyboard_control/fast
+
+#=============================================================================
 # Target rules for targets named menu
 
 # Build rule for target.
@@ -278,6 +291,19 @@ test_imu/fast:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_imu.dir/build.make CMakeFiles/test_imu.dir/build
 .PHONY : test_imu/fast
 
+#=============================================================================
+# Target rules for targets named test_keyboard_control
+
+# Build rule for target.
+test_keyboard_control: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 test_keyboard_control
+.PHONY : test_keyboard_control
+
+# fast build rule for target.
+test_keyboard_control/fast:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_keyboard_control.dir/build.make CMakeFiles/test_keyboard_control.dir/build
+.PHONY : test_keyboard_control/fast
+
 src/calibration.o: src/calibration.cpp.o
 .PHONY : src/calibration.o
 
@@ -301,6 +327,30 @@ src/calibration.s: src/calibration.cpp.s
 src/calibration.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/calibration.dir/build.make CMakeFiles/calibration.dir/src/calibration.cpp.s
 .PHONY : src/calibration.cpp.s
+
+src/keyboard_control.o: src/keyboard_control.cpp.o
+.PHONY : src/keyboard_control.o
+
+# target to build an object file
+src/keyboard_control.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/keyboard_control.dir/build.make CMakeFiles/keyboard_control.dir/src/keyboard_control.cpp.o
+.PHONY : src/keyboard_control.cpp.o
+
+src/keyboard_control.i: src/keyboard_control.cpp.i
+.PHONY : src/keyboard_control.i
+
+# target to preprocess a source file
+src/keyboard_control.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/keyboard_control.dir/build.make CMakeFiles/keyboard_control.dir/src/keyboard_control.cpp.i
+.PHONY : src/keyboard_control.cpp.i
+
+src/keyboard_control.s: src/keyboard_control.cpp.s
+.PHONY : src/keyboard_control.s
+
+# target to generate assembly for a file
+src/keyboard_control.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/keyboard_control.dir/build.make CMakeFiles/keyboard_control.dir/src/keyboard_control.cpp.s
+.PHONY : src/keyboard_control.cpp.s
 
 src/logger.o: src/logger.cpp.o
 .PHONY : src/logger.o
@@ -470,6 +520,30 @@ tests/test_imu.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_imu.dir/build.make CMakeFiles/test_imu.dir/tests/test_imu.cpp.s
 .PHONY : tests/test_imu.cpp.s
 
+tests/test_keyboard_control.o: tests/test_keyboard_control.cpp.o
+.PHONY : tests/test_keyboard_control.o
+
+# target to build an object file
+tests/test_keyboard_control.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_keyboard_control.dir/build.make CMakeFiles/test_keyboard_control.dir/tests/test_keyboard_control.cpp.o
+.PHONY : tests/test_keyboard_control.cpp.o
+
+tests/test_keyboard_control.i: tests/test_keyboard_control.cpp.i
+.PHONY : tests/test_keyboard_control.i
+
+# target to preprocess a source file
+tests/test_keyboard_control.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_keyboard_control.dir/build.make CMakeFiles/test_keyboard_control.dir/tests/test_keyboard_control.cpp.i
+.PHONY : tests/test_keyboard_control.cpp.i
+
+tests/test_keyboard_control.s: tests/test_keyboard_control.cpp.s
+.PHONY : tests/test_keyboard_control.s
+
+# target to generate assembly for a file
+tests/test_keyboard_control.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_keyboard_control.dir/build.make CMakeFiles/test_keyboard_control.dir/tests/test_keyboard_control.cpp.s
+.PHONY : tests/test_keyboard_control.cpp.s
+
 tests/test_optitrack_logging.o: tests/test_optitrack_logging.cpp.o
 .PHONY : tests/test_optitrack_logging.o
 
@@ -508,16 +582,21 @@ help:
 	@echo "... rebuild_cache"
 	@echo "... calibration"
 	@echo "... helper_functions"
+	@echo "... keyboard_control"
 	@echo "... logger"
 	@echo "... menu"
 	@echo "... optitrack"
 	@echo "... tello_controller"
 	@echo "... tello_imu_handler"
 	@echo "... test_imu"
+	@echo "... test_keyboard_control"
 	@echo "... test_optitrack_logging"
 	@echo "... src/calibration.o"
 	@echo "... src/calibration.i"
 	@echo "... src/calibration.s"
+	@echo "... src/keyboard_control.o"
+	@echo "... src/keyboard_control.i"
+	@echo "... src/keyboard_control.s"
 	@echo "... src/logger.o"
 	@echo "... src/logger.i"
 	@echo "... src/logger.s"
@@ -539,6 +618,9 @@ help:
 	@echo "... tests/test_imu.o"
 	@echo "... tests/test_imu.i"
 	@echo "... tests/test_imu.s"
+	@echo "... tests/test_keyboard_control.o"
+	@echo "... tests/test_keyboard_control.i"
+	@echo "... tests/test_keyboard_control.s"
 	@echo "... tests/test_optitrack_logging.o"
 	@echo "... tests/test_optitrack_logging.i"
 	@echo "... tests/test_optitrack_logging.s"

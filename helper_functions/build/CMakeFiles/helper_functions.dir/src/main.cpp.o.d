@@ -202,7 +202,9 @@ CMakeFiles/helper_functions.dir/src/main.cpp.o: \
  /usr/include/c++/13/bits/unique_ptr.h \
  /usr/include/c++/13/ext/aligned_buffer.h \
  /usr/include/c++/13/bits/fs_dir.h /usr/include/c++/13/bits/fs_ops.h \
- /usr/include/string.h /usr/include/strings.h \
+ /usr/include/string.h /usr/include/strings.h /usr/include/c++/13/thread \
+ /usr/include/c++/13/bits/std_thread.h \
+ /usr/include/c++/13/bits/this_thread_sleep.h \
  /home/finn/ferroflock/helper_functions/src/../include/tello_controller.h \
  /usr/include/c++/13/vector /usr/include/c++/13/bits/stl_uninitialized.h \
  /usr/include/c++/13/bits/stl_vector.h \
@@ -212,9 +214,7 @@ CMakeFiles/helper_functions.dir/src/main.cpp.o: \
  /usr/include/c++/13/bits/node_handle.h \
  /usr/include/c++/13/bits/stl_map.h \
  /usr/include/c++/13/bits/stl_multimap.h \
- /usr/include/c++/13/bits/erase_if.h /usr/include/c++/13/thread \
- /usr/include/c++/13/bits/std_thread.h \
- /usr/include/c++/13/bits/this_thread_sleep.h /usr/include/c++/13/mutex \
+ /usr/include/c++/13/bits/erase_if.h /usr/include/c++/13/mutex \
  /usr/include/c++/13/bits/std_mutex.h \
  /usr/include/c++/13/bits/unique_lock.h /usr/include/c++/13/chrono \
  /usr/include/c++/13/functional /usr/include/c++/13/bits/std_function.h \
@@ -431,4 +431,18 @@ CMakeFiles/helper_functions.dir/src/main.cpp.o: \
  /home/finn/ferroflock/helper_functions/src/../include/optitrack.h \
  /home/finn/ferroflock/helper_functions/src/../include/tello_controller.h \
  /home/finn/ferroflock/helper_functions/src/../include/calibration.h \
- /home/finn/ferroflock/helper_functions/src/../include/logger.h
+ /home/finn/ferroflock/helper_functions/src/../include/logger.h \
+ /home/finn/ferroflock/helper_functions/src/../include/keyboard_control.h \
+ /usr/include/c++/13/atomic /usr/include/termios.h \
+ /usr/include/x86_64-linux-gnu/bits/termios.h \
+ /usr/include/x86_64-linux-gnu/bits/termios-struct.h \
+ /usr/include/x86_64-linux-gnu/bits/termios-c_cc.h \
+ /usr/include/x86_64-linux-gnu/bits/termios-c_iflag.h \
+ /usr/include/x86_64-linux-gnu/bits/termios-c_oflag.h \
+ /usr/include/x86_64-linux-gnu/bits/termios-baud.h \
+ /usr/include/x86_64-linux-gnu/bits/termios-c_cflag.h \
+ /usr/include/x86_64-linux-gnu/bits/termios-c_lflag.h \
+ /usr/include/x86_64-linux-gnu/bits/termios-tcflow.h \
+ /usr/include/x86_64-linux-gnu/bits/termios-misc.h \
+ /usr/include/x86_64-linux-gnu/sys/ttydefaults.h \
+ /home/finn/ferroflock/helper_functions/src/../include/tello_imu_handler.h

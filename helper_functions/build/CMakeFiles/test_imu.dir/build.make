@@ -98,9 +98,7 @@ test_imu: liblogger.a
 test_imu: libmenu.a
 test_imu: liboptitrack.a
 test_imu: libcalibration.a
-test_imu: libtello_controller.a
 test_imu: liboptitrack.a
-test_imu: liblogger.a
 test_imu: /usr/lib/x86_64-linux-gnu/libopencv_stitching.so.4.6.0
 test_imu: /usr/lib/x86_64-linux-gnu/libopencv_alphamat.so.4.6.0
 test_imu: /usr/lib/x86_64-linux-gnu/libopencv_aruco.so.4.6.0
@@ -156,6 +154,9 @@ test_imu: /usr/lib/x86_64-linux-gnu/libopencv_xphoto.so.4.6.0
 test_imu: /usr/lib/x86_64-linux-gnu/libopencv_photo.so.4.6.0
 test_imu: /usr/lib/x86_64-linux-gnu/libopencv_imgproc.so.4.6.0
 test_imu: /usr/lib/x86_64-linux-gnu/libopencv_core.so.4.6.0
+test_imu: libkeyboard_control.a
+test_imu: libtello_controller.a
+test_imu: liblogger.a
 test_imu: CMakeFiles/test_imu.dir/link.txt
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --bold --progress-dir=/home/finn/ferroflock/helper_functions/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Linking CXX executable test_imu"
 	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/test_imu.dir/link.txt --verbose=$(VERBOSE)

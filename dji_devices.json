@@ -1,3 +1,15 @@
 {
-  "devices": []
+  "devices": [
+    {
+      "ip": "192.168.1.103",
+      "port": 8889,
+      "name": "Bird1",
+      "type": "tello",
+      "model": "Tello EDU",
+      "mac": "34:d2:62:ed:f3:ce",
+      "status": "online",
+      "discovered": "2025-03-07 14:02:37",
+      "tracker_id": "Bird1"
+    }
+  ]
 }

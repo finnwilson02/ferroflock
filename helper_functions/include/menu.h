@@ -24,6 +24,7 @@
 #include "optitrack.h"
 #include "tello_controller.h"
 #include "calibration.h"
+#include "keyboard_control.h"
 
 // Menu option struct
 struct MenuOption {
@@ -104,6 +105,9 @@ private:
     
     // Mutex for thread safety when accessing drones_
     std::mutex drones_mutex_;
+    
+    // Keyboard control handler (not active by default)
+    std::unique_ptr<KeyboardControl> keyboard_control_;
     
     // Get user input with validation
     std::string getValidInput(const std::vector<std::string>& valid_inputs);

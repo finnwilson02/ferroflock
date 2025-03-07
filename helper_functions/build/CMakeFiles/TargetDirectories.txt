@@ -3,10 +3,12 @@
 /home/finn/ferroflock/helper_functions/build/CMakeFiles/logger.dir
 /home/finn/ferroflock/helper_functions/build/CMakeFiles/optitrack.dir
 /home/finn/ferroflock/helper_functions/build/CMakeFiles/calibration.dir
+/home/finn/ferroflock/helper_functions/build/CMakeFiles/keyboard_control.dir
 /home/finn/ferroflock/helper_functions/build/CMakeFiles/menu.dir
 /home/finn/ferroflock/helper_functions/build/CMakeFiles/helper_functions.dir
 /home/finn/ferroflock/helper_functions/build/CMakeFiles/test_optitrack_logging.dir
 /home/finn/ferroflock/helper_functions/build/CMakeFiles/test_imu.dir
+/home/finn/ferroflock/helper_functions/build/CMakeFiles/test_keyboard_control.dir
 /home/finn/ferroflock/helper_functions/build/CMakeFiles/edit_cache.dir
 /home/finn/ferroflock/helper_functions/build/CMakeFiles/rebuild_cache.dir
 /home/finn/ferroflock/helper_functions/build/CMakeFiles/list_install_components.dir

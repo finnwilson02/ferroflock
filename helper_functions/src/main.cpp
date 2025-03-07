@@ -136,13 +136,14 @@ int main(int argc, char** argv) {
     g_menu = new Menu(*g_optitrack, *g_tello_controller);
     g_menu->initialize();
     
-    // Initialize IMU handlers for all drones
-    std::map<std::string, TelloIMUHandler> imu_handlers;
+    // Initialize IMU handlers for all drones using unique_ptr
+    std::map<std::string, std::unique_ptr<TelloIMUHandler>> imu_handlers;
     for (const auto& drone : g_menu->loadDronesFromJSON("../dji_devices.json")) {
-        imu_handlers.emplace(drone.ip, TelloIMUHandler(*g_tello_controller, drone.ip));
-        if (!imu_handlers[drone.ip].initialize()) {
+        auto handler = std::make_unique<TelloIMUHandler>(*g_tello_controller, drone.ip);
+        if (!handler->initialize()) {
             std::cerr << "Failed to initialize IMU handler for " << drone.ip << std::endl;
         }
+        imu_handlers[drone.ip] = std::move(handler);
     }
     
     // Start IMU logging thread
@@ -150,15 +151,15 @@ int main(int argc, char** argv) {
         while (true) {
             if (g_logger && g_logger->isOpen()) {
                 for (auto& [ip, handler] : imu_handlers) {
-                    if (handler.isDataValid()) {
+                    if (handler->isDataValid()) {
                         DataPoint data;
                         data.timestamp = std::chrono::system_clock::now();
-                        data.imu_yaw = handler.getYaw();
-                        data.imu_pitch = handler.getPitch();
-                        data.imu_roll = handler.getRoll();
-                        data.imu_agx = handler.getAgx();
-                        data.imu_agy = handler.getAgy();
-                        data.imu_agz = handler.getAgz();
+                        data.imu_yaw = handler->getYaw();
+                        data.imu_pitch = handler->getPitch();
+                        data.imu_roll = handler->getRoll();
+                        data.imu_agx = handler->getAgx();
+                        data.imu_agy = handler->getAgy();
+                        data.imu_agz = handler->getAgz();
                         data.tracker_id = "Unknown"; // Update if linked to tracker
                         g_logger->logData(data);
                     }
