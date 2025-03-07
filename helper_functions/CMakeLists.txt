@@ -42,7 +42,7 @@ set(MAIN_SOURCES
 )
 
 set(TEST_OPTITRACK_LOGGING_SOURCES
-    src/test_optitrack_logging.cpp
+    tests/test_optitrack_logging.cpp
 )
 
 # Create libraries

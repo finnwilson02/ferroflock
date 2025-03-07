@@ -69,28 +69,28 @@ include CMakeFiles/test_optitrack_logging.dir/progress.make
 # Include the compile flags for this target's objects.
 include CMakeFiles/test_optitrack_logging.dir/flags.make
 
-CMakeFiles/test_optitrack_logging.dir/src/test_optitrack_logging.cpp.o: CMakeFiles/test_optitrack_logging.dir/flags.make
-CMakeFiles/test_optitrack_logging.dir/src/test_optitrack_logging.cpp.o: /home/finn/ferroflock/helper_functions/src/test_optitrack_logging.cpp
-CMakeFiles/test_optitrack_logging.dir/src/test_optitrack_logging.cpp.o: CMakeFiles/test_optitrack_logging.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/finn/ferroflock/helper_functions/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building CXX object CMakeFiles/test_optitrack_logging.dir/src/test_optitrack_logging.cpp.o"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/test_optitrack_logging.dir/src/test_optitrack_logging.cpp.o -MF CMakeFiles/test_optitrack_logging.dir/src/test_optitrack_logging.cpp.o.d -o CMakeFiles/test_optitrack_logging.dir/src/test_optitrack_logging.cpp.o -c /home/finn/ferroflock/helper_functions/src/test_optitrack_logging.cpp
+CMakeFiles/test_optitrack_logging.dir/tests/test_optitrack_logging.cpp.o: CMakeFiles/test_optitrack_logging.dir/flags.make
+CMakeFiles/test_optitrack_logging.dir/tests/test_optitrack_logging.cpp.o: /home/finn/ferroflock/helper_functions/tests/test_optitrack_logging.cpp
+CMakeFiles/test_optitrack_logging.dir/tests/test_optitrack_logging.cpp.o: CMakeFiles/test_optitrack_logging.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/finn/ferroflock/helper_functions/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building CXX object CMakeFiles/test_optitrack_logging.dir/tests/test_optitrack_logging.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/test_optitrack_logging.dir/tests/test_optitrack_logging.cpp.o -MF CMakeFiles/test_optitrack_logging.dir/tests/test_optitrack_logging.cpp.o.d -o CMakeFiles/test_optitrack_logging.dir/tests/test_optitrack_logging.cpp.o -c /home/finn/ferroflock/helper_functions/tests/test_optitrack_logging.cpp
 
-CMakeFiles/test_optitrack_logging.dir/src/test_optitrack_logging.cpp.i: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/test_optitrack_logging.dir/src/test_optitrack_logging.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/finn/ferroflock/helper_functions/src/test_optitrack_logging.cpp > CMakeFiles/test_optitrack_logging.dir/src/test_optitrack_logging.cpp.i
+CMakeFiles/test_optitrack_logging.dir/tests/test_optitrack_logging.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/test_optitrack_logging.dir/tests/test_optitrack_logging.cpp.i"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/finn/ferroflock/helper_functions/tests/test_optitrack_logging.cpp > CMakeFiles/test_optitrack_logging.dir/tests/test_optitrack_logging.cpp.i
 
-CMakeFiles/test_optitrack_logging.dir/src/test_optitrack_logging.cpp.s: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/test_optitrack_logging.dir/src/test_optitrack_logging.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/finn/ferroflock/helper_functions/src/test_optitrack_logging.cpp -o CMakeFiles/test_optitrack_logging.dir/src/test_optitrack_logging.cpp.s
+CMakeFiles/test_optitrack_logging.dir/tests/test_optitrack_logging.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/test_optitrack_logging.dir/tests/test_optitrack_logging.cpp.s"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/finn/ferroflock/helper_functions/tests/test_optitrack_logging.cpp -o CMakeFiles/test_optitrack_logging.dir/tests/test_optitrack_logging.cpp.s
 
 # Object files for target test_optitrack_logging
 test_optitrack_logging_OBJECTS = \
-"CMakeFiles/test_optitrack_logging.dir/src/test_optitrack_logging.cpp.o"
+"CMakeFiles/test_optitrack_logging.dir/tests/test_optitrack_logging.cpp.o"
 
 # External object files for target test_optitrack_logging
 test_optitrack_logging_EXTERNAL_OBJECTS =
 
-test_optitrack_logging: CMakeFiles/test_optitrack_logging.dir/src/test_optitrack_logging.cpp.o
+test_optitrack_logging: CMakeFiles/test_optitrack_logging.dir/tests/test_optitrack_logging.cpp.o
 test_optitrack_logging: CMakeFiles/test_optitrack_logging.dir/build.make
 test_optitrack_logging: liblogger.a
 test_optitrack_logging: liboptitrack.a

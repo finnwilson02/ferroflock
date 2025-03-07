@@ -396,29 +396,29 @@ src/tello_controller.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/tello_controller.dir/build.make CMakeFiles/tello_controller.dir/src/tello_controller.cpp.s
 .PHONY : src/tello_controller.cpp.s
 
-src/test_optitrack_logging.o: src/test_optitrack_logging.cpp.o
-.PHONY : src/test_optitrack_logging.o
+tests/test_optitrack_logging.o: tests/test_optitrack_logging.cpp.o
+.PHONY : tests/test_optitrack_logging.o
 
 # target to build an object file
-src/test_optitrack_logging.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_optitrack_logging.dir/build.make CMakeFiles/test_optitrack_logging.dir/src/test_optitrack_logging.cpp.o
-.PHONY : src/test_optitrack_logging.cpp.o
+tests/test_optitrack_logging.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_optitrack_logging.dir/build.make CMakeFiles/test_optitrack_logging.dir/tests/test_optitrack_logging.cpp.o
+.PHONY : tests/test_optitrack_logging.cpp.o
 
-src/test_optitrack_logging.i: src/test_optitrack_logging.cpp.i
-.PHONY : src/test_optitrack_logging.i
+tests/test_optitrack_logging.i: tests/test_optitrack_logging.cpp.i
+.PHONY : tests/test_optitrack_logging.i
 
 # target to preprocess a source file
-src/test_optitrack_logging.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_optitrack_logging.dir/build.make CMakeFiles/test_optitrack_logging.dir/src/test_optitrack_logging.cpp.i
-.PHONY : src/test_optitrack_logging.cpp.i
+tests/test_optitrack_logging.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_optitrack_logging.dir/build.make CMakeFiles/test_optitrack_logging.dir/tests/test_optitrack_logging.cpp.i
+.PHONY : tests/test_optitrack_logging.cpp.i
 
-src/test_optitrack_logging.s: src/test_optitrack_logging.cpp.s
-.PHONY : src/test_optitrack_logging.s
+tests/test_optitrack_logging.s: tests/test_optitrack_logging.cpp.s
+.PHONY : tests/test_optitrack_logging.s
 
 # target to generate assembly for a file
-src/test_optitrack_logging.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_optitrack_logging.dir/build.make CMakeFiles/test_optitrack_logging.dir/src/test_optitrack_logging.cpp.s
-.PHONY : src/test_optitrack_logging.cpp.s
+tests/test_optitrack_logging.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_optitrack_logging.dir/build.make CMakeFiles/test_optitrack_logging.dir/tests/test_optitrack_logging.cpp.s
+.PHONY : tests/test_optitrack_logging.cpp.s
 
 # Help Target
 help:
@@ -457,9 +457,9 @@ help:
 	@echo "... src/tello_controller.o"
 	@echo "... src/tello_controller.i"
 	@echo "... src/tello_controller.s"
-	@echo "... src/test_optitrack_logging.o"
-	@echo "... src/test_optitrack_logging.i"
-	@echo "... src/test_optitrack_logging.s"
+	@echo "... tests/test_optitrack_logging.o"
+	@echo "... tests/test_optitrack_logging.i"
+	@echo "... tests/test_optitrack_logging.s"
 .PHONY : help
 
 

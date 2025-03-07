@@ -1,6 +1,6 @@
 file(REMOVE_RECURSE
-  "CMakeFiles/test_optitrack_logging.dir/src/test_optitrack_logging.cpp.o"
-  "CMakeFiles/test_optitrack_logging.dir/src/test_optitrack_logging.cpp.o.d"
+  "CMakeFiles/test_optitrack_logging.dir/tests/test_optitrack_logging.cpp.o"
+  "CMakeFiles/test_optitrack_logging.dir/tests/test_optitrack_logging.cpp.o.d"
   "test_optitrack_logging"
   "test_optitrack_logging.pdb"
 )

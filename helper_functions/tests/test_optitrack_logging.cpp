@@ -1,5 +1,6 @@
-// test_optitrack_logging.cpp
+// tests/test_optitrack_logging.cpp
 // Standalone test script to log OptiTrack data for one active tracker
+// Moved to 'tests' folder and built with 'make tests' target
 
 #include <iostream>          // For console output
 #include <signal.h>          // For signal handling (Ctrl+C)
@@ -7,9 +8,9 @@
 #include <thread>            // For sleep functionality
 #include <memory>            // For smart pointers if needed later
 #include <cstdlib>           // For atexit
-#include "optitrack.h"       // OptiTrack class for tracker data
-#include "logger.h"          // Logger class for saving data
-#include "test_optitrack_logging.h" // Header for this file
+#include "../include/optitrack.h"       // OptiTrack class for tracker data
+#include "../include/logger.h"          // Logger class for saving data
+#include "../include/test_optitrack_logging.h" // Header for this file
 
 // Define the global debug flag
 bool g_debug_enabled = false;
