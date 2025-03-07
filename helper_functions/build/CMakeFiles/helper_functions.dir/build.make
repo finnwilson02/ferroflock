@@ -93,6 +93,7 @@ helper_functions_EXTERNAL_OBJECTS =
 helper_functions: CMakeFiles/helper_functions.dir/src/main.cpp.o
 helper_functions: CMakeFiles/helper_functions.dir/build.make
 helper_functions: libtello_controller.a
+helper_functions: libtello_imu_handler.a
 helper_functions: liblogger.a
 helper_functions: liboptitrack.a
 helper_functions: libcalibration.a

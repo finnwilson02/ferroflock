@@ -42,7 +42,9 @@ bool Logger::open(const std::string& filename) {
     // Write header if file is new
     if (file_.tellp() == 0) {
         LOG_DEBUG("Adding CSV header to log file");
-        file_ << "timestamp,x,y,z,qw,qx,qy,qz,yaw_raw,yaw_corrected,imu_yaw,commanded_yaw,tracker_id\n";
+        file_ << "timestamp,x,y,z,qw,qx,qy,qz,yaw_raw,yaw_corrected,"
+              << "imu_yaw,imu_pitch,imu_roll,imu_agx,imu_agy,imu_agz,"
+              << "commanded_yaw,tracker_id\n";
         file_.flush();
     }
     
@@ -91,6 +93,11 @@ void Logger::logData(const DataPoint& data) {
           << data.yaw_raw << ","
           << data.yaw_corrected << ","
           << data.imu_yaw << ","
+          << data.imu_pitch << ","
+          << data.imu_roll << ","
+          << data.imu_agx << ","
+          << data.imu_agy << ","
+          << data.imu_agz << ","
           << data.commanded_yaw << ","
           << data.tracker_id << "\n";
     

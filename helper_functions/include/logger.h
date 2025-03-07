@@ -32,6 +32,11 @@ struct DataPoint {
     double yaw_raw{0.0};
     double yaw_corrected{0.0};
     double imu_yaw{0.0};
+    double imu_pitch{0.0};
+    double imu_roll{0.0};
+    double imu_agx{0.0};
+    double imu_agy{0.0};
+    double imu_agz{0.0};
     double commanded_yaw{0.0};
     std::string tracker_id;
     
@@ -39,7 +44,7 @@ struct DataPoint {
     DataPoint() = default;
     
     // Constructor with timestamp set to now
-    DataPoint(const std::string& id) : tracker_id(id), timestamp(std::chrono::system_clock::now()) {}
+    DataPoint(const std::string& id) : timestamp(std::chrono::system_clock::now()), tracker_id(id) {}
 };
 
 class Logger {

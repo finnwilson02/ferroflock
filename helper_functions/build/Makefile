@@ -175,6 +175,19 @@ tello_controller/fast:
 .PHONY : tello_controller/fast
 
 #=============================================================================
+# Target rules for targets named tello_imu_handler
+
+# Build rule for target.
+tello_imu_handler: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 tello_imu_handler
+.PHONY : tello_imu_handler
+
+# fast build rule for target.
+tello_imu_handler/fast:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/tello_imu_handler.dir/build.make CMakeFiles/tello_imu_handler.dir/build
+.PHONY : tello_imu_handler/fast
+
+#=============================================================================
 # Target rules for targets named logger
 
 # Build rule for target.
@@ -251,6 +264,19 @@ test_optitrack_logging: cmake_check_build_system
 test_optitrack_logging/fast:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_optitrack_logging.dir/build.make CMakeFiles/test_optitrack_logging.dir/build
 .PHONY : test_optitrack_logging/fast
+
+#=============================================================================
+# Target rules for targets named test_imu
+
+# Build rule for target.
+test_imu: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 test_imu
+.PHONY : test_imu
+
+# fast build rule for target.
+test_imu/fast:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_imu.dir/build.make CMakeFiles/test_imu.dir/build
+.PHONY : test_imu/fast
 
 src/calibration.o: src/calibration.cpp.o
 .PHONY : src/calibration.o
@@ -396,6 +422,54 @@ src/tello_controller.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/tello_controller.dir/build.make CMakeFiles/tello_controller.dir/src/tello_controller.cpp.s
 .PHONY : src/tello_controller.cpp.s
 
+src/tello_imu_handler.o: src/tello_imu_handler.cpp.o
+.PHONY : src/tello_imu_handler.o
+
+# target to build an object file
+src/tello_imu_handler.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/tello_imu_handler.dir/build.make CMakeFiles/tello_imu_handler.dir/src/tello_imu_handler.cpp.o
+.PHONY : src/tello_imu_handler.cpp.o
+
+src/tello_imu_handler.i: src/tello_imu_handler.cpp.i
+.PHONY : src/tello_imu_handler.i
+
+# target to preprocess a source file
+src/tello_imu_handler.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/tello_imu_handler.dir/build.make CMakeFiles/tello_imu_handler.dir/src/tello_imu_handler.cpp.i
+.PHONY : src/tello_imu_handler.cpp.i
+
+src/tello_imu_handler.s: src/tello_imu_handler.cpp.s
+.PHONY : src/tello_imu_handler.s
+
+# target to generate assembly for a file
+src/tello_imu_handler.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/tello_imu_handler.dir/build.make CMakeFiles/tello_imu_handler.dir/src/tello_imu_handler.cpp.s
+.PHONY : src/tello_imu_handler.cpp.s
+
+tests/test_imu.o: tests/test_imu.cpp.o
+.PHONY : tests/test_imu.o
+
+# target to build an object file
+tests/test_imu.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_imu.dir/build.make CMakeFiles/test_imu.dir/tests/test_imu.cpp.o
+.PHONY : tests/test_imu.cpp.o
+
+tests/test_imu.i: tests/test_imu.cpp.i
+.PHONY : tests/test_imu.i
+
+# target to preprocess a source file
+tests/test_imu.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_imu.dir/build.make CMakeFiles/test_imu.dir/tests/test_imu.cpp.i
+.PHONY : tests/test_imu.cpp.i
+
+tests/test_imu.s: tests/test_imu.cpp.s
+.PHONY : tests/test_imu.s
+
+# target to generate assembly for a file
+tests/test_imu.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_imu.dir/build.make CMakeFiles/test_imu.dir/tests/test_imu.cpp.s
+.PHONY : tests/test_imu.cpp.s
+
 tests/test_optitrack_logging.o: tests/test_optitrack_logging.cpp.o
 .PHONY : tests/test_optitrack_logging.o
 
@@ -438,6 +512,8 @@ help:
 	@echo "... menu"
 	@echo "... optitrack"
 	@echo "... tello_controller"
+	@echo "... tello_imu_handler"
+	@echo "... test_imu"
 	@echo "... test_optitrack_logging"
 	@echo "... src/calibration.o"
 	@echo "... src/calibration.i"
@@ -457,6 +533,12 @@ help:
 	@echo "... src/tello_controller.o"
 	@echo "... src/tello_controller.i"
 	@echo "... src/tello_controller.s"
+	@echo "... src/tello_imu_handler.o"
+	@echo "... src/tello_imu_handler.i"
+	@echo "... src/tello_imu_handler.s"
+	@echo "... tests/test_imu.o"
+	@echo "... tests/test_imu.i"
+	@echo "... tests/test_imu.s"
 	@echo "... tests/test_optitrack_logging.o"
 	@echo "... tests/test_optitrack_logging.i"
 	@echo "... tests/test_optitrack_logging.s"

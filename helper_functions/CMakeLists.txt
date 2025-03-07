@@ -21,6 +21,10 @@ set(TELLO_CONTROLLER_SOURCES
     src/tello_controller.cpp
 )
 
+set(TELLO_IMU_HANDLER_SOURCES
+    src/tello_imu_handler.cpp
+)
+
 set(LOGGER_SOURCES
     src/logger.cpp
 )
@@ -45,8 +49,13 @@ set(TEST_OPTITRACK_LOGGING_SOURCES
     tests/test_optitrack_logging.cpp
 )
 
+set(TEST_IMU_SOURCES
+    tests/test_imu.cpp
+)
+
 # Create libraries
 add_library(tello_controller ${TELLO_CONTROLLER_SOURCES})
+add_library(tello_imu_handler ${TELLO_IMU_HANDLER_SOURCES})
 add_library(logger ${LOGGER_SOURCES})
 add_library(optitrack ${OPTITRACK_SOURCES})
 add_library(calibration ${CALIBRATION_SOURCES})
@@ -55,10 +64,12 @@ add_library(menu ${MENU_SOURCES})
 # Create main executable
 add_executable(helper_functions ${MAIN_SOURCES})
 
-# Create test optitrack logging executable
+# Create test executables
 add_executable(test_optitrack_logging ${TEST_OPTITRACK_LOGGING_SOURCES})
+add_executable(test_imu ${TEST_IMU_SOURCES})
 
 # Set dependencies for libraries
+target_link_libraries(tello_imu_handler PRIVATE tello_controller)
 target_link_libraries(optitrack PRIVATE logger ${OpenCV_LIBS} vrpn quat)
 target_link_libraries(calibration PRIVATE logger optitrack tello_controller)
 target_link_libraries(menu PRIVATE logger optitrack tello_controller calibration)
@@ -67,6 +78,7 @@ target_link_libraries(menu PRIVATE logger optitrack tello_controller calibration
 target_link_libraries(helper_functions
     PRIVATE
     tello_controller
+    tello_imu_handler
     logger
     optitrack
     calibration
@@ -77,7 +89,7 @@ target_link_libraries(helper_functions
     pthread
 )
 
-# Link libraries to test executable
+# Link libraries to test executables
 target_link_libraries(test_optitrack_logging
     PRIVATE
     logger
@@ -88,8 +100,21 @@ target_link_libraries(test_optitrack_logging
     pthread
 )
 
+target_link_libraries(test_imu
+    PRIVATE
+    tello_controller
+    tello_imu_handler
+    logger
+    menu
+    optitrack
+    ${OpenCV_LIBS}
+    vrpn
+    quat
+    pthread
+)
+
 # Install targets
-install(TARGETS helper_functions test_optitrack_logging DESTINATION bin)
+install(TARGETS helper_functions test_optitrack_logging test_imu DESTINATION bin)
 
 # No need to copy configuration files to the build directory
 # Configuration files will be accessed relative to the executable

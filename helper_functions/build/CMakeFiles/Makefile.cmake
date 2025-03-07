@@ -51,10 +51,12 @@ set(CMAKE_MAKEFILE_PRODUCTS
 # Dependency information for all targets:
 set(CMAKE_DEPEND_INFO_FILES
   "CMakeFiles/tello_controller.dir/DependInfo.cmake"
+  "CMakeFiles/tello_imu_handler.dir/DependInfo.cmake"
   "CMakeFiles/logger.dir/DependInfo.cmake"
   "CMakeFiles/optitrack.dir/DependInfo.cmake"
   "CMakeFiles/calibration.dir/DependInfo.cmake"
   "CMakeFiles/menu.dir/DependInfo.cmake"
   "CMakeFiles/helper_functions.dir/DependInfo.cmake"
   "CMakeFiles/test_optitrack_logging.dir/DependInfo.cmake"
+  "CMakeFiles/test_imu.dir/DependInfo.cmake"
   )

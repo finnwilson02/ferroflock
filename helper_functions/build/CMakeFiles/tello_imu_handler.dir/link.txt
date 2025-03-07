@@ -1,0 +1,2 @@
+/usr/bin/ar qc libtello_imu_handler.a CMakeFiles/tello_imu_handler.dir/src/tello_imu_handler.cpp.o
+/usr/bin/ranlib libtello_imu_handler.a
