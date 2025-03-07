@@ -1,3 +1,16 @@
+/**
+ * logger.h
+ * 
+ * Purpose: Provides logging infrastructure for drone telemetry and command data
+ * 
+ * Data Flow:
+ *   Input: Various telemetry data from OptiTrack, IMU readings, and drone commands
+ *   Output: CSV log files with timestamped telemetry and command data
+ * 
+ * This module records position, orientation, IMU readings, and command data
+ * to CSV files for later analysis, with each drone command tracked separately.
+ */
+
 #ifndef LOGGER_H
 #define LOGGER_H
 
@@ -37,7 +50,22 @@ struct DataPoint {
     double imu_agx{0.0};
     double imu_agy{0.0};
     double imu_agz{0.0};
-    double commanded_yaw{0.0};
+    double command_command{-1.0};    // SDK mode entry
+    double command_takeoff{-1.0};    // Takeoff command
+    double command_land{-1.0};       // Land command
+    double command_up{-1.0};         // Up movement (cm)
+    double command_down{-1.0};       // Down movement (cm)
+    double command_left{-1.0};       // Left movement (cm)
+    double command_right{-1.0};      // Right movement (cm)
+    double command_forward{-1.0};    // Forward movement (cm)
+    double command_back{-1.0};       // Backward movement (cm)
+    double command_cw{-1.0};         // Clockwise rotation (degrees)
+    double command_ccw{-1.0};        // Counterclockwise rotation (degrees)
+    double command_flip{-1.0};       // Flip direction (0-3 for l,r,f,b)
+    double command_speed{-1.0};      // Speed setting (cm/s)
+    double command_reboot{-1.0};     // Reboot command
+    double command_stop{-1.0};       // Stop command
+    double command_emergency{-1.0};  // Emergency stop
     std::string tracker_id;
     
     // Default constructor
@@ -78,7 +106,7 @@ public:
     void logIMU(double imu_yaw, double timestamp);
     
     // Log command data
-    void logCommand(double commanded_yaw, double timestamp);
+    void logCommand(const std::string& command, double value, double timestamp);
     
     // Flush the log to disk
     void flush();

@@ -1,3 +1,16 @@
+/**
+ * calibration.h
+ * 
+ * Purpose: Handles calibration procedures for the drone system
+ * 
+ * Data Flow:
+ *   Input: Position and orientation data from OptiTrack, commands to drones
+ *   Output: Calibrated offsets and parameters for accurate drone control
+ * 
+ * This module manages calibration procedures to align drone orientation with
+ * OptiTrack coordinate system and determine necessary control parameters.
+ */
+
 #ifndef CALIBRATION_H
 #define CALIBRATION_H
 

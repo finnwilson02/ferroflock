@@ -1,3 +1,17 @@
+/**
+ * tello_controller.cpp
+ * 
+ * Purpose: Implementation of the TelloController class for drone communication
+ * 
+ * Data Flow:
+ *   Input: Command strings from application logic
+ *   Output: UDP command packets sent to drones, response data from drones
+ * 
+ * This implementation handles socket communication with Tello drones,
+ * command formatting, transmission retries, and manages socket connections
+ * for multiple drones simultaneously.
+ */
+
 #include "../include/tello_controller.h"
 #include <iostream>
 #include <cstring>

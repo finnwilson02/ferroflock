@@ -1,3 +1,16 @@
+/**
+ * tello_imu_handler.cpp
+ * 
+ * Purpose: Implementation of the TelloIMUHandler class
+ * 
+ * Data Flow:
+ *   Input: Raw state and IMU responses from Tello drones
+ *   Output: Parsed IMU data (yaw, pitch, roll, acceleration)
+ * 
+ * This implementation handles the communication protocol for IMU data,
+ * parses the responses, and maintains the latest IMU values for each drone.
+ */
+
 #include "../include/tello_imu_handler.h"
 #include <iostream>
 #include <thread>

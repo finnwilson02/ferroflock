@@ -1,0 +1,66 @@
+{
+  "devices": [
+    {
+      "ip": "192.168.1.103",
+      "port": 8889,
+      "name": "Bird1",
+      "type": "tello",
+      "model": "Tello EDU",
+      "mac": "34:d2:62:ed:f3:ce",
+      "status": "online",
+      "discovered": "2025-03-06 12:00:00",
+      "tracker_id": "Bird1",
+      "optitrack_streaming_name": "Stream1",
+      "drift_correction": 0.5,
+      "frame_transform": {
+        "x_offset": 0.1,
+        "y_offset": 0.2,
+        "z_offset": 0.0,
+        "yaw_offset": 5.0
+      }
+    },
+    {
+      "ip": "192.168.1.104",
+      "port": 8889,
+      "name": "Bird4",
+      "type": "tello",
+      "model": "Tello EDU",
+      "mac": "34:d2:62:ed:ff:bc",
+      "status": "online",
+      "discovered": "2025-03-06 12:00:00",
+      "tracker_id": "Bird4",
+      "pid_gains": {
+        "kp": 1.0,
+        "ki": 0.1,
+        "kd": 0.05
+      }
+    },
+    {
+      "ip": "192.168.1.106",
+      "port": 8889,
+      "name": "Bird3",
+      "type": "tello",
+      "model": "Tello EDU",
+      "mac": "34:d2:62:ee:01:b4",
+      "status": "online",
+      "discovered": "2025-03-06 12:00:00",
+      "tracker_id": "Bird3"
+    },
+    {
+      "ip": "192.168.1.107",
+      "port": 8889,
+      "name": "Bird5",
+      "type": "tello",
+      "model": "Tello EDU",
+      "mac": "00:11:22:33:44:55",
+      "status": "offline",
+      "discovered": "2025-03-05 10:00:00",
+      "tracker_id": "Bird5",
+      "pid_gains": {
+        "kp": 1.0,
+        "ki": 0.1,
+        "kd": 0.05
+      }
+    }
+  ]
+}

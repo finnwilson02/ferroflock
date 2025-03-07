@@ -1,3 +1,16 @@
+/**
+ * tello_controller.h
+ * 
+ * Purpose: Manages communication with DJI Tello drones
+ * 
+ * Data Flow:
+ *   Input: Command strings from application logic
+ *   Output: UDP commands sent to drones, responses received from drones
+ * 
+ * This module handles initialization, command transmission, response handling,
+ * and cleanup for multiple Tello drones across the network.
+ */
+
 #ifndef TELLO_CONTROLLER_H
 #define TELLO_CONTROLLER_H
 

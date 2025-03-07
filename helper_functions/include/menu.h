@@ -1,3 +1,17 @@
+/**
+ * menu.h
+ * 
+ * Purpose: Provides the user interface for controlling the drone system
+ * 
+ * Data Flow:
+ *   Input: User commands from terminal input
+ *   Output: Control commands to Tello drones, visualization to console
+ * 
+ * This module manages the interactive menu system, handles user input,
+ * drone device discovery, and coordinates operations between OptiTrack
+ * and TelloController components.
+ */
+
 #ifndef MENU_H
 #define MENU_H
 

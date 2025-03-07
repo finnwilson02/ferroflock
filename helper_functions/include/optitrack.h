@@ -1,3 +1,17 @@
+/**
+ * optitrack.h
+ * 
+ * Purpose: Interfaces with OptiTrack motion capture system for drone positioning
+ * 
+ * Data Flow:
+ *   Input: Position and orientation data from OptiTrack system via VRPN
+ *   Output: Processed position and orientation data for drone control
+ * 
+ * This module manages the connection to OptiTrack, tracks multiple objects,
+ * handles coordinate transformations, and provides position/orientation data
+ * for the control system.
+ */
+
 #ifndef OPTITRACK_H
 #define OPTITRACK_H
 

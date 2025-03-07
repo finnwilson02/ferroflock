@@ -1,3 +1,16 @@
+/**
+ * optitrack.cpp
+ * 
+ * Purpose: Implementation of the OptiTrack class for motion capture integration
+ * 
+ * Data Flow:
+ *   Input: Raw position and orientation data from OptiTrack VRPN server
+ *   Output: Processed position and orientation data for drone tracking and control
+ * 
+ * This implementation handles VRPN callbacks, coordinate transformations,
+ * yaw correction, and visualization of tracked objects in real-time.
+ */
+
 #include "../include/optitrack.h"
 #include "../include/logger.h"
 #include <algorithm>

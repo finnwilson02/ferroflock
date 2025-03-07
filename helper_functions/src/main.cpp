@@ -1,3 +1,17 @@
+/**
+ * main.cpp
+ * 
+ * Purpose: Main entry point for the ferroflock drone control application
+ * 
+ * Data Flow:
+ *   Input: User commands, OptiTrack data, drone responses
+ *   Output: Control commands to drones, logging data to files
+ * 
+ * This module initializes all system components (OptiTrack, TelloController,
+ * Logger, Menu), handles signal interrupts, and coordinates the overall 
+ * application flow.
+ */
+
 #include <iostream>
 #include <signal.h>
 #include <filesystem>

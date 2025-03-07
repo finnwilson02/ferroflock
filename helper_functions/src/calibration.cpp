@@ -1,3 +1,17 @@
+/**
+ * calibration.cpp
+ * 
+ * Purpose: Implementation of the Calibration class for drone calibration
+ * 
+ * Data Flow:
+ *   Input: OptiTrack position/orientation data, drone responses
+ *   Output: Calibrated parameters (e.g., yaw offset) for accurate control
+ * 
+ * This implementation handles the drone orientation calibration process,
+ * synchronizing OptiTrack data with drone orientation to establish accurate
+ * movement mapping.
+ */
+
 #include "../include/calibration.h"
 #include <iostream>
 #include <filesystem>

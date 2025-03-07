@@ -1,3 +1,16 @@
+/**
+ * tello_imu_handler.h
+ * 
+ * Purpose: Handles IMU data retrieval and processing from Tello drones
+ * 
+ * Data Flow:
+ *   Input: Raw IMU responses from Tello drones
+ *   Output: Processed yaw, pitch, roll, and acceleration data
+ * 
+ * This module manages the periodic polling of IMU data from drones,
+ * parsing responses, and providing access to the latest IMU readings.
+ */
+
 #ifndef TELLO_IMU_HANDLER_H
 #define TELLO_IMU_HANDLER_H
 

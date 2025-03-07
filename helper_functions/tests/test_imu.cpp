@@ -83,33 +83,11 @@ int main() {
     
     std::cout << "Logger initialized with file: " << log_filename << "\n";
     
-    // Load drones from JSON file
-    std::vector<DroneData> drones = menu.loadDronesFromJSON("../drone_info/dji_devices.json");
+    // Hardcode the connection to 192.168.1.103
+    std::string selected_ip = "192.168.1.103";
+    std::string selected_name = "Hardcoded Drone";
     
-    if (drones.empty()) {
-        std::cerr << "No drones found in configuration file.\n";
-        return 1;
-    }
-    
-    // List available drones
-    std::cout << "Available drones:\n";
-    for (size_t i = 0; i < drones.size(); ++i) {
-        std::cout << i + 1 << ". " << drones[i].name << " (" << drones[i].ip << ")\n";
-    }
-    
-    // Prompt user to select a drone
-    size_t choice = 0;
-    std::cout << "Select a drone (1-" << drones.size() << "): ";
-    std::cin >> choice;
-    
-    if (choice < 1 || choice > drones.size()) {
-        std::cerr << "Invalid choice. Please enter a number between 1 and " << drones.size() << ".\n";
-        return 1;
-    }
-    
-    // Get selected drone IP
-    std::string selected_ip = drones[choice - 1].ip;
-    std::string selected_name = drones[choice - 1].name;
+    std::cout << "Using hardcoded drone at " << selected_ip << "\n";
     std::cout << "Selected drone: " << selected_name << " at " << selected_ip << "\n";
     
     // Create IMU handler for the selected drone

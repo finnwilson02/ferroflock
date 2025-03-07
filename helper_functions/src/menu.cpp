@@ -1,3 +1,16 @@
+/**
+ * menu.cpp
+ * 
+ * Purpose: Implementation of the Menu class for user interaction
+ * 
+ * Data Flow:
+ *   Input: User commands from terminal, drone information from JSON files
+ *   Output: Actions sent to TelloController and OptiTrack systems
+ * 
+ * This implementation handles the interactive terminal menu, drone discovery via
+ * Python scripts, and coordinates communication between system components.
+ */
+
 #include "../include/menu.h"
 #include "../include/logger.h"
 #include <iostream>
@@ -314,21 +327,14 @@ std::vector<DroneData> Menu::loadDronesFromJSON(const std::string& filename) {
 void Menu::initialize() {
     LOG_INFO("Starting menu initialization");
     
-    // First try to load drones from drone_info directory (in parent dir, not build)
-    LOG_INFO("Checking for drones in ../drone_info/dji_devices.json");
-    if (std::filesystem::exists("../drone_info/dji_devices.json")) {
-        drones_ = loadDronesFromJSON("../drone_info/dji_devices.json");
-    }
-    
-    // If no drones found, try the parent directory
-    if (drones_.empty()) {
-        LOG_INFO("No drones found in ../drone_info, trying ../dji_devices.json");
+    LOG_INFO("Checking for drones in ../dji_devices.json");
+    if (std::filesystem::exists("../dji_devices.json")) {
         drones_ = loadDronesFromJSON("../dji_devices.json");
     }
     
     // If no drones found, set up a default drone
     if (drones_.empty()) {
-        LOG_WARNING("No drones found in dji_devices.json, using default drone");
+        LOG_WARNING("No drones found in ../dji_devices.json, using default drone");
         DroneData default_drone;
         default_drone.name = "Default";
         default_drone.ip = "192.168.10.1";
@@ -424,11 +430,8 @@ void Menu::handleListDrones() {
 void Menu::handleNetworkScan() {
     std::cout << "Running network scan for Tello drones...\n";
     
-    // Create drone_info directory if it doesn't exist (in parent directory, not in build)
-    std::filesystem::create_directory("../drone_info");
-    
-    // Run the Python script to scan for drones (use relative paths)
-    std::string command = "python3 ../python/get_devices.py --output-dir ../drone_info";
+    // Source the drone_venv and use sudo to run the script (scapy needs root privileges)
+    std::string command = "sudo -E bash -c 'source ~/drone_venv/bin/activate && python3 ../python/get_devices.py'";
     std::cout << "Executing: " << command << "\n";
     
     int result = system(command.c_str());
@@ -442,8 +445,8 @@ void Menu::handleNetworkScan() {
     std::cout << "Network scan complete.\n";
     std::cout << "Loading updated drone information...\n";
     
-    // Load the updated drone information from the parent directory
-    drones_ = loadDronesFromJSON("../drone_info/dji_devices.json");
+    // Load the updated drone information from the new location
+    drones_ = loadDronesFromJSON("../dji_devices.json");
     
     // Update OptiTrack drone mapping
     optitrack_.setupDroneMapping(drones_);
