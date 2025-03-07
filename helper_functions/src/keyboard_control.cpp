@@ -17,6 +17,7 @@
 #include <unistd.h>
 #include <fcntl.h>
 #include <chrono>
+#include <algorithm> // For std::min, std::max
 
 // External reference to global logger
 extern Logger* g_logger;
@@ -50,6 +51,14 @@ void KeyboardControl::stop() {
     LOG_INFO("KeyboardControl stopped");
 }
 
+// Reset all speed levels to zero
+void KeyboardControl::resetSpeedLevels() {
+    fb_level_ = 0;
+    lr_level_ = 0;
+    ud_level_ = 0;
+    yaw_level_ = 0;
+}
+
 // Main keyboard input processing loop
 void KeyboardControl::keyboardLoop() {
     // Save terminal settings
@@ -69,12 +78,18 @@ void KeyboardControl::keyboardLoop() {
     std::cout << "  't' - takeoff" << std::endl;
     std::cout << "  'l' - land" << std::endl;
     std::cout << "  'q' - quit keyboard control" << std::endl;
-    std::cout << "  'w/s' - forward/backward" << std::endl;
-    std::cout << "  'a/d' - left/right" << std::endl;
-    std::cout << "  'Arrow Up/Down' - up/down" << std::endl;
-    std::cout << "  'Arrow Left/Right' - rotate left/right" << std::endl;
+    std::cout << "  'w/s' - increase/decrease forward speed" << std::endl;
+    std::cout << "  'a/d' - increase left/right speed" << std::endl;
+    std::cout << "  'Arrow Up/Down' - increase up/down speed" << std::endl;
+    std::cout << "  'Arrow Left/Right' - increase rotation left/right" << std::endl;
     std::cout << "  'space' - hover (stop all movement)" << std::endl;
+    std::cout << "  'enter' - emergency stop" << std::endl;
+    std::cout << "Each press adjusts speed by 1 level (max ±10, maps to ±50 units)" << std::endl;
+    std::cout << "Current levels are maintained until changed or reset" << std::endl;
     std::cout << "===============================" << std::endl;
+
+    // Reset speed levels at startup
+    resetSpeedLevels();
 
     // Control loop
     while (running_) {
@@ -97,45 +112,61 @@ void KeyboardControl::keyboardLoop() {
                     g_logger->logCommand("land", 1.0, std::chrono::system_clock::to_time_t(std::chrono::system_clock::now()));
                 }
             } else if (key == 'w') {
-                // Forward
-                sendRCCommand(0, 50, 0, 0);
+                // Increase forward speed
+                fb_level_ = std::min(fb_level_ + 1, 10);
             } else if (key == 's') {
-                // Backward
-                sendRCCommand(0, -50, 0, 0);
+                // Increase backward speed
+                fb_level_ = std::max(fb_level_ - 1, -10);
             } else if (key == 'a') {
-                // Left
-                sendRCCommand(-50, 0, 0, 0);
+                // Increase left speed
+                lr_level_ = std::max(lr_level_ - 1, -10);
             } else if (key == 'd') {
-                // Right
-                sendRCCommand(50, 0, 0, 0);
+                // Increase right speed
+                lr_level_ = std::min(lr_level_ + 1, 10);
             } else if (key == KEY_UP) {
-                // Up
-                sendRCCommand(0, 0, 50, 0);
+                // Increase up speed
+                ud_level_ = std::min(ud_level_ + 1, 10);
             } else if (key == KEY_DOWN) {
-                // Down
-                sendRCCommand(0, 0, -50, 0);
+                // Increase down speed
+                ud_level_ = std::max(ud_level_ - 1, -10);
             } else if (key == KEY_LEFT) {
-                // Rotate left
-                sendRCCommand(0, 0, 0, -50);
+                // Increase rotate left speed
+                yaw_level_ = std::max(yaw_level_ - 1, -10);
             } else if (key == KEY_RIGHT) {
-                // Rotate right
-                sendRCCommand(0, 0, 0, 50);
+                // Increase rotate right speed
+                yaw_level_ = std::min(yaw_level_ + 1, 10);
             } else if (key == ' ') {
                 // Hover (stop all movement)
-                sendRCCommand(0, 0, 0, 0);
+                resetSpeedLevels();
+            } else if (key == '\n' || key == '\r') {
+                // Emergency stop
+                controller_.sendCommandToAll("emergency");
+                resetSpeedLevels();
+                if (g_logger && g_logger->isOpen()) {
+                    g_logger->logCommand("emergency", 1.0, std::chrono::system_clock::to_time_t(std::chrono::system_clock::now()));
+                }
             }
-        } else {
-            // No key press - send hover command to maintain stability
-            sendRCCommand(0, 0, 0, 0);
+            
+            // Print current speed levels
+            std::cout << "\rSpeed levels - FB: " << fb_level_ << " LR: " << lr_level_ 
+                      << " UD: " << ud_level_ << " YAW: " << yaw_level_ << "     " << std::flush;
         }
 
-        // Sleep to avoid excessive CPU usage and to limit RC command rate
+        // Always send RC command based on current speed levels
+        sendRCCommand(
+            levelToSpeed(lr_level_),
+            levelToSpeed(fb_level_),
+            levelToSpeed(ud_level_),
+            levelToSpeed(yaw_level_)
+        );
+
+        // Sleep to maintain 50Hz update rate (20ms)
         std::this_thread::sleep_for(std::chrono::milliseconds(20));
     }
 
     // Restore terminal settings
     tcsetattr(STDIN_FILENO, TCSAFLUSH, &orig_termios_);
-    std::cout << "Keyboard control stopped." << std::endl;
+    std::cout << "\nKeyboard control stopped." << std::endl;
 }
 
 // Get a key press, handling special keys like arrow keys

@@ -23,12 +23,12 @@ extern Logger* g_logger;
 
 // Constructor
 TelloController::TelloController() {
-    std::cout << "TelloController initialized" << std::endl;
+    LOG_DEBUG("TelloController initialized");
 }
 
 // Destructor
 TelloController::~TelloController() {
-    std::cout << "TelloController shutting down, cleaning up" << std::endl;
+    LOG_DEBUG("TelloController shutting down, cleaning up");
     cleanup();
 }
 
@@ -60,13 +60,13 @@ bool TelloController::TelloDevice::initializeSockets() {
     close(command_socket);
     command_socket = new_socket;
 
-    std::cout << "[SOCKET] Created new socket " << command_socket 
-            << " for " << ip << ":" << local_port << std::endl;
+    LOG_DEBUG("[SOCKET] Created new socket " + std::to_string(command_socket) 
+            + " for " + ip + ":" + std::to_string(local_port));
 
     // Enable socket reuse
     int reuse = 1;
     if (setsockopt(command_socket, SOL_SOCKET, SO_REUSEADDR, &reuse, sizeof(reuse)) < 0) {
-        std::cerr << "Failed to set SO_REUSEADDR for " << ip << ": " << strerror(errno) << std::endl;
+        LOG_ERROR("Failed to set SO_REUSEADDR for " + ip + ": " + strerror(errno));
         close(command_socket);
         return false;
     }
@@ -79,8 +79,8 @@ bool TelloController::TelloDevice::initializeSockets() {
 
     // Bind to local port
     if (bind(command_socket, (struct sockaddr *)&local_addr, sizeof(local_addr)) < 0) {
-        std::cerr << "Failed to bind socket for " << ip 
-                << ": " << strerror(errno) << std::endl;
+        LOG_ERROR("Failed to bind socket for " + ip 
+                + ": " + strerror(errno));
         close(command_socket);
         return false;
     }
@@ -104,30 +104,31 @@ bool TelloController::TelloDevice::initializeSockets() {
 // Send a command to a TelloDevice
 bool TelloController::TelloDevice::sendCommand(const std::string& cmd) {
     if (!socket_valid || command_socket < 0) {
-        std::cerr << "[ERROR] Invalid socket state for " << ip << std::endl;
+        LOG_ERROR("[ERROR] Invalid socket state for " + ip);
         return reinitializeAndSend(cmd);
     }
     
     std::string clean_cmd = cleanCommand(cmd);
     
-    std::cout << "[SEND] IP: " << ip << " Port: " << local_port 
-            << " Socket: " << command_socket 
-            << " Command: " << clean_cmd << std::endl;
+    LOG_DEBUG("[SEND] IP: " + ip + " Port: " + std::to_string(local_port) + 
+            " Socket: " + std::to_string(command_socket) + 
+            " Command: " + clean_cmd);
     
     ssize_t sent = sendto(command_socket, clean_cmd.c_str(), clean_cmd.length(), 0,
                         (struct sockaddr *)&command_addr, sizeof(command_addr));
     
     if (sent < 0) {
-        std::cerr << "Send failed for " << ip << ": " << strerror(errno) << std::endl;
+        LOG_ERROR("Send failed for " + ip + ": " + strerror(errno));
         socket_valid = false;
         return reinitializeAndSend(clean_cmd);
     }
     
-    std::cout << "[SUCCESS] Sent " << sent << " bytes to " << ip << std::endl;
-    std::cout << "[DEBUG] Command '" << clean_cmd << "' sent to " << ip << ", bytes: " << sent << std::endl;
+    LOG_DEBUG("[SUCCESS] Sent " + std::to_string(sent) + " bytes to " + ip);
+    LOG_DEBUG("[DEBUG] Command '" + clean_cmd + "' sent to " + ip + ", bytes: " + std::to_string(sent));
     
-    // Log the command using global logger if available
-    if (g_logger && g_logger->isOpen()) {
+    // Log the command using global logger if available, but skip 'rc' commands
+    // to avoid parsing errors and log flooding
+    if (clean_cmd.compare(0, 2, "rc") != 0 && g_logger && g_logger->isOpen()) {
         std::string command_name = clean_cmd;
         double value = 1.0; // Default for commands without values
         size_t space_pos = clean_cmd.find(' ');
@@ -177,8 +178,8 @@ std::optional<std::string> TelloController::TelloDevice::receiveResponse() {
     
     if (received < 0) {
         if (errno != EAGAIN && errno != EWOULDBLOCK) {
-            std::cerr << "Receive error for " << ip << ": " 
-                    << strerror(errno) << std::endl;
+            LOG_ERROR("Receive error for " + ip + ": " 
+                    + strerror(errno));
         }
         return std::nullopt;
     }
@@ -188,7 +189,7 @@ std::optional<std::string> TelloController::TelloDevice::receiveResponse() {
     buffer[received] = '\0';
     std::string response(buffer);
     
-    std::cout << "[RESPONSE] IP: " << ip << " Response: " << response << std::endl;
+    LOG_DEBUG("[RESPONSE] IP: " + ip + " Response: " + response);
     return response;
 }
 
@@ -209,17 +210,17 @@ bool TelloController::initialize(const std::string& ip, bool skip_reboot) {
     if (devices.find(ip) != devices.end()) {
         // If device is already initialized but needs reboot and we're not skipping it
         if (devices[ip].needs_reboot && !skip_reboot) {
-            std::cout << "Rebooting drone at " << ip << " before use..." << std::endl;
+            LOG_DEBUG("Rebooting drone at " + ip + " before use...");
             rebootDrone(ip);
             devices[ip].needs_reboot = false;
             
             // Wait for reboot to complete
-            std::cout << "Waiting for drone to reboot (15 seconds)..." << std::endl;
+            LOG_DEBUG("Waiting for drone to reboot (15 seconds)...");
             std::this_thread::sleep_for(std::chrono::seconds(15));
             
             // Reconnect sockets after reboot
             if (!devices[ip].initializeSockets()) {
-                std::cerr << "Failed to reinitialize sockets after reboot" << std::endl;
+                LOG_ERROR("Failed to reinitialize sockets after reboot");
                 return false;
             }
         }
@@ -227,7 +228,7 @@ bool TelloController::initialize(const std::string& ip, bool skip_reboot) {
     }
     
     // Skip rebooting at the start of routine
-    std::cout << "Initializing drone at " << ip << " (no reboot)" << std::endl;
+    LOG_DEBUG("Initializing drone at " + ip + " (no reboot)");
     
     TelloDevice device;
     device.ip = ip;
@@ -235,12 +236,12 @@ bool TelloController::initialize(const std::string& ip, bool skip_reboot) {
     device.needs_reboot = false; // No need to reboot
     
     if (!device.initializeSockets()) {
-        std::cerr << "Failed to initialize sockets for " << ip << std::endl;
+        LOG_ERROR("Failed to initialize sockets for " + ip);
         return false;
     }
     
     // Enter SDK mode - send the command multiple times since Tellos are unreliable
-    std::cout << "Sending SDK mode command to " << ip << std::endl;
+    LOG_DEBUG("Sending SDK mode command to " + ip);
     
     // Send command 3 times for redundancy
     for (int i = 0; i < 3; i++) {
@@ -249,7 +250,7 @@ bool TelloController::initialize(const std::string& ip, bool skip_reboot) {
     }
     
     // Don't wait for response - assume it worked
-    std::cout << "Assuming drone at " << ip << " entered SDK mode" << std::endl;
+    LOG_DEBUG("Assuming drone at " + ip + " entered SDK mode");
     devices[ip] = std::move(device);
     return true;
 }
@@ -258,14 +259,14 @@ bool TelloController::initialize(const std::string& ip, bool skip_reboot) {
 bool TelloController::sendCommand(const std::string& ip, const std::string& command, bool skip_reboot) {
     if (devices.find(ip) == devices.end()) {
         if (!initialize(ip, skip_reboot)) {
-            std::cerr << "Failed to initialize device at " << ip << " for command: " << command << std::endl;
+            LOG_ERROR("Failed to initialize device at " + ip + " for command: " + command);
             return false;
         }
     }
     
     bool result = devices[ip].sendCommand(command);
     if (!result) {
-        std::cerr << "Failed to send command '" << command << "' to " << ip << std::endl;
+        LOG_ERROR("Failed to send command '" + command + "' to " + ip);
     }
     return result;
 }
@@ -300,11 +301,11 @@ std::optional<std::string> TelloController::receiveResponse(const std::string& i
 
 // Reboot a specific drone
 bool TelloController::rebootDrone(const std::string& ip, int port) {
-    std::cout << "Rebooting drone at " << ip << "..." << std::endl;
+    LOG_DEBUG("Rebooting drone at " + ip + "...");
     
     int sock = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
     if (sock < 0) {
-        std::cerr << "Failed to create socket for reboot: " << strerror(errno) << std::endl;
+        LOG_ERROR("Failed to create socket for reboot: " + std::string(strerror(errno)));
         return false;
     }
 
@@ -322,11 +323,11 @@ bool TelloController::rebootDrone(const std::string& ip, int port) {
     close(sock);
     
     if (sent < 0) {
-        std::cerr << "Failed to send reboot to " << ip << ": " << strerror(errno) << std::endl;
+        LOG_ERROR("Failed to send reboot to " + ip + ": " + std::string(strerror(errno)));
         return false;
     }
     
-    std::cout << "Sent reboot command to " << ip << std::endl;
+    LOG_DEBUG("Sent reboot command to " + ip);
     return true;
 }
 
@@ -341,7 +342,7 @@ void TelloController::cleanup() {
     for (auto& [ip, device] : devices) {
         if (device.socket_valid) {
             // Try to land first, then reboot
-            std::cout << "Attempting to land drone at " << ip << std::endl;
+            LOG_DEBUG("Attempting to land drone at " + ip);
             for (int i = 0; i < 3; i++) {
                 device.sendCommand("land");
                 std::this_thread::sleep_for(std::chrono::milliseconds(300));
@@ -351,7 +352,7 @@ void TelloController::cleanup() {
             std::this_thread::sleep_for(std::chrono::seconds(3));
             
             // Then reboot for clean state
-            std::cout << "Rebooting drone at " << ip << " for clean exit" << std::endl;
+            LOG_DEBUG("Rebooting drone at " + ip + " for clean exit");
             rebootDrone(ip);
         }
     }
@@ -366,7 +367,7 @@ void TelloController::cleanup() {
     }
     devices.clear();
     
-    std::cout << "All drones have been landed and rebooted" << std::endl;
+    LOG_DEBUG("All drones have been landed and rebooted");
 }
 
 // Send a command to all drones simultaneously
