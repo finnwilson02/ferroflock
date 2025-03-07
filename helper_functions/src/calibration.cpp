@@ -196,20 +196,37 @@ void Calibration::runCalibrationRoutine(
         
         // Check if the tracker is visible before proceeding
         if (!optitrack_.isTrackerActive(tracker_id)) {
-            std::cout << "[ERROR] Tracker " << tracker_id << " not visible before takeoff. Aborting." << std::endl;
-            calibration_in_progress_ = false;
-            if (on_complete_callback) on_complete_callback();
-            return;
+            std::cout << "[WARNING] Tracker " << tracker_id << " not visible before takeoff. Proceeding with calibration." << std::endl;
+            LOG_WARNING("Tracker " + tracker_id + " not active before takeoff");
         }
         
         // Log initial state before takeoff
         LOG_INFO("Logging initial state before takeoff");
         DataPoint initial_data(tracker_id);
-        initial_data.x = optitrack_.getXPosition(tracker_id);
-        initial_data.y = optitrack_.getYPosition(tracker_id);
-        initial_data.z = optitrack_.getZPosition(tracker_id);
-        initial_data.yaw_raw = optitrack_.getRawYaw(tracker_id);
-        initial_data.yaw_corrected = optitrack_.getYaw(tracker_id);
+        bool tracker_visible = optitrack_.isTrackerActive(tracker_id);
+        
+        // Handle tracker data - set zeros if not visible
+        if (tracker_visible) {
+            initial_data.x = optitrack_.getXPosition(tracker_id);
+            initial_data.y = optitrack_.getYPosition(tracker_id);
+            initial_data.z = optitrack_.getZPosition(tracker_id);
+            initial_data.yaw_raw = optitrack_.getRawYaw(tracker_id);
+            initial_data.yaw_corrected = optitrack_.getYaw(tracker_id);
+            LOG_INFO("Initial tracker position: x=" + std::to_string(initial_data.x) + 
+                    ", y=" + std::to_string(initial_data.y) + 
+                    ", z=" + std::to_string(initial_data.z));
+        } else {
+            // Explicitly set position and orientation to zero when tracker isn't visible
+            initial_data.x = 0.0;
+            initial_data.y = 0.0;
+            initial_data.z = 0.0;
+            initial_data.yaw_raw = 0.0;
+            initial_data.yaw_corrected = 0.0;
+            LOG_WARNING("Tracker " + tracker_id + " not visible before takeoff, logging initial position as (0, 0, 0) and yaw as 0");
+            std::cout << "[WARNING] Tracker " << tracker_id << " not visible before takeoff, logging initial position as (0, 0, 0) and yaw as 0" << std::endl;
+        }
+        
+        // IMU data is independent of tracker visibility
         initial_data.imu_yaw = imu_handler->getYaw();
         initial_data.imu_pitch = imu_handler->getPitch();
         initial_data.imu_roll = imu_handler->getRoll();
@@ -248,12 +265,34 @@ void Calibration::runCalibrationRoutine(
         LOG_INFO("Waiting for takeoff to complete while logging");
         auto start_time = std::chrono::steady_clock::now();
         while (std::chrono::steady_clock::now() - start_time < std::chrono::seconds(5)) {
+            // Check and log tracker visibility
+            bool tracker_visible = optitrack_.isTrackerActive(tracker_id);
+            if (tracker_visible) {
+                LOG_INFO("Tracker " + tracker_id + " is visible during takeoff");
+            } else {
+                LOG_WARNING("Tracker " + tracker_id + " not visible during takeoff");
+            }
+            
             DataPoint takeoff_data(tracker_id);
-            takeoff_data.x = optitrack_.getXPosition(tracker_id);
-            takeoff_data.y = optitrack_.getYPosition(tracker_id);
-            takeoff_data.z = optitrack_.getZPosition(tracker_id);
-            takeoff_data.yaw_raw = optitrack_.getRawYaw(tracker_id);
-            takeoff_data.yaw_corrected = optitrack_.getYaw(tracker_id);
+            
+            // Handle tracker data - set zeros if not visible
+            if (tracker_visible) {
+                takeoff_data.x = optitrack_.getXPosition(tracker_id);
+                takeoff_data.y = optitrack_.getYPosition(tracker_id);
+                takeoff_data.z = optitrack_.getZPosition(tracker_id);
+                takeoff_data.yaw_raw = optitrack_.getRawYaw(tracker_id);
+                takeoff_data.yaw_corrected = optitrack_.getYaw(tracker_id);
+            } else {
+                // Explicitly set position and orientation to zero when tracker isn't visible
+                takeoff_data.x = 0.0;
+                takeoff_data.y = 0.0;
+                takeoff_data.z = 0.0;
+                takeoff_data.yaw_raw = 0.0;
+                takeoff_data.yaw_corrected = 0.0;
+                std::cout << "[WARNING] Tracker " << tracker_id << " not visible, logging position as (0, 0, 0) and yaw as 0" << std::endl;
+            }
+            
+            // IMU data is independent of tracker visibility
             takeoff_data.imu_yaw = imu_handler->getYaw();
             takeoff_data.imu_pitch = imu_handler->getPitch();
             takeoff_data.imu_roll = imu_handler->getRoll();
@@ -269,6 +308,37 @@ void Calibration::runCalibrationRoutine(
             
             // Log every 100ms (10Hz) during takeoff
             std::this_thread::sleep_for(std::chrono::milliseconds(100));
+        }
+        
+        // Wait for tracker to become visible after takeoff (up to 10 seconds)
+        LOG_INFO("Waiting for tracker " + tracker_id + " to become visible after takeoff...");
+        std::cout << "[INFO] Waiting for tracker " << tracker_id << " to become visible after takeoff..." << std::endl;
+        
+        bool tracker_became_visible = false;
+        start_time = std::chrono::steady_clock::now();
+        
+        while (std::chrono::steady_clock::now() - start_time < std::chrono::seconds(10)) {
+            if (optitrack_.isTrackerActive(tracker_id)) {
+                tracker_became_visible = true;
+                LOG_INFO("Tracker " + tracker_id + " is now visible. Proceeding with calibration.");
+                std::cout << "[INFO] Tracker " << tracker_id << " is now visible. Proceeding with calibration." << std::endl;
+                break;
+            }
+            std::this_thread::sleep_for(std::chrono::seconds(1));
+        }
+        
+        if (!tracker_became_visible) {
+            LOG_ERROR("Tracker " + tracker_id + " not visible after takeoff. Aborting calibration.");
+            std::cout << "[ERROR] Tracker " << tracker_id << " not visible after takeoff. Aborting calibration." << std::endl;
+            
+            // Try to land the drone
+            tello_controller_.sendCommand(drone_ip, "land");
+            calibration_logger->logCommand("land", 1.0, std::chrono::system_clock::to_time_t(std::chrono::system_clock::now()));
+            
+            // Signal that the calibration is complete (with error)
+            calibration_in_progress_ = false;
+            if (on_complete_callback) on_complete_callback();
+            return;
         }
         
         // Log post-takeoff position
@@ -313,13 +383,35 @@ void Calibration::runCalibrationRoutine(
             // Send RC command for upward movement (left-right, forward-back, up-down, yaw)
             tello_controller_.sendCommand(drone_ip, "rc 0 0 50 0");
             
+            // Check and log tracker visibility
+            bool tracker_visible = optitrack_.isTrackerActive(tracker_id);
+            
             // Log position data
             DataPoint data(tracker_id);
-            data.x = optitrack_.getXPosition(tracker_id);
-            data.y = optitrack_.getYPosition(tracker_id);
-            data.z = optitrack_.getZPosition(tracker_id);
-            data.yaw_raw = optitrack_.getRawYaw(tracker_id);
-            data.yaw_corrected = optitrack_.getYaw(tracker_id);
+            
+            // Handle tracker data - set zeros if not visible
+            if (tracker_visible) {
+                data.x = optitrack_.getXPosition(tracker_id);
+                data.y = optitrack_.getYPosition(tracker_id);
+                data.z = optitrack_.getZPosition(tracker_id);
+                data.yaw_raw = optitrack_.getRawYaw(tracker_id);
+                data.yaw_corrected = optitrack_.getYaw(tracker_id);
+            } else {
+                // Explicitly set position and orientation to zero when tracker isn't visible
+                data.x = 0.0;
+                data.y = 0.0;
+                data.z = 0.0;
+                data.yaw_raw = 0.0;
+                data.yaw_corrected = 0.0;
+                
+                // Only log visibility warning every 10th sample to avoid too much output
+                if (log_counter % 10 == 0) {
+                    LOG_WARNING("Tracker " + tracker_id + " not visible during upward movement");
+                    std::cout << "[WARNING] Tracker " << tracker_id << " not visible, logging position as (0, 0, 0) and yaw as 0" << std::endl;
+                }
+            }
+            
+            // IMU data is independent of tracker visibility
             data.imu_yaw = imu_handler->getYaw();
             data.imu_pitch = imu_handler->getPitch();
             data.imu_roll = imu_handler->getRoll();
@@ -337,7 +429,8 @@ void Calibration::runCalibrationRoutine(
             if (log_counter % 10 == 0) {
                 std::cout << "[DEBUG] Upward movement - logged data: x=" << data.x 
                           << ", y=" << data.y << ", z=" << data.z 
-                          << ", yaw=" << data.yaw_corrected << std::endl;
+                          << ", yaw=" << data.yaw_corrected 
+                          << (tracker_visible ? " (tracker visible)" : " (tracker not visible)") << std::endl;
             }
             log_counter++;
             
@@ -415,13 +508,35 @@ void Calibration::runCalibrationRoutine(
             // Send RC command for forward movement (left-right, forward-back, up-down, yaw)
             tello_controller_.sendCommand(drone_ip, "rc 0 50 0 0");
             
+            // Check tracker visibility
+            bool tracker_visible = optitrack_.isTrackerActive(tracker_id);
+            
             // Log position data
             DataPoint data(tracker_id);
-            data.x = optitrack_.getXPosition(tracker_id);
-            data.y = optitrack_.getYPosition(tracker_id);
-            data.z = optitrack_.getZPosition(tracker_id);
-            data.yaw_raw = optitrack_.getRawYaw(tracker_id);
-            data.yaw_corrected = optitrack_.getYaw(tracker_id);
+            
+            // Handle tracker data - set zeros if not visible
+            if (tracker_visible) {
+                data.x = optitrack_.getXPosition(tracker_id);
+                data.y = optitrack_.getYPosition(tracker_id);
+                data.z = optitrack_.getZPosition(tracker_id);
+                data.yaw_raw = optitrack_.getRawYaw(tracker_id);
+                data.yaw_corrected = optitrack_.getYaw(tracker_id);
+            } else {
+                // Explicitly set position and orientation to zero when tracker isn't visible
+                data.x = 0.0;
+                data.y = 0.0;
+                data.z = 0.0;
+                data.yaw_raw = 0.0;
+                data.yaw_corrected = 0.0;
+                
+                // Only log visibility warning every 10th sample to avoid too much output
+                if (log_counter % 10 == 0) {
+                    LOG_WARNING("Tracker " + tracker_id + " not visible during forward movement");
+                    std::cout << "[WARNING] Tracker " << tracker_id << " not visible, logging position as (0, 0, 0) and yaw as 0" << std::endl;
+                }
+            }
+            
+            // IMU data is independent of tracker visibility
             data.imu_yaw = imu_handler->getYaw();
             data.imu_pitch = imu_handler->getPitch();
             data.imu_roll = imu_handler->getRoll();
@@ -436,7 +551,8 @@ void Calibration::runCalibrationRoutine(
             }
             
             // Store yaw values for calibration during the middle 3 seconds
-            if (current_time >= middle_start && current_time <= middle_end) {
+            // Only store values when tracker is visible
+            if (current_time >= middle_start && current_time <= middle_end && tracker_visible) {
                 yaw_values.push_back(data.yaw_corrected);
             }
             
@@ -444,7 +560,8 @@ void Calibration::runCalibrationRoutine(
             if (log_counter % 10 == 0) {
                 std::cout << "[DEBUG] Forward movement - logged data: x=" << data.x 
                           << ", y=" << data.y << ", z=" << data.z 
-                          << ", yaw=" << data.yaw_corrected << std::endl;
+                          << ", yaw=" << data.yaw_corrected 
+                          << (tracker_visible ? " (tracker visible)" : " (tracker not visible)") << std::endl;
             }
             log_counter++;
             
@@ -481,13 +598,36 @@ void Calibration::runCalibrationRoutine(
         // Log data during landing process
         LOG_INFO("Logging data during landing process");
         start_time = std::chrono::steady_clock::now();
+        log_counter = 0;
         while (std::chrono::steady_clock::now() - start_time < std::chrono::seconds(5)) {
+            // Check tracker visibility
+            bool tracker_visible = optitrack_.isTrackerActive(tracker_id);
+            
             DataPoint landing_data(tracker_id);
-            landing_data.x = optitrack_.getXPosition(tracker_id);
-            landing_data.y = optitrack_.getYPosition(tracker_id);
-            landing_data.z = optitrack_.getZPosition(tracker_id);
-            landing_data.yaw_raw = optitrack_.getRawYaw(tracker_id);
-            landing_data.yaw_corrected = optitrack_.getYaw(tracker_id);
+            
+            // Handle tracker data - set zeros if not visible
+            if (tracker_visible) {
+                landing_data.x = optitrack_.getXPosition(tracker_id);
+                landing_data.y = optitrack_.getYPosition(tracker_id);
+                landing_data.z = optitrack_.getZPosition(tracker_id);
+                landing_data.yaw_raw = optitrack_.getRawYaw(tracker_id);
+                landing_data.yaw_corrected = optitrack_.getYaw(tracker_id);
+            } else {
+                // Explicitly set position and orientation to zero when tracker isn't visible
+                landing_data.x = 0.0;
+                landing_data.y = 0.0;
+                landing_data.z = 0.0;
+                landing_data.yaw_raw = 0.0;
+                landing_data.yaw_corrected = 0.0;
+                
+                // Only log visibility warning every 10th sample to avoid too much output
+                if (log_counter % 10 == 0) {
+                    LOG_WARNING("Tracker " + tracker_id + " not visible during landing process");
+                    std::cout << "[WARNING] Tracker " << tracker_id << " not visible during landing, logging position as (0, 0, 0) and yaw as 0" << std::endl;
+                }
+            }
+            
+            // IMU data is independent of tracker visibility
             landing_data.imu_yaw = imu_handler->getYaw();
             landing_data.imu_pitch = imu_handler->getPitch();
             landing_data.imu_roll = imu_handler->getRoll();
@@ -501,17 +641,45 @@ void Calibration::runCalibrationRoutine(
                 calibration_logger->logData(landing_data);
             }
             
+            // Only print every 10th sample to avoid too much output
+            if (log_counter % 10 == 0) {
+                std::cout << "[DEBUG] Landing process - logged data: x=" << landing_data.x 
+                          << ", y=" << landing_data.y << ", z=" << landing_data.z 
+                          << ", yaw=" << landing_data.yaw_corrected 
+                          << (tracker_visible ? " (tracker visible)" : " (tracker not visible)") << std::endl;
+            }
+            log_counter++;
+            
             // Log at 10Hz during landing
             std::this_thread::sleep_for(std::chrono::milliseconds(100));
         }
         
         // Log final position after landing
         DataPoint final_data(tracker_id);
-        final_data.x = optitrack_.getXPosition(tracker_id);
-        final_data.y = optitrack_.getYPosition(tracker_id);
-        final_data.z = optitrack_.getZPosition(tracker_id);
-        final_data.yaw_raw = optitrack_.getRawYaw(tracker_id);
-        final_data.yaw_corrected = optitrack_.getYaw(tracker_id);
+        tracker_visible = optitrack_.isTrackerActive(tracker_id);
+        
+        // Handle tracker data - set zeros if not visible
+        if (tracker_visible) {
+            final_data.x = optitrack_.getXPosition(tracker_id);
+            final_data.y = optitrack_.getYPosition(tracker_id);
+            final_data.z = optitrack_.getZPosition(tracker_id);
+            final_data.yaw_raw = optitrack_.getRawYaw(tracker_id);
+            final_data.yaw_corrected = optitrack_.getYaw(tracker_id);
+            LOG_INFO("Final tracker position: x=" + std::to_string(final_data.x) + 
+                    ", y=" + std::to_string(final_data.y) + 
+                    ", z=" + std::to_string(final_data.z));
+        } else {
+            // Explicitly set position and orientation to zero when tracker isn't visible
+            final_data.x = 0.0;
+            final_data.y = 0.0;
+            final_data.z = 0.0;
+            final_data.yaw_raw = 0.0;
+            final_data.yaw_corrected = 0.0;
+            LOG_WARNING("Tracker " + tracker_id + " not visible after landing, logging position as (0, 0, 0) and yaw as 0");
+            std::cout << "[WARNING] Tracker " << tracker_id << " not visible after landing, logging position as (0, 0, 0) and yaw as 0" << std::endl;
+        }
+        
+        // IMU data is independent of tracker visibility
         final_data.imu_yaw = imu_handler->getYaw();
         final_data.imu_pitch = imu_handler->getPitch();
         final_data.imu_roll = imu_handler->getRoll();
@@ -525,9 +693,9 @@ void Calibration::runCalibrationRoutine(
             calibration_logger->logData(final_data);
         }
         
-        LOG_INFO("Landing complete, final position: x=" + std::to_string(final_data.x) + 
-                 ", y=" + std::to_string(final_data.y) + 
-                 ", z=" + std::to_string(final_data.z));
+        LOG_INFO("Landing complete");
+        std::cout << "[INFO] Landing complete" 
+                  << (tracker_visible ? " with final tracker data" : " (tracker not visible at final position)") << std::endl;
         
         // 5. Calculate yaw offset
         LOG_INFO("Calibration step 5: Calculating yaw offset");
