@@ -20,6 +20,7 @@
 #include <chrono>
 #include <mutex>
 #include <cmath>
+#include <memory>
 #include "optitrack.h"
 #include "tello_controller.h"
 #include "logger.h"
@@ -50,6 +51,11 @@ private:
     // Thread for the calibration process
     std::thread calibration_thread_;
     
+    // Shared resources for the calibration thread
+    std::shared_ptr<Logger> calibration_logger_;
+    std::shared_ptr<std::vector<DroneData>> drones_data_;
+    std::shared_ptr<std::mutex> drones_mutex_;
+    
     // The actual calibration routine (runs in a separate thread)
     void runCalibrationRoutine(
         const std::string& drone_ip, 
@@ -57,9 +63,9 @@ private:
         const std::string& drone_name,
         int drone_idx, 
         const std::string& log_filename,
-        Logger& calibration_logger,
-        std::vector<DroneData>& drones,
-        std::mutex& drones_mutex,
+        std::shared_ptr<Logger> calibration_logger,
+        std::shared_ptr<std::vector<DroneData>> drones_data,
+        std::shared_ptr<std::mutex> drones_mutex,
         std::function<void()> on_complete_callback
     );
 };

@@ -20,7 +20,9 @@
 
 // Constructor
 Calibration::Calibration(OptiTrack& optitrack, TelloController& tello_controller)
-    : optitrack_(optitrack), tello_controller_(tello_controller) {
+    : optitrack_(optitrack), tello_controller_(tello_controller),
+      calibration_logger_(nullptr), drones_data_(std::make_shared<std::vector<DroneData>>()),
+      drones_mutex_(std::make_shared<std::mutex>()) {
     LOG_INFO("Initializing calibration system");
 }
 
@@ -36,6 +38,7 @@ Calibration::~Calibration() {
             calibration_thread_.join();
         }
     }
+    // shared_ptr members will automatically clean up when this object is destroyed
 }
 
 // Start the calibration routine for a specific drone
@@ -98,9 +101,11 @@ void Calibration::calibrateDroneOrientation(DroneData& drone, int drone_idx, std
     
     // Create a logger to record calibration data
     std::string log_filename = data_dir + "/" + Logger::createUniqueFilename("application_log", ".csv");
-    Logger calibration_logger(log_filename);
     
-    if (!calibration_logger.isOpen()) {
+    // Create and assign the logger as a shared_ptr
+    calibration_logger_ = std::make_shared<Logger>(log_filename);
+    
+    if (!calibration_logger_->isOpen()) {
         LOG_ERROR("Failed to open log file: " + log_filename);
         std::cout << "Error: Failed to open log file. Aborting calibration.\n";
         
@@ -113,6 +118,18 @@ void Calibration::calibrateDroneOrientation(DroneData& drone, int drone_idx, std
         return;
     }
     
+    // Add drone to drones_data_ if not already present
+    {
+        std::lock_guard<std::mutex> lock(*drones_mutex_);
+        auto it = std::find_if(drones_data_->begin(), drones_data_->end(),
+            [&drone](const DroneData& d) { return d.ip == drone.ip; });
+        if (it == drones_data_->end()) {
+            drones_data_->push_back(drone);
+        } else {
+            *it = drone; // Update existing entry
+        }
+    }
+    
     LOG_INFO("Starting calibration for drone " + drone.name + " (IP: " + drone.ip + ")");
     std::cout << "\nStarting calibration for " << drone.name << " (" << drone.ip << ")\n";
     std::cout << "Starting calibration routine...\n";
@@ -122,31 +139,21 @@ void Calibration::calibrateDroneOrientation(DroneData& drone, int drone_idx, std
         calibration_thread_.join();
     }
     
-    // Create a new std::mutex that will be shared with the thread
-    auto drones_mutex = std::make_shared<std::mutex>();
-    
-    // Initialize IMU handler
-    TelloIMUHandler imu_handler(tello_controller_, drone.ip);
-    if (!imu_handler.initialize()) {
-        LOG_ERROR("Failed to initialize IMU handler for " + drone.ip);
-        std::cout << "Error: Failed to initialize IMU handler for " << drone.ip << ".\n";
-        calibration_in_progress_ = false;
-        if (on_complete_callback) on_complete_callback();
-        return;
-    }
-    
-    // Create a shared_ptr to store the drone data
-    auto drones_data = std::make_shared<std::vector<DroneData>>();
-    drones_data->push_back(drone);
+    // Set thread attributes to avoid pthread priority issues
+    pthread_attr_t attr;
+    pthread_attr_init(&attr);
+    pthread_attr_setinheritsched(&attr, PTHREAD_EXPLICIT_SCHED); // Use explicit scheduling
+    pthread_attr_setschedpolicy(&attr, SCHED_OTHER); // Default scheduling policy
+    pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED); // Ensure detached state
     
     calibration_thread_ = std::thread(&Calibration::runCalibrationRoutine, this,
-                               drone.ip, drone.tracker_id, drone.name, drone_idx, log_filename,
-                               std::ref(calibration_logger), std::ref(*drones_data), 
-                               std::ref(*drones_mutex),
-                               on_complete_callback);
+        drone.ip, drone.tracker_id, drone.name, drone_idx, log_filename,
+        calibration_logger_, drones_data_, drones_mutex_, on_complete_callback);
     
     // Detach the thread so it runs independently
     calibration_thread_.detach();
+    
+    pthread_attr_destroy(&attr);
 }
 
 // Check if a calibration is in progress
@@ -162,9 +169,9 @@ void Calibration::runCalibrationRoutine(
     const std::string& drone_name,
     int drone_idx, 
     const std::string& log_filename,
-    Logger& calibration_logger,
-    std::vector<DroneData>& drones,
-    std::mutex& drones_mutex,
+    std::shared_ptr<Logger> calibration_logger,
+    std::shared_ptr<std::vector<DroneData>> drones_data,
+    std::shared_ptr<std::mutex> drones_mutex,
     std::function<void()> on_complete_callback) {
     
     std::unique_ptr<TelloIMUHandler> imu_handler;
@@ -204,7 +211,7 @@ void Calibration::runCalibrationRoutine(
             static std::mutex logger_mutex;
             std::lock_guard<std::mutex> lock(logger_mutex);
             tello_controller_.sendCommand(drone_ip, "command");
-            calibration_logger.logCommand("command", 1.0, std::chrono::system_clock::to_time_t(std::chrono::system_clock::now()));
+            calibration_logger->logCommand("command", 1.0, std::chrono::system_clock::to_time_t(std::chrono::system_clock::now()));
         }
         
         std::this_thread::sleep_for(std::chrono::milliseconds(500));
@@ -213,7 +220,7 @@ void Calibration::runCalibrationRoutine(
             static std::mutex logger_mutex;
             std::lock_guard<std::mutex> lock(logger_mutex);
             tello_controller_.sendCommand(drone_ip, "takeoff");
-            calibration_logger.logCommand("takeoff", 1.0, std::chrono::system_clock::to_time_t(std::chrono::system_clock::now()));
+            calibration_logger->logCommand("takeoff", 1.0, std::chrono::system_clock::to_time_t(std::chrono::system_clock::now()));
         }
         
         std::this_thread::sleep_for(std::chrono::milliseconds(500));
@@ -238,7 +245,7 @@ void Calibration::runCalibrationRoutine(
         {
             static std::mutex logger_mutex;
             std::lock_guard<std::mutex> lock(logger_mutex);
-            calibration_logger.logData(takeoff_data);
+            calibration_logger->logData(takeoff_data);
         }
         
         std::cout << "[DEBUG] Logged data for " << tracker_id << ": x=" << takeoff_data.x 
@@ -252,7 +259,7 @@ void Calibration::runCalibrationRoutine(
             static std::mutex logger_mutex;
             std::lock_guard<std::mutex> lock(logger_mutex);
             tello_controller_.sendCommand(drone_ip, "up 50");
-            calibration_logger.logCommand("up", 50.0, std::chrono::system_clock::to_time_t(std::chrono::system_clock::now()));
+            calibration_logger->logCommand("up", 50.0, std::chrono::system_clock::to_time_t(std::chrono::system_clock::now()));
         }
         std::this_thread::sleep_for(std::chrono::milliseconds(500));
         
@@ -274,7 +281,7 @@ void Calibration::runCalibrationRoutine(
             {
                 static std::mutex logger_mutex;
                 std::lock_guard<std::mutex> lock(logger_mutex);
-                calibration_logger.logData(data);
+                calibration_logger->logData(data);
             }
             
             // Only print every 5th sample to avoid too much output
@@ -296,7 +303,7 @@ void Calibration::runCalibrationRoutine(
             static std::mutex logger_mutex;
             std::lock_guard<std::mutex> lock(logger_mutex);
             tello_controller_.sendCommand(drone_ip, "forward 50");
-            calibration_logger.logCommand("forward", 50.0, std::chrono::system_clock::to_time_t(std::chrono::system_clock::now()));
+            calibration_logger->logCommand("forward", 50.0, std::chrono::system_clock::to_time_t(std::chrono::system_clock::now()));
         }
         std::this_thread::sleep_for(std::chrono::milliseconds(500));
         
@@ -322,7 +329,7 @@ void Calibration::runCalibrationRoutine(
             {
                 static std::mutex logger_mutex;
                 std::lock_guard<std::mutex> lock(logger_mutex);
-                calibration_logger.logData(data);
+                calibration_logger->logData(data);
             }
             
             // Store yaw values for calibration during the middle 3 seconds
@@ -347,7 +354,7 @@ void Calibration::runCalibrationRoutine(
             static std::mutex logger_mutex;
             std::lock_guard<std::mutex> lock(logger_mutex);
             tello_controller_.sendCommand(drone_ip, "land");
-            calibration_logger.logCommand("land", 1.0, std::chrono::system_clock::to_time_t(std::chrono::system_clock::now()));
+            calibration_logger->logCommand("land", 1.0, std::chrono::system_clock::to_time_t(std::chrono::system_clock::now()));
         }
         std::this_thread::sleep_for(std::chrono::milliseconds(500));
         std::this_thread::sleep_for(std::chrono::seconds(5));
@@ -382,15 +389,17 @@ void Calibration::runCalibrationRoutine(
         
         // Update the drone data in the main list (need to use mutex if we modify shared data)
         {
-            std::lock_guard<std::mutex> lock(drones_mutex);
-            drones[drone_idx].yaw_offset = avg_yaw;
+            std::lock_guard<std::mutex> lock(*drones_mutex);
+            if (drone_idx < drones_data->size()) {
+                (*drones_data)[drone_idx].yaw_offset = avg_yaw;
+            }
             
             // Also save to a calibration file
             LOG_INFO("Saving calibration data to file");
         }
         
         // Make sure the logger flushes all data
-        calibration_logger.flush();
+        calibration_logger->flush();
         
         LOG_INFO("Calibration complete for " + drone_name + " with yaw offset " + 
                  std::to_string(avg_yaw) + " degrees");
@@ -422,11 +431,11 @@ void Calibration::runCalibrationRoutine(
             static std::mutex logger_mutex;
             std::lock_guard<std::mutex> lock(logger_mutex);
             tello_controller_.sendCommand(drone_ip, "land");
-            calibration_logger.logCommand("land", 1.0, std::chrono::system_clock::to_time_t(std::chrono::system_clock::now()));
+            calibration_logger->logCommand("land", 1.0, std::chrono::system_clock::to_time_t(std::chrono::system_clock::now()));
         }
         
         // Flush logger
-        calibration_logger.flush();
+        calibration_logger->flush();
         
         // Signal that the calibration is complete (with error)
         {
