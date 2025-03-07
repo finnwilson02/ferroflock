@@ -44,21 +44,18 @@ TelloController::TelloDevice::~TelloDevice() {
 bool TelloController::TelloDevice::initializeSockets() {
     // Close existing socket if any
     if (command_socket >= 0) {
+        LOG_DEBUG("[SOCKET] Closing existing socket " + std::to_string(command_socket) + " for " + ip);
         close(command_socket);
         command_socket = -1;
         socket_valid = false;
     }
 
+    // Create a new socket
     command_socket = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
     if (command_socket < 0) {
-        std::cerr << "Failed to create socket for " << ip << ": " << strerror(errno) << std::endl;
+        LOG_ERROR("Failed to create socket for " + ip + ": " + strerror(errno));
         return false;
     }
-
-    // Duplicate the socket to ensure unique descriptor
-    int new_socket = dup(command_socket);
-    close(command_socket);
-    command_socket = new_socket;
 
     LOG_DEBUG("[SOCKET] Created new socket " + std::to_string(command_socket) 
             + " for " + ip + ":" + std::to_string(local_port));
@@ -68,6 +65,7 @@ bool TelloController::TelloDevice::initializeSockets() {
     if (setsockopt(command_socket, SOL_SOCKET, SO_REUSEADDR, &reuse, sizeof(reuse)) < 0) {
         LOG_ERROR("Failed to set SO_REUSEADDR for " + ip + ": " + strerror(errno));
         close(command_socket);
+        command_socket = -1;
         return false;
     }
 
@@ -82,6 +80,7 @@ bool TelloController::TelloDevice::initializeSockets() {
         LOG_ERROR("Failed to bind socket for " + ip 
                 + ": " + strerror(errno));
         close(command_socket);
+        command_socket = -1;
         return false;
     }
 
@@ -98,11 +97,13 @@ bool TelloController::TelloDevice::initializeSockets() {
     setsockopt(command_socket, SOL_SOCKET, SO_RCVTIMEO, &tv, sizeof(tv));
 
     socket_valid = true;
+    LOG_DEBUG("[SOCKET] Successfully initialized socket " + std::to_string(command_socket) + " for " + ip);
     return true;
 }
 
 // Send a command to a TelloDevice
 bool TelloController::TelloDevice::sendCommand(const std::string& cmd) {
+    LOG_DEBUG("sendCommand: Checking socket state for " + ip + ", socket: " + std::to_string(command_socket));
     if (!socket_valid || command_socket < 0) {
         LOG_ERROR("[ERROR] Invalid socket state for " + ip);
         return reinitializeAndSend(cmd);
@@ -118,7 +119,7 @@ bool TelloController::TelloDevice::sendCommand(const std::string& cmd) {
                         (struct sockaddr *)&command_addr, sizeof(command_addr));
     
     if (sent < 0) {
-        LOG_ERROR("Send failed for " + ip + ": " + strerror(errno));
+        LOG_ERROR("Send failed for " + ip + ": " + strerror(errno) + ", socket: " + std::to_string(command_socket));
         socket_valid = false;
         return reinitializeAndSend(clean_cmd);
     }
@@ -129,18 +130,26 @@ bool TelloController::TelloDevice::sendCommand(const std::string& cmd) {
     // Log the command using global logger if available, but skip 'rc' commands
     // to avoid parsing errors and log flooding
     if (clean_cmd.compare(0, 2, "rc") != 0 && g_logger && g_logger->isOpen()) {
-        std::string command_name = clean_cmd;
-        double value = 1.0; // Default for commands without values
-        size_t space_pos = clean_cmd.find(' ');
-        if (space_pos != std::string::npos) {
-            command_name = clean_cmd.substr(0, space_pos);
-            try {
-                value = std::stod(clean_cmd.substr(space_pos + 1));
-            } catch (const std::exception&) {
-                value = 1.0; // Fallback if parsing fails
+        try {
+            std::string command_name = clean_cmd;
+            double value = 1.0; // Default for commands without values
+            size_t space_pos = clean_cmd.find(' ');
+            if (space_pos != std::string::npos) {
+                command_name = clean_cmd.substr(0, space_pos);
+                try {
+                    value = std::stod(clean_cmd.substr(space_pos + 1));
+                } catch (const std::exception&) {
+                    value = 1.0; // Fallback if parsing fails
+                }
             }
+            
+            // Use local mutex to protect g_logger access
+            static std::mutex logger_mutex;
+            std::lock_guard<std::mutex> lock(logger_mutex);
+            g_logger->logCommand(command_name, value, std::chrono::system_clock::to_time_t(std::chrono::system_clock::now()));
+        } catch (const std::exception& e) {
+            LOG_ERROR("Logger error in sendCommand: " + std::string(e.what()));
         }
-        g_logger->logCommand(command_name, value, std::chrono::system_clock::to_time_t(std::chrono::system_clock::now()));
     }
     
     // Don't wait for responses from Tellos - they're unreliable

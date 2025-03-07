@@ -12,6 +12,7 @@
  */
 
 #include "../include/tello_imu_handler.h"
+#include "../include/logger.h"
 #include <iostream>
 #include <thread>
 #include <sstream>
@@ -20,6 +21,8 @@
 // Constructor
 TelloIMUHandler::TelloIMUHandler(TelloController& controller, const std::string& drone_ip)
     : controller(controller), ip(drone_ip) {
+    
+    LOG_DEBUG("TelloIMUHandler constructor: Initializing mutex for " + ip);
     
     // Make sure the drone exists in the controller
     if (!controller.pingDrone(ip)) {
@@ -136,13 +139,42 @@ bool TelloIMUHandler::initializeStateSocket() {
 // State receiver thread function
 void TelloIMUHandler::stateReceiver() {
     while (running) {
+        // First get the state data without any locks
         std::optional<std::string> state_data = receiveState();
+        
         if (state_data) {
-            parseStateData(*state_data);
-            {
-                std::lock_guard<std::mutex> lock(data_mutex);
-                last_state_time = std::chrono::system_clock::now();
+            // Lock the mutex once before parsing data
+            LOG_DEBUG("stateReceiver: Attempting to lock data_mutex for " + ip);
+            std::lock_guard<std::mutex> lock(data_mutex);
+            LOG_DEBUG("stateReceiver: Successfully locked data_mutex for " + ip);
+            
+            // Parse the data and update last_state_time (with mutex already locked)
+            std::istringstream iss(*state_data);
+            std::string token;
+            
+            while (std::getline(iss, token, ';')) {
+                size_t pos = token.find(':');
+                if (pos != std::string::npos) {
+                    std::string key = token.substr(0, pos);
+                    std::string value = token.substr(pos + 1);
+                    
+                    try {
+                        if (key == "yaw") imu_yaw = std::stod(value);
+                        else if (key == "pitch") imu_pitch = std::stod(value);
+                        else if (key == "roll") imu_roll = std::stod(value);
+                        else if (key == "agx") imu_agx = std::stod(value);
+                        else if (key == "agy") imu_agy = std::stod(value);
+                        else if (key == "agz") imu_agz = std::stod(value);
+                    } catch (const std::exception& e) {
+                        LOG_ERROR("Parsing " + key + " failed: " + e.what());
+                    }
+                }
             }
+            
+            // Update the timestamp
+            last_state_time = std::chrono::system_clock::now();
+            LOG_DEBUG("stateReceiver: Completed data parsing for " + ip);
+            LOG_DEBUG("stateReceiver: Unlocking data_mutex for " + ip);
         }
         
         // Sleep to prevent CPU overload
@@ -154,7 +186,20 @@ void TelloIMUHandler::stateReceiver() {
 void TelloIMUHandler::parseStateData(const std::string& data) {
     std::istringstream iss(data);
     std::string token;
+    LOG_DEBUG("parseStateData: Attempting to lock data_mutex for " + ip);
+    
+    // Check if mutex is already locked (should NOT be able to lock it)
+    bool was_locked = !data_mutex.try_lock();
+    if (!was_locked) {
+        // If we successfully locked it, unlock immediately - this is not expected
+        data_mutex.unlock();
+        LOG_ERROR("MUTEX ERROR: data_mutex should already be locked in parseStateData for " + ip);
+    } else {
+        LOG_DEBUG("Mutex check passed - data_mutex is already locked for " + ip);
+    }
+    
     std::lock_guard<std::mutex> lock(data_mutex);
+    LOG_DEBUG("parseStateData: Locked data_mutex for " + ip);
     
     while (std::getline(iss, token, ';')) {
         size_t pos = token.find(':');
@@ -181,6 +226,7 @@ void TelloIMUHandler::parseStateData(const std::string& data) {
         imu_agz < -10.0 || imu_agz > 10.0) {
         // std::cerr << "[WARNING] IMU acceleration out of range for " << ip << std::endl;
     }
+    LOG_DEBUG("parseStateData: Unlocking data_mutex for " + ip);
 }
 
 // Receive state data from UDP port 8890

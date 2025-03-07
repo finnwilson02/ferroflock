@@ -32,10 +32,8 @@ enum LogLevel {
     LOG_LEVEL_NONE  = 4  // Suppress all logs
 };
 
-// Global debug flag
+// Global debug flag and logging level
 extern bool g_debug_enabled;
-
-// Global logging level (default to DEBUG to show all messages)
 extern LogLevel g_log_level;
 
 // Logging functions for consistent output

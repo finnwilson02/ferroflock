@@ -14,8 +14,9 @@
 
 #include "../include/logger.h"
 
-// Define global logging level
-LogLevel g_log_level = LOG_LEVEL_DEBUG; // Default to showing all messages
+// Define global logging variables (these are already defined in main.cpp)
+LogLevel g_log_level; // Defined in main.cpp
+// bool g_debug_enabled is defined in main.cpp
 
 // Constructor
 Logger::Logger(const std::string& filename) {
@@ -89,10 +90,13 @@ bool Logger::isOpen() const {
 
 // Log a data point
 void Logger::logData(const DataPoint& data) {
+    LOG_DEBUG("logData: Attempting to lock file_mutex_");
     std::lock_guard<std::mutex> lock(file_mutex_);
+    LOG_DEBUG("logData: Locked file_mutex_");
     
     if (!file_.is_open()) {
         LOG_ERROR("Cannot log data - log file is not open");
+        LOG_DEBUG("logData: Unlocking file_mutex_ (early return)");
         return;
     }
     
@@ -147,6 +151,8 @@ void Logger::logData(const DataPoint& data) {
             file_.clear(); // Clear error flags to continue writing
         }
     }
+    
+    LOG_DEBUG("logData: Unlocking file_mutex_");
 }
 
 // Log position data
