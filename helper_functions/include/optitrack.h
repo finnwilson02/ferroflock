@@ -51,6 +51,7 @@ struct DroneData {
     std::string name;        // Human-readable name (e.g., "Bird 3")
     std::string tracker_id;  // OptiTrack tracker ID (e.g., "Tracker4")
     std::string ip;          // IP address of the drone (e.g., "192.168.1.108")
+    int port{8889};          // Command port (default: 8889)
     double yaw_offset{0.0};  // Calibrated yaw offset
 };
 

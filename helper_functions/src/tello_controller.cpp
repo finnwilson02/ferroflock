@@ -217,6 +217,11 @@ std::string TelloController::TelloDevice::cleanCommand(const std::string& cmd) {
 bool TelloController::initialize(const std::string& ip, bool skip_reboot) {
     // Check if already initialized
     if (devices.find(ip) != devices.end()) {
+        if (!devices[ip].socket_valid) {
+            LOG_WARNING("Reinitializing invalid socket for " + ip);
+            devices[ip].initializeSockets(); // Reinitialize if invalid
+        }
+        
         // If device is already initialized but needs reboot and we're not skipping it
         if (devices[ip].needs_reboot && !skip_reboot) {
             LOG_DEBUG("Rebooting drone at " + ip + " before use...");
@@ -236,12 +241,16 @@ bool TelloController::initialize(const std::string& ip, bool skip_reboot) {
         return true;
     }
     
+    // Validate IP
+    if (ip.find('.') == std::string::npos) {
+        LOG_ERROR("Invalid IP address: " + ip);
+        return false;
+    }
+    
     // Skip rebooting at the start of routine
     LOG_DEBUG("Initializing drone at " + ip + " (no reboot)");
     
-    TelloDevice device;
-    device.ip = ip;
-    device.local_port = next_port++;
+    TelloDevice device(ip, 8889, next_port++);
     device.needs_reboot = false; // No need to reboot
     
     if (!device.initializeSockets()) {
@@ -259,7 +268,7 @@ bool TelloController::initialize(const std::string& ip, bool skip_reboot) {
     }
     
     // Don't wait for response - assume it worked
-    LOG_DEBUG("Assuming drone at " + ip + " entered SDK mode");
+    LOG_INFO("Initialized TelloDevice for " + ip + " with socket " + std::to_string(device.command_socket));
     devices[ip] = std::move(device);
     return true;
 }

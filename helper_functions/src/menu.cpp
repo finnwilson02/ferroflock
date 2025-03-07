@@ -211,9 +211,22 @@ std::vector<DroneData> Menu::loadDronesFromJSON(const std::string& filename) {
             // Extract IP (required)
             if (device.contains("ip") && device["ip"].is_string()) {
                 drone.ip = device["ip"].get<std::string>();
+                // Validate IP format
+                if (drone.ip.find('.') == std::string::npos) {
+                    LOG_WARNING("Invalid IP: " + drone.ip + ", skipping");
+                    continue;
+                }
             } else {
-                LOG_WARNING("Device without IP address, skipping");
+                LOG_WARNING("Missing IP, skipping device");
                 continue;
+            }
+
+            // Extract port
+            if (device.contains("port") && device["port"].is_number()) {
+                drone.port = device["port"].get<int>();
+            } else {
+                drone.port = 8889; // Default port
+                LOG_WARNING("Missing port for " + drone.ip + ", using default 8889");
             }
 
             // Extract name
@@ -221,6 +234,7 @@ std::vector<DroneData> Menu::loadDronesFromJSON(const std::string& filename) {
                 drone.name = device["name"].get<std::string>();
             } else {
                 drone.name = "Drone " + std::to_string(++drone_count);
+                LOG_WARNING("Missing name for " + drone.ip + ", using '" + drone.name + "'");
             }
 
             // Extract tracker_id
@@ -232,9 +246,11 @@ std::vector<DroneData> Menu::loadDronesFromJSON(const std::string& filename) {
                 drone.tracker_id = ipToOptitrackMap[drone.ip];
                 // Also use tracker name as drone name for consistency
                 drone.name = drone.tracker_id;
+                LOG_WARNING("Using hardcoded tracker_id mapping for " + drone.ip + ": " + drone.tracker_id);
             } else {
                 // Last resort
                 drone.tracker_id = "Bird" + std::to_string(drone_count);
+                LOG_WARNING("Missing tracker_id for " + drone.ip + ", using fallback: " + drone.tracker_id);
             }
 
             // Extract yaw_offset
@@ -242,9 +258,11 @@ std::vector<DroneData> Menu::loadDronesFromJSON(const std::string& filename) {
                 drone.yaw_offset = device["yaw_offset"].get<double>();
             } else {
                 drone.yaw_offset = 0.0;
+                LOG_WARNING("Missing yaw_offset for " + drone.ip + ", using default 0.0");
             }
 
             LOG_INFO("Loaded drone: IP=" + drone.ip + 
+                     ", Port=" + std::to_string(drone.port) +
                      ", Name=" + drone.name + 
                      ", Tracker=" + drone.tracker_id + 
                      ", YawOffset=" + std::to_string(drone.yaw_offset));
@@ -255,7 +273,9 @@ std::vector<DroneData> Menu::loadDronesFromJSON(const std::string& filename) {
     }
     
     if (drones.empty()) {
-        LOG_ERROR("No drones found in JSON");
+        LOG_ERROR("No drones found in JSON file: " + actual_filename);
+    } else {
+        LOG_INFO("Successfully loaded " + std::to_string(drones.size()) + " drones from " + actual_filename);
     }
     
     // Store the loaded drones

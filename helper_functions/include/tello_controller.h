@@ -22,6 +22,7 @@
 #include <chrono>
 #include <functional>
 #include <optional>
+#include <iostream>
 #include <sys/socket.h>
 #include <arpa/inet.h>
 #include <netinet/in.h>
@@ -67,8 +68,52 @@ private:
         bool socket_valid{false};
         bool needs_reboot{true}; // Always reboot at first
         
+        // Constructor with parameters
+        TelloDevice(std::string ip_addr = "", int cmd_port = 8889, int loc_port = 8890)
+            : ip(ip_addr), command_port(cmd_port), local_port(loc_port),
+              command_socket(-1), socket_valid(false), needs_reboot(false) {}
+              
+        // Move constructor
+        TelloDevice(TelloDevice&& other) noexcept
+            : ip(std::move(other.ip)),
+              command_port(other.command_port),
+              local_port(other.local_port),
+              command_socket(other.command_socket),
+              command_addr(other.command_addr),
+              socket_valid(other.socket_valid),
+              needs_reboot(other.needs_reboot) {
+            std::cout << "[SOCKET] Moved socket " << command_socket << " from " << other.ip << std::endl;
+            other.command_socket = -1;
+            other.socket_valid = false;
+        }
+
+        // Move assignment operator
+        TelloDevice& operator=(TelloDevice&& other) noexcept {
+            if (this != &other) {
+                if (command_socket >= 0) {
+                    std::cout << "[SOCKET] Closing socket " << command_socket << " for " << ip << std::endl;
+                    close(command_socket);
+                }
+                ip = std::move(other.ip);
+                command_port = other.command_port;
+                local_port = other.local_port;
+                command_socket = other.command_socket;
+                command_addr = other.command_addr;
+                socket_valid = other.socket_valid;
+                needs_reboot = other.needs_reboot;
+                std::cout << "[SOCKET] Moved socket " << command_socket << " from " << other.ip << std::endl;
+                other.command_socket = -1;
+                other.socket_valid = false;
+            }
+            return *this;
+        }
+        
         // Destructor to close sockets
         ~TelloDevice();
+        
+        // Prevent copying
+        TelloDevice(const TelloDevice&) = delete;
+        TelloDevice& operator=(const TelloDevice&) = delete;
         
         // Initialize socket connections
         bool initializeSockets();
