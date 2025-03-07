@@ -202,6 +202,27 @@ void Calibration::runCalibrationRoutine(
             return;
         }
         
+        // Log initial state before takeoff
+        LOG_INFO("Logging initial state before takeoff");
+        DataPoint initial_data(tracker_id);
+        initial_data.x = optitrack_.getXPosition(tracker_id);
+        initial_data.y = optitrack_.getYPosition(tracker_id);
+        initial_data.z = optitrack_.getZPosition(tracker_id);
+        initial_data.yaw_raw = optitrack_.getRawYaw(tracker_id);
+        initial_data.yaw_corrected = optitrack_.getYaw(tracker_id);
+        initial_data.imu_yaw = imu_handler->getYaw();
+        initial_data.imu_pitch = imu_handler->getPitch();
+        initial_data.imu_roll = imu_handler->getRoll();
+        initial_data.imu_agx = imu_handler->getAgx();
+        initial_data.imu_agy = imu_handler->getAgy();
+        initial_data.imu_agz = imu_handler->getAgz();
+        
+        {
+            static std::mutex logger_mutex;
+            std::lock_guard<std::mutex> lock(logger_mutex);
+            calibration_logger->logData(initial_data);
+        }
+        
         // 1. Takeoff
         LOG_INFO("Calibration step 1: Taking off");
         std::cout << "Step 1: Taking off...\n";
@@ -223,48 +244,76 @@ void Calibration::runCalibrationRoutine(
             calibration_logger->logCommand("takeoff", 1.0, std::chrono::system_clock::to_time_t(std::chrono::system_clock::now()));
         }
         
-        std::this_thread::sleep_for(std::chrono::milliseconds(500));
+        // Wait for takeoff to complete while logging data
+        LOG_INFO("Waiting for takeoff to complete while logging");
+        auto start_time = std::chrono::steady_clock::now();
+        while (std::chrono::steady_clock::now() - start_time < std::chrono::seconds(5)) {
+            DataPoint takeoff_data(tracker_id);
+            takeoff_data.x = optitrack_.getXPosition(tracker_id);
+            takeoff_data.y = optitrack_.getYPosition(tracker_id);
+            takeoff_data.z = optitrack_.getZPosition(tracker_id);
+            takeoff_data.yaw_raw = optitrack_.getRawYaw(tracker_id);
+            takeoff_data.yaw_corrected = optitrack_.getYaw(tracker_id);
+            takeoff_data.imu_yaw = imu_handler->getYaw();
+            takeoff_data.imu_pitch = imu_handler->getPitch();
+            takeoff_data.imu_roll = imu_handler->getRoll();
+            takeoff_data.imu_agx = imu_handler->getAgx();
+            takeoff_data.imu_agy = imu_handler->getAgy();
+            takeoff_data.imu_agz = imu_handler->getAgz();
+            
+            {
+                static std::mutex logger_mutex;
+                std::lock_guard<std::mutex> lock(logger_mutex);
+                calibration_logger->logData(takeoff_data);
+            }
+            
+            // Log every 100ms (10Hz) during takeoff
+            std::this_thread::sleep_for(std::chrono::milliseconds(100));
+        }
         
-        // Wait for takeoff to complete
-        std::this_thread::sleep_for(std::chrono::seconds(5));
-        
-        // Log initial position
-        DataPoint takeoff_data(tracker_id);
-        takeoff_data.x = optitrack_.getXPosition(tracker_id);
-        takeoff_data.y = optitrack_.getYPosition(tracker_id);
-        takeoff_data.z = optitrack_.getZPosition(tracker_id);
-        takeoff_data.yaw_raw = optitrack_.getRawYaw(tracker_id);
-        takeoff_data.yaw_corrected = optitrack_.getYaw(tracker_id);
-        takeoff_data.imu_yaw = imu_handler->getYaw();
-        takeoff_data.imu_pitch = imu_handler->getPitch();
-        takeoff_data.imu_roll = imu_handler->getRoll();
-        takeoff_data.imu_agx = imu_handler->getAgx();
-        takeoff_data.imu_agy = imu_handler->getAgy();
-        takeoff_data.imu_agz = imu_handler->getAgz();
+        // Log post-takeoff position
+        DataPoint post_takeoff_data(tracker_id);
+        post_takeoff_data.x = optitrack_.getXPosition(tracker_id);
+        post_takeoff_data.y = optitrack_.getYPosition(tracker_id);
+        post_takeoff_data.z = optitrack_.getZPosition(tracker_id);
+        post_takeoff_data.yaw_raw = optitrack_.getRawYaw(tracker_id);
+        post_takeoff_data.yaw_corrected = optitrack_.getYaw(tracker_id);
+        post_takeoff_data.imu_yaw = imu_handler->getYaw();
+        post_takeoff_data.imu_pitch = imu_handler->getPitch();
+        post_takeoff_data.imu_roll = imu_handler->getRoll();
+        post_takeoff_data.imu_agx = imu_handler->getAgx();
+        post_takeoff_data.imu_agy = imu_handler->getAgy();
+        post_takeoff_data.imu_agz = imu_handler->getAgz();
         
         {
             static std::mutex logger_mutex;
             std::lock_guard<std::mutex> lock(logger_mutex);
-            calibration_logger->logData(takeoff_data);
+            calibration_logger->logData(post_takeoff_data);
         }
         
-        std::cout << "[DEBUG] Logged data for " << tracker_id << ": x=" << takeoff_data.x 
-                  << ", y=" << takeoff_data.y << ", z=" << takeoff_data.z 
-                  << ", yaw=" << takeoff_data.yaw_corrected << std::endl;
+        std::cout << "[DEBUG] Logged data for " << tracker_id << ": x=" << post_takeoff_data.x 
+                  << ", y=" << post_takeoff_data.y << ", z=" << post_takeoff_data.z 
+                  << ", yaw=" << post_takeoff_data.yaw_corrected << std::endl;
         
-        // 2. Move upward for 3 seconds
+        // 2. Move upward for 3 seconds using continuous RC commands
         LOG_INFO("Calibration step 2: Moving upward for 3 seconds");
         std::cout << "Step 2: Moving upward for 3 seconds...\n";
+        
+        // Log command start
         {
             static std::mutex logger_mutex;
             std::lock_guard<std::mutex> lock(logger_mutex);
-            tello_controller_.sendCommand(drone_ip, "up 50");
-            calibration_logger->logCommand("up", 50.0, std::chrono::system_clock::to_time_t(std::chrono::system_clock::now()));
+            calibration_logger->logCommand("rc_upward_start", 50.0, std::chrono::system_clock::to_time_t(std::chrono::system_clock::now()));
         }
-        std::this_thread::sleep_for(std::chrono::milliseconds(500));
         
-        // Log positions while moving upward (30 samples over 3 seconds)
-        for (int i = 0; i < 30; i++) {
+        // Send continuous upward commands while logging data
+        start_time = std::chrono::steady_clock::now();
+        int log_counter = 0;
+        while (std::chrono::steady_clock::now() - start_time < std::chrono::seconds(3)) {
+            // Send RC command for upward movement (left-right, forward-back, up-down, yaw)
+            tello_controller_.sendCommand(drone_ip, "rc 0 0 50 0");
+            
+            // Log position data
             DataPoint data(tracker_id);
             data.x = optitrack_.getXPosition(tracker_id);
             data.y = optitrack_.getYPosition(tracker_id);
@@ -284,35 +333,89 @@ void Calibration::runCalibrationRoutine(
                 calibration_logger->logData(data);
             }
             
-            // Only print every 5th sample to avoid too much output
-            if (i % 5 == 0) {
-                std::cout << "[DEBUG] Logged data for " << tracker_id << ": x=" << data.x 
+            // Only print every 10th sample to avoid too much output
+            if (log_counter % 10 == 0) {
+                std::cout << "[DEBUG] Upward movement - logged data: x=" << data.x 
                           << ", y=" << data.y << ", z=" << data.z 
                           << ", yaw=" << data.yaw_corrected << std::endl;
             }
+            log_counter++;
             
-            std::this_thread::sleep_for(std::chrono::milliseconds(100));
+            // Send commands at 20Hz (50ms interval)
+            std::this_thread::sleep_for(std::chrono::milliseconds(50));
         }
         
-        std::this_thread::sleep_for(std::chrono::seconds(1)); // Stabilize
+        // Stop movement
+        LOG_INFO("Stopping upward movement");
+        for (int i = 0; i < 3; i++) {  // Send stop command multiple times for reliability
+            tello_controller_.sendCommand(drone_ip, "rc 0 0 0 0");
+            std::this_thread::sleep_for(std::chrono::milliseconds(50));
+        }
         
-        // 3. Move forward for 5 seconds
-        LOG_INFO("Calibration step 3: Moving forward for 5 seconds");
-        std::cout << "Step 3: Moving forward for 5 seconds...\n";
+        // Log command end
         {
             static std::mutex logger_mutex;
             std::lock_guard<std::mutex> lock(logger_mutex);
-            tello_controller_.sendCommand(drone_ip, "forward 50");
-            calibration_logger->logCommand("forward", 50.0, std::chrono::system_clock::to_time_t(std::chrono::system_clock::now()));
+            calibration_logger->logCommand("rc_upward_stop", 0.0, std::chrono::system_clock::to_time_t(std::chrono::system_clock::now()));
         }
-        std::this_thread::sleep_for(std::chrono::milliseconds(500));
+        
+        // Log while stabilizing for 1 second
+        LOG_INFO("Stabilizing for 1 second");
+        start_time = std::chrono::steady_clock::now();
+        while (std::chrono::steady_clock::now() - start_time < std::chrono::seconds(1)) {
+            DataPoint data(tracker_id);
+            data.x = optitrack_.getXPosition(tracker_id);
+            data.y = optitrack_.getYPosition(tracker_id);
+            data.z = optitrack_.getZPosition(tracker_id);
+            data.yaw_raw = optitrack_.getRawYaw(tracker_id);
+            data.yaw_corrected = optitrack_.getYaw(tracker_id);
+            data.imu_yaw = imu_handler->getYaw();
+            data.imu_pitch = imu_handler->getPitch();
+            data.imu_roll = imu_handler->getRoll();
+            data.imu_agx = imu_handler->getAgx();
+            data.imu_agy = imu_handler->getAgy();
+            data.imu_agz = imu_handler->getAgz();
+            
+            {
+                static std::mutex logger_mutex;
+                std::lock_guard<std::mutex> lock(logger_mutex);
+                calibration_logger->logData(data);
+            }
+            
+            // Log at 10Hz during stabilization
+            std::this_thread::sleep_for(std::chrono::milliseconds(100));
+        }
+        
+        // 3. Move forward for 5 seconds using continuous RC commands
+        LOG_INFO("Calibration step 3: Moving forward for 5 seconds");
+        std::cout << "Step 3: Moving forward for 5 seconds...\n";
+        
+        // Log command start
+        {
+            static std::mutex logger_mutex;
+            std::lock_guard<std::mutex> lock(logger_mutex);
+            calibration_logger->logCommand("rc_forward_start", 50.0, std::chrono::system_clock::to_time_t(std::chrono::system_clock::now()));
+        }
         
         // Initialize variables to store yaw values
         std::vector<double> yaw_values;
         double initial_yaw = optitrack_.getYaw(tracker_id);
         
-        // Log positions during forward movement (50 samples over 5 seconds)
-        for (int i = 0; i < 50; i++) {
+        // Send continuous forward commands while logging data
+        start_time = std::chrono::steady_clock::now();
+        log_counter = 0;
+        
+        // Calculate time ranges for middle 3 seconds (from 1s to 4s mark)
+        auto middle_start = start_time + std::chrono::seconds(1);
+        auto middle_end = start_time + std::chrono::seconds(4);
+        
+        while (std::chrono::steady_clock::now() - start_time < std::chrono::seconds(5)) {
+            auto current_time = std::chrono::steady_clock::now();
+            
+            // Send RC command for forward movement (left-right, forward-back, up-down, yaw)
+            tello_controller_.sendCommand(drone_ip, "rc 0 50 0 0");
+            
+            // Log position data
             DataPoint data(tracker_id);
             data.x = optitrack_.getXPosition(tracker_id);
             data.y = optitrack_.getYPosition(tracker_id);
@@ -333,31 +436,98 @@ void Calibration::runCalibrationRoutine(
             }
             
             // Store yaw values for calibration during the middle 3 seconds
-            if (i >= 10 && i < 40) {
+            if (current_time >= middle_start && current_time <= middle_end) {
                 yaw_values.push_back(data.yaw_corrected);
             }
             
             // Only print every 10th sample to avoid too much output
-            if (i % 10 == 0) {
-                std::cout << "[DEBUG] Logged data for " << tracker_id << ": x=" << data.x 
+            if (log_counter % 10 == 0) {
+                std::cout << "[DEBUG] Forward movement - logged data: x=" << data.x 
                           << ", y=" << data.y << ", z=" << data.z 
                           << ", yaw=" << data.yaw_corrected << std::endl;
             }
+            log_counter++;
             
-            std::this_thread::sleep_for(std::chrono::milliseconds(100));
+            // Send commands at 20Hz (50ms interval)
+            std::this_thread::sleep_for(std::chrono::milliseconds(50));
+        }
+        
+        // Stop movement
+        LOG_INFO("Stopping forward movement");
+        for (int i = 0; i < 3; i++) {  // Send stop command multiple times for reliability
+            tello_controller_.sendCommand(drone_ip, "rc 0 0 0 0");
+            std::this_thread::sleep_for(std::chrono::milliseconds(50));
+        }
+        
+        // Log command end
+        {
+            static std::mutex logger_mutex;
+            std::lock_guard<std::mutex> lock(logger_mutex);
+            calibration_logger->logCommand("rc_forward_stop", 0.0, std::chrono::system_clock::to_time_t(std::chrono::system_clock::now()));
         }
         
         // 4. Land the drone
         LOG_INFO("Calibration step 4: Landing");
         std::cout << "Step 4: Landing...\n";
+        
+        // Send land command
         {
             static std::mutex logger_mutex;
             std::lock_guard<std::mutex> lock(logger_mutex);
             tello_controller_.sendCommand(drone_ip, "land");
             calibration_logger->logCommand("land", 1.0, std::chrono::system_clock::to_time_t(std::chrono::system_clock::now()));
         }
-        std::this_thread::sleep_for(std::chrono::milliseconds(500));
-        std::this_thread::sleep_for(std::chrono::seconds(5));
+        
+        // Log data during landing process
+        LOG_INFO("Logging data during landing process");
+        start_time = std::chrono::steady_clock::now();
+        while (std::chrono::steady_clock::now() - start_time < std::chrono::seconds(5)) {
+            DataPoint landing_data(tracker_id);
+            landing_data.x = optitrack_.getXPosition(tracker_id);
+            landing_data.y = optitrack_.getYPosition(tracker_id);
+            landing_data.z = optitrack_.getZPosition(tracker_id);
+            landing_data.yaw_raw = optitrack_.getRawYaw(tracker_id);
+            landing_data.yaw_corrected = optitrack_.getYaw(tracker_id);
+            landing_data.imu_yaw = imu_handler->getYaw();
+            landing_data.imu_pitch = imu_handler->getPitch();
+            landing_data.imu_roll = imu_handler->getRoll();
+            landing_data.imu_agx = imu_handler->getAgx();
+            landing_data.imu_agy = imu_handler->getAgy();
+            landing_data.imu_agz = imu_handler->getAgz();
+            
+            {
+                static std::mutex logger_mutex;
+                std::lock_guard<std::mutex> lock(logger_mutex);
+                calibration_logger->logData(landing_data);
+            }
+            
+            // Log at 10Hz during landing
+            std::this_thread::sleep_for(std::chrono::milliseconds(100));
+        }
+        
+        // Log final position after landing
+        DataPoint final_data(tracker_id);
+        final_data.x = optitrack_.getXPosition(tracker_id);
+        final_data.y = optitrack_.getYPosition(tracker_id);
+        final_data.z = optitrack_.getZPosition(tracker_id);
+        final_data.yaw_raw = optitrack_.getRawYaw(tracker_id);
+        final_data.yaw_corrected = optitrack_.getYaw(tracker_id);
+        final_data.imu_yaw = imu_handler->getYaw();
+        final_data.imu_pitch = imu_handler->getPitch();
+        final_data.imu_roll = imu_handler->getRoll();
+        final_data.imu_agx = imu_handler->getAgx();
+        final_data.imu_agy = imu_handler->getAgy();
+        final_data.imu_agz = imu_handler->getAgz();
+        
+        {
+            static std::mutex logger_mutex;
+            std::lock_guard<std::mutex> lock(logger_mutex);
+            calibration_logger->logData(final_data);
+        }
+        
+        LOG_INFO("Landing complete, final position: x=" + std::to_string(final_data.x) + 
+                 ", y=" + std::to_string(final_data.y) + 
+                 ", z=" + std::to_string(final_data.z));
         
         // 5. Calculate yaw offset
         LOG_INFO("Calibration step 5: Calculating yaw offset");
