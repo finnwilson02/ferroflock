@@ -239,6 +239,19 @@ helper_functions/fast:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/helper_functions.dir/build.make CMakeFiles/helper_functions.dir/build
 .PHONY : helper_functions/fast
 
+#=============================================================================
+# Target rules for targets named test_optitrack_logging
+
+# Build rule for target.
+test_optitrack_logging: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 test_optitrack_logging
+.PHONY : test_optitrack_logging
+
+# fast build rule for target.
+test_optitrack_logging/fast:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_optitrack_logging.dir/build.make CMakeFiles/test_optitrack_logging.dir/build
+.PHONY : test_optitrack_logging/fast
+
 src/calibration.o: src/calibration.cpp.o
 .PHONY : src/calibration.o
 
@@ -383,6 +396,30 @@ src/tello_controller.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/tello_controller.dir/build.make CMakeFiles/tello_controller.dir/src/tello_controller.cpp.s
 .PHONY : src/tello_controller.cpp.s
 
+src/test_optitrack_logging.o: src/test_optitrack_logging.cpp.o
+.PHONY : src/test_optitrack_logging.o
+
+# target to build an object file
+src/test_optitrack_logging.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_optitrack_logging.dir/build.make CMakeFiles/test_optitrack_logging.dir/src/test_optitrack_logging.cpp.o
+.PHONY : src/test_optitrack_logging.cpp.o
+
+src/test_optitrack_logging.i: src/test_optitrack_logging.cpp.i
+.PHONY : src/test_optitrack_logging.i
+
+# target to preprocess a source file
+src/test_optitrack_logging.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_optitrack_logging.dir/build.make CMakeFiles/test_optitrack_logging.dir/src/test_optitrack_logging.cpp.i
+.PHONY : src/test_optitrack_logging.cpp.i
+
+src/test_optitrack_logging.s: src/test_optitrack_logging.cpp.s
+.PHONY : src/test_optitrack_logging.s
+
+# target to generate assembly for a file
+src/test_optitrack_logging.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_optitrack_logging.dir/build.make CMakeFiles/test_optitrack_logging.dir/src/test_optitrack_logging.cpp.s
+.PHONY : src/test_optitrack_logging.cpp.s
+
 # Help Target
 help:
 	@echo "The following are some of the valid targets for this Makefile:"
@@ -401,6 +438,7 @@ help:
 	@echo "... menu"
 	@echo "... optitrack"
 	@echo "... tello_controller"
+	@echo "... test_optitrack_logging"
 	@echo "... src/calibration.o"
 	@echo "... src/calibration.i"
 	@echo "... src/calibration.s"
@@ -419,6 +457,9 @@ help:
 	@echo "... src/tello_controller.o"
 	@echo "... src/tello_controller.i"
 	@echo "... src/tello_controller.s"
+	@echo "... src/test_optitrack_logging.o"
+	@echo "... src/test_optitrack_logging.i"
+	@echo "... src/test_optitrack_logging.s"
 .PHONY : help
 
 

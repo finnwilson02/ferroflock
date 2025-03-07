@@ -56,4 +56,5 @@ set(CMAKE_DEPEND_INFO_FILES
   "CMakeFiles/calibration.dir/DependInfo.cmake"
   "CMakeFiles/menu.dir/DependInfo.cmake"
   "CMakeFiles/helper_functions.dir/DependInfo.cmake"
+  "CMakeFiles/test_optitrack_logging.dir/DependInfo.cmake"
   )
