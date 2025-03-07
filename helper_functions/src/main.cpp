@@ -16,10 +16,12 @@
 #include <signal.h>
 #include <filesystem>
 #include <string.h>
+#include <thread>
 #include "../include/tello_controller.h"
 #include "../include/logger.h"
 #include "../include/optitrack.h"
 #include "../include/menu.h"
+#include "../include/tello_imu_handler.h"
 
 // Global debug flag
 bool g_debug_enabled = false;
@@ -133,6 +135,39 @@ int main(int argc, char** argv) {
     // Create menu instance
     g_menu = new Menu(*g_optitrack, *g_tello_controller);
     g_menu->initialize();
+    
+    // Initialize IMU handlers for all drones
+    std::map<std::string, TelloIMUHandler> imu_handlers;
+    for (const auto& drone : g_menu->loadDronesFromJSON("../dji_devices.json")) {
+        imu_handlers.emplace(drone.ip, TelloIMUHandler(*g_tello_controller, drone.ip));
+        if (!imu_handlers[drone.ip].initialize()) {
+            std::cerr << "Failed to initialize IMU handler for " << drone.ip << std::endl;
+        }
+    }
+    
+    // Start IMU logging thread
+    std::thread imu_thread([&imu_handlers]() {
+        while (true) {
+            if (g_logger && g_logger->isOpen()) {
+                for (auto& [ip, handler] : imu_handlers) {
+                    if (handler.isDataValid()) {
+                        DataPoint data;
+                        data.timestamp = std::chrono::system_clock::now();
+                        data.imu_yaw = handler.getYaw();
+                        data.imu_pitch = handler.getPitch();
+                        data.imu_roll = handler.getRoll();
+                        data.imu_agx = handler.getAgx();
+                        data.imu_agy = handler.getAgy();
+                        data.imu_agz = handler.getAgz();
+                        data.tracker_id = "Unknown"; // Update if linked to tracker
+                        g_logger->logData(data);
+                    }
+                }
+            }
+            std::this_thread::sleep_for(std::chrono::milliseconds(100));
+        }
+    });
+    imu_thread.detach();
     
     // Main menu loop
     LOG_INFO("Entering main menu loop");

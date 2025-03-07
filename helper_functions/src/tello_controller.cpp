@@ -13,9 +13,13 @@
  */
 
 #include "../include/tello_controller.h"
+#include "../include/logger.h"
 #include <iostream>
 #include <cstring>
 #include <optional>
+
+// External reference to global logger
+extern Logger* g_logger;
 
 // Constructor
 TelloController::TelloController() {
@@ -121,6 +125,22 @@ bool TelloController::TelloDevice::sendCommand(const std::string& cmd) {
     
     std::cout << "[SUCCESS] Sent " << sent << " bytes to " << ip << std::endl;
     std::cout << "[DEBUG] Command '" << clean_cmd << "' sent to " << ip << ", bytes: " << sent << std::endl;
+    
+    // Log the command using global logger if available
+    if (g_logger && g_logger->isOpen()) {
+        std::string command_name = clean_cmd;
+        double value = 1.0; // Default for commands without values
+        size_t space_pos = clean_cmd.find(' ');
+        if (space_pos != std::string::npos) {
+            command_name = clean_cmd.substr(0, space_pos);
+            try {
+                value = std::stod(clean_cmd.substr(space_pos + 1));
+            } catch (const std::exception&) {
+                value = 1.0; // Fallback if parsing fails
+            }
+        }
+        g_logger->logCommand(command_name, value, std::chrono::system_clock::to_time_t(std::chrono::system_clock::now()));
+    }
     
     // Don't wait for responses from Tellos - they're unreliable
     // Just assume success if the send worked
