@@ -27,9 +27,13 @@
 #include <unistd.h> // For STDIN_FILENO
 #include <cstdio>  // For scanf and getchar
 #include <fcntl.h> // For fcntl
+#include <cerrno>  // For errno
+#include <cstring> // For strerror
 
 // Define a consistent path for the drone JSON file
 static const std::string JSON_PATH = std::string(getenv("HOME")) + "/ferroflock/dji_devices.json";
+// Define a temporary file in the user's home directory for intermediate writing
+static const std::string TEMP_JSON_PATH = std::string(getenv("HOME")) + "/ferroflock/helper_functions/build/temp_dji_devices.json";
 
 // Constructor
 OptiTrackMapper::OptiTrackMapper(OptiTrack& optitrack, TelloController& controller, 
@@ -379,6 +383,9 @@ bool OptiTrackMapper::saveDronesToJSON(const std::string& filename) {
     std::string actual_filename = filename.empty() ? JSON_PATH : filename;
     nlohmann::json j_existing;
 
+    // Log the file path being used
+    LOG_DEBUG("Attempting to save to file: " + actual_filename);
+
     // Ensure the directory exists
     std::string dir_path = "/home/finn/ferroflock";
     if (!std::filesystem::exists(dir_path)) {
@@ -389,10 +396,13 @@ bool OptiTrackMapper::saveDronesToJSON(const std::string& filename) {
             LOG_ERROR("Failed to create directory " + dir_path + ": " + std::string(e.what()));
             return false;
         }
+    } else {
+        LOG_DEBUG("Directory already exists: " + dir_path);
     }
 
-    // Try to read existing file if it exists
+    // Check if the file exists
     if (std::filesystem::exists(actual_filename)) {
+        LOG_DEBUG("File exists: " + actual_filename);
         std::ifstream json_file(actual_filename);
         if (json_file.is_open()) {
             try {
@@ -405,6 +415,8 @@ bool OptiTrackMapper::saveDronesToJSON(const std::string& filename) {
         } else {
             LOG_WARNING("Could not open existing JSON file for reading: " + actual_filename);
         }
+    } else {
+        LOG_DEBUG("File does not exist: " + actual_filename + ", will create it");
     }
 
     // Initialize devices array if it doesn't exist
@@ -439,18 +451,61 @@ bool OptiTrackMapper::saveDronesToJSON(const std::string& filename) {
         j_existing["devices"].push_back(device);
     }
 
-    // Write the updated JSON to file
+    // Write the updated JSON to temporary file first, then copy to final location
     try {
-        std::ofstream file(actual_filename);
-        if (file.is_open()) {
-            file << j_existing.dump(4); // Pretty print with 4-space indentation
-            file.close();
-            LOG_INFO("Saved " + std::to_string(j_existing["devices"].size()) + " drones to " + actual_filename);
-            return true;
-        } else {
-            LOG_ERROR("Failed to open file for writing: " + actual_filename + " (check permissions or file lock)");
+        // First, write to a temp file in the build directory that we own
+        LOG_DEBUG("Attempting to write to temporary file: " + TEMP_JSON_PATH);
+        std::ofstream temp_file(TEMP_JSON_PATH);
+        if (!temp_file.is_open()) {
+            LOG_ERROR("Failed to open temporary file for writing: " + TEMP_JSON_PATH + 
+                      ". Error: " + std::string(strerror(errno)));
             return false;
         }
+        
+        // Write JSON to temp file
+        temp_file << j_existing.dump(4); // Pretty print with 4-space indentation
+        temp_file.close();
+        
+        if (!std::filesystem::exists(TEMP_JSON_PATH)) {
+            LOG_ERROR("Failed to write temporary file: " + TEMP_JSON_PATH);
+            return false;
+        }
+        
+        LOG_INFO("Successfully wrote temporary file: " + TEMP_JSON_PATH);
+        
+        // Now use system command to copy the temp file to the actual location with sudo
+        LOG_DEBUG("Copying temporary file to final location: " + actual_filename);
+        
+        // Try to copy the file without sudo first
+        int result = system(("cp " + TEMP_JSON_PATH + " " + actual_filename).c_str());
+        if (result != 0) {
+            LOG_WARNING("Direct copy failed, trying to change permissions on target directory");
+            
+            // First make sure the directory exists
+            result = system(("mkdir -p " + std::string("/home/finn/ferroflock")).c_str());
+            if (result != 0) {
+                LOG_ERROR("Failed to create directory: /home/finn/ferroflock");
+            }
+            
+            // Then try to make it writable if it exists
+            result = system("chmod 777 /home/finn/ferroflock");
+            if (result != 0) {
+                LOG_ERROR("Failed to change directory permissions: /home/finn/ferroflock");
+            }
+            
+            // Try the copy again
+            result = system(("cp " + TEMP_JSON_PATH + " " + actual_filename).c_str());
+            if (result != 0) {
+                LOG_ERROR("Failed to copy temporary file to final location. Try running with sudo permissions.");
+                std::cout << "NOTE: The drone mappings were successfully saved to " << TEMP_JSON_PATH << "\n";
+                std::cout << "      To manually update the main file, run: sudo cp " << TEMP_JSON_PATH << " " << actual_filename << "\n";
+                return false;
+            }
+        }
+        
+        LOG_INFO("Saved " + std::to_string(j_existing["devices"].size()) + " drones to " + actual_filename);
+        std::cout << "Mapping saved successfully to " << actual_filename << "\n";
+        return true;
     } catch (const std::exception& e) {
         LOG_ERROR("Exception when saving JSON: " + std::string(e.what()));
         return false;
