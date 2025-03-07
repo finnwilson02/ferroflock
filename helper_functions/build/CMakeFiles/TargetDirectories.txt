@@ -4,6 +4,7 @@
 /home/finn/ferroflock/helper_functions/build/CMakeFiles/optitrack.dir
 /home/finn/ferroflock/helper_functions/build/CMakeFiles/calibration.dir
 /home/finn/ferroflock/helper_functions/build/CMakeFiles/keyboard_control.dir
+/home/finn/ferroflock/helper_functions/build/CMakeFiles/map_optitrack.dir
 /home/finn/ferroflock/helper_functions/build/CMakeFiles/menu.dir
 /home/finn/ferroflock/helper_functions/build/CMakeFiles/helper_functions.dir
 /home/finn/ferroflock/helper_functions/build/CMakeFiles/test_optitrack_logging.dir

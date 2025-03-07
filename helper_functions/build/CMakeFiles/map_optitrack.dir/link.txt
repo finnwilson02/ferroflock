@@ -1,0 +1,2 @@
+/usr/bin/ar qc libmap_optitrack.a CMakeFiles/map_optitrack.dir/src/map_optitrack.cpp.o
+/usr/bin/ranlib libmap_optitrack.a

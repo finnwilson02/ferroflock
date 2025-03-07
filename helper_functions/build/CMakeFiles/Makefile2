@@ -69,6 +69,7 @@ all: CMakeFiles/logger.dir/all
 all: CMakeFiles/optitrack.dir/all
 all: CMakeFiles/calibration.dir/all
 all: CMakeFiles/keyboard_control.dir/all
+all: CMakeFiles/map_optitrack.dir/all
 all: CMakeFiles/menu.dir/all
 all: CMakeFiles/helper_functions.dir/all
 all: CMakeFiles/test_optitrack_logging.dir/all
@@ -87,6 +88,7 @@ clean: CMakeFiles/logger.dir/clean
 clean: CMakeFiles/optitrack.dir/clean
 clean: CMakeFiles/calibration.dir/clean
 clean: CMakeFiles/keyboard_control.dir/clean
+clean: CMakeFiles/map_optitrack.dir/clean
 clean: CMakeFiles/menu.dir/clean
 clean: CMakeFiles/helper_functions.dir/clean
 clean: CMakeFiles/test_optitrack_logging.dir/clean
@@ -101,7 +103,7 @@ clean: CMakeFiles/test_keyboard_control.dir/clean
 CMakeFiles/tello_controller.dir/all:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/tello_controller.dir/build.make CMakeFiles/tello_controller.dir/depend
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/tello_controller.dir/build.make CMakeFiles/tello_controller.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/finn/ferroflock/helper_functions/build/CMakeFiles --progress-num=13,14 "Built target tello_controller"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/finn/ferroflock/helper_functions/build/CMakeFiles --progress-num=15,16 "Built target tello_controller"
 .PHONY : CMakeFiles/tello_controller.dir/all
 
 # Build rule for subdir invocation for target.
@@ -127,7 +129,7 @@ CMakeFiles/tello_controller.dir/clean:
 CMakeFiles/tello_imu_handler.dir/all: CMakeFiles/tello_controller.dir/all
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/tello_imu_handler.dir/build.make CMakeFiles/tello_imu_handler.dir/depend
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/tello_imu_handler.dir/build.make CMakeFiles/tello_imu_handler.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/finn/ferroflock/helper_functions/build/CMakeFiles --progress-num=15,16 "Built target tello_imu_handler"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/finn/ferroflock/helper_functions/build/CMakeFiles --progress-num=17,18 "Built target tello_imu_handler"
 .PHONY : CMakeFiles/tello_imu_handler.dir/all
 
 # Build rule for subdir invocation for target.
@@ -179,7 +181,7 @@ CMakeFiles/logger.dir/clean:
 CMakeFiles/optitrack.dir/all: CMakeFiles/logger.dir/all
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/optitrack.dir/build.make CMakeFiles/optitrack.dir/depend
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/optitrack.dir/build.make CMakeFiles/optitrack.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/finn/ferroflock/helper_functions/build/CMakeFiles --progress-num=11,12 "Built target optitrack"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/finn/ferroflock/helper_functions/build/CMakeFiles --progress-num=13,14 "Built target optitrack"
 .PHONY : CMakeFiles/optitrack.dir/all
 
 # Build rule for subdir invocation for target.
@@ -254,6 +256,35 @@ CMakeFiles/keyboard_control.dir/clean:
 .PHONY : CMakeFiles/keyboard_control.dir/clean
 
 #=============================================================================
+# Target rules for target CMakeFiles/map_optitrack.dir
+
+# All Build rule for target.
+CMakeFiles/map_optitrack.dir/all: CMakeFiles/tello_controller.dir/all
+CMakeFiles/map_optitrack.dir/all: CMakeFiles/logger.dir/all
+CMakeFiles/map_optitrack.dir/all: CMakeFiles/optitrack.dir/all
+CMakeFiles/map_optitrack.dir/all: CMakeFiles/keyboard_control.dir/all
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/map_optitrack.dir/build.make CMakeFiles/map_optitrack.dir/depend
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/map_optitrack.dir/build.make CMakeFiles/map_optitrack.dir/build
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/finn/ferroflock/helper_functions/build/CMakeFiles --progress-num=9,10 "Built target map_optitrack"
+.PHONY : CMakeFiles/map_optitrack.dir/all
+
+# Build rule for subdir invocation for target.
+CMakeFiles/map_optitrack.dir/rule: cmake_check_build_system
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/finn/ferroflock/helper_functions/build/CMakeFiles 10
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 CMakeFiles/map_optitrack.dir/all
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/finn/ferroflock/helper_functions/build/CMakeFiles 0
+.PHONY : CMakeFiles/map_optitrack.dir/rule
+
+# Convenience name for target.
+map_optitrack: CMakeFiles/map_optitrack.dir/rule
+.PHONY : map_optitrack
+
+# clean rule for target.
+CMakeFiles/map_optitrack.dir/clean:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/map_optitrack.dir/build.make CMakeFiles/map_optitrack.dir/clean
+.PHONY : CMakeFiles/map_optitrack.dir/clean
+
+#=============================================================================
 # Target rules for target CMakeFiles/menu.dir
 
 # All Build rule for target.
@@ -262,14 +293,15 @@ CMakeFiles/menu.dir/all: CMakeFiles/logger.dir/all
 CMakeFiles/menu.dir/all: CMakeFiles/optitrack.dir/all
 CMakeFiles/menu.dir/all: CMakeFiles/calibration.dir/all
 CMakeFiles/menu.dir/all: CMakeFiles/keyboard_control.dir/all
+CMakeFiles/menu.dir/all: CMakeFiles/map_optitrack.dir/all
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/menu.dir/build.make CMakeFiles/menu.dir/depend
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/menu.dir/build.make CMakeFiles/menu.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/finn/ferroflock/helper_functions/build/CMakeFiles --progress-num=9,10 "Built target menu"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/finn/ferroflock/helper_functions/build/CMakeFiles --progress-num=11,12 "Built target menu"
 .PHONY : CMakeFiles/menu.dir/all
 
 # Build rule for subdir invocation for target.
 CMakeFiles/menu.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/finn/ferroflock/helper_functions/build/CMakeFiles 12
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/finn/ferroflock/helper_functions/build/CMakeFiles 14
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 CMakeFiles/menu.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/finn/ferroflock/helper_functions/build/CMakeFiles 0
 .PHONY : CMakeFiles/menu.dir/rule
@@ -293,6 +325,7 @@ CMakeFiles/helper_functions.dir/all: CMakeFiles/logger.dir/all
 CMakeFiles/helper_functions.dir/all: CMakeFiles/optitrack.dir/all
 CMakeFiles/helper_functions.dir/all: CMakeFiles/calibration.dir/all
 CMakeFiles/helper_functions.dir/all: CMakeFiles/keyboard_control.dir/all
+CMakeFiles/helper_functions.dir/all: CMakeFiles/map_optitrack.dir/all
 CMakeFiles/helper_functions.dir/all: CMakeFiles/menu.dir/all
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/helper_functions.dir/build.make CMakeFiles/helper_functions.dir/depend
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/helper_functions.dir/build.make CMakeFiles/helper_functions.dir/build
@@ -301,7 +334,7 @@ CMakeFiles/helper_functions.dir/all: CMakeFiles/menu.dir/all
 
 # Build rule for subdir invocation for target.
 CMakeFiles/helper_functions.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/finn/ferroflock/helper_functions/build/CMakeFiles 16
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/finn/ferroflock/helper_functions/build/CMakeFiles 18
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 CMakeFiles/helper_functions.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/finn/ferroflock/helper_functions/build/CMakeFiles 0
 .PHONY : CMakeFiles/helper_functions.dir/rule
@@ -323,7 +356,7 @@ CMakeFiles/test_optitrack_logging.dir/all: CMakeFiles/logger.dir/all
 CMakeFiles/test_optitrack_logging.dir/all: CMakeFiles/optitrack.dir/all
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_optitrack_logging.dir/build.make CMakeFiles/test_optitrack_logging.dir/depend
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_optitrack_logging.dir/build.make CMakeFiles/test_optitrack_logging.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/finn/ferroflock/helper_functions/build/CMakeFiles --progress-num=21,22 "Built target test_optitrack_logging"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/finn/ferroflock/helper_functions/build/CMakeFiles --progress-num=23,24 "Built target test_optitrack_logging"
 .PHONY : CMakeFiles/test_optitrack_logging.dir/all
 
 # Build rule for subdir invocation for target.
@@ -352,15 +385,16 @@ CMakeFiles/test_imu.dir/all: CMakeFiles/logger.dir/all
 CMakeFiles/test_imu.dir/all: CMakeFiles/optitrack.dir/all
 CMakeFiles/test_imu.dir/all: CMakeFiles/calibration.dir/all
 CMakeFiles/test_imu.dir/all: CMakeFiles/keyboard_control.dir/all
+CMakeFiles/test_imu.dir/all: CMakeFiles/map_optitrack.dir/all
 CMakeFiles/test_imu.dir/all: CMakeFiles/menu.dir/all
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_imu.dir/build.make CMakeFiles/test_imu.dir/depend
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_imu.dir/build.make CMakeFiles/test_imu.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/finn/ferroflock/helper_functions/build/CMakeFiles --progress-num=17,18 "Built target test_imu"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/finn/ferroflock/helper_functions/build/CMakeFiles --progress-num=19,20 "Built target test_imu"
 .PHONY : CMakeFiles/test_imu.dir/all
 
 # Build rule for subdir invocation for target.
 CMakeFiles/test_imu.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/finn/ferroflock/helper_functions/build/CMakeFiles 16
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/finn/ferroflock/helper_functions/build/CMakeFiles 18
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 CMakeFiles/test_imu.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/finn/ferroflock/helper_functions/build/CMakeFiles 0
 .PHONY : CMakeFiles/test_imu.dir/rule
@@ -383,7 +417,7 @@ CMakeFiles/test_keyboard_control.dir/all: CMakeFiles/logger.dir/all
 CMakeFiles/test_keyboard_control.dir/all: CMakeFiles/keyboard_control.dir/all
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_keyboard_control.dir/build.make CMakeFiles/test_keyboard_control.dir/depend
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_keyboard_control.dir/build.make CMakeFiles/test_keyboard_control.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/finn/ferroflock/helper_functions/build/CMakeFiles --progress-num=19,20 "Built target test_keyboard_control"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/finn/ferroflock/helper_functions/build/CMakeFiles --progress-num=21,22 "Built target test_keyboard_control"
 .PHONY : CMakeFiles/test_keyboard_control.dir/all
 
 # Build rule for subdir invocation for target.

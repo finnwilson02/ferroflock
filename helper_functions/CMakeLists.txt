@@ -15,6 +15,7 @@ include_directories(
     include
     .
 )
+include_directories(${CMAKE_SOURCE_DIR}/include)
 
 # Define source files for each library
 set(TELLO_CONTROLLER_SOURCES
@@ -39,6 +40,10 @@ set(CALIBRATION_SOURCES
 
 set(KEYBOARD_CONTROL_SOURCES
     src/keyboard_control.cpp
+)
+
+set(MAP_OPTITRACK_SOURCES
+    src/map_optitrack.cpp
 )
 
 set(MENU_SOURCES
@@ -68,6 +73,7 @@ add_library(logger ${LOGGER_SOURCES})
 add_library(optitrack ${OPTITRACK_SOURCES})
 add_library(calibration ${CALIBRATION_SOURCES})
 add_library(keyboard_control ${KEYBOARD_CONTROL_SOURCES})
+add_library(map_optitrack ${MAP_OPTITRACK_SOURCES})
 add_library(menu ${MENU_SOURCES})
 
 # Create main executable
@@ -83,7 +89,8 @@ target_link_libraries(tello_imu_handler PRIVATE tello_controller)
 target_link_libraries(optitrack PRIVATE logger ${OpenCV_LIBS} vrpn quat)
 target_link_libraries(calibration PRIVATE logger optitrack tello_controller)
 target_link_libraries(keyboard_control PRIVATE logger tello_controller)
-target_link_libraries(menu PRIVATE logger optitrack tello_controller calibration keyboard_control)
+target_link_libraries(map_optitrack PRIVATE logger optitrack tello_controller keyboard_control)
+target_link_libraries(menu PRIVATE logger optitrack tello_controller calibration keyboard_control map_optitrack)
 
 # Link libraries to main executable
 target_link_libraries(helper_functions
@@ -94,6 +101,7 @@ target_link_libraries(helper_functions
     optitrack
     calibration
     keyboard_control
+    map_optitrack
     menu
     ${OpenCV_LIBS}
     vrpn

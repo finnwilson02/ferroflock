@@ -98,8 +98,10 @@ helper_functions: liblogger.a
 helper_functions: liboptitrack.a
 helper_functions: libcalibration.a
 helper_functions: libkeyboard_control.a
+helper_functions: libmap_optitrack.a
 helper_functions: libmenu.a
 helper_functions: libcalibration.a
+helper_functions: libmap_optitrack.a
 helper_functions: liboptitrack.a
 helper_functions: /usr/lib/x86_64-linux-gnu/libopencv_stitching.so.4.6.0
 helper_functions: /usr/lib/x86_64-linux-gnu/libopencv_alphamat.so.4.6.0

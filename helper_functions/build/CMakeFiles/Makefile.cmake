@@ -56,6 +56,7 @@ set(CMAKE_DEPEND_INFO_FILES
   "CMakeFiles/optitrack.dir/DependInfo.cmake"
   "CMakeFiles/calibration.dir/DependInfo.cmake"
   "CMakeFiles/keyboard_control.dir/DependInfo.cmake"
+  "CMakeFiles/map_optitrack.dir/DependInfo.cmake"
   "CMakeFiles/menu.dir/DependInfo.cmake"
   "CMakeFiles/helper_functions.dir/DependInfo.cmake"
   "CMakeFiles/test_optitrack_logging.dir/DependInfo.cmake"

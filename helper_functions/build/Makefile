@@ -240,6 +240,19 @@ keyboard_control/fast:
 .PHONY : keyboard_control/fast
 
 #=============================================================================
+# Target rules for targets named map_optitrack
+
+# Build rule for target.
+map_optitrack: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 map_optitrack
+.PHONY : map_optitrack
+
+# fast build rule for target.
+map_optitrack/fast:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/map_optitrack.dir/build.make CMakeFiles/map_optitrack.dir/build
+.PHONY : map_optitrack/fast
+
+#=============================================================================
 # Target rules for targets named menu
 
 # Build rule for target.
@@ -399,6 +412,30 @@ src/main.s: src/main.cpp.s
 src/main.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/helper_functions.dir/build.make CMakeFiles/helper_functions.dir/src/main.cpp.s
 .PHONY : src/main.cpp.s
+
+src/map_optitrack.o: src/map_optitrack.cpp.o
+.PHONY : src/map_optitrack.o
+
+# target to build an object file
+src/map_optitrack.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/map_optitrack.dir/build.make CMakeFiles/map_optitrack.dir/src/map_optitrack.cpp.o
+.PHONY : src/map_optitrack.cpp.o
+
+src/map_optitrack.i: src/map_optitrack.cpp.i
+.PHONY : src/map_optitrack.i
+
+# target to preprocess a source file
+src/map_optitrack.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/map_optitrack.dir/build.make CMakeFiles/map_optitrack.dir/src/map_optitrack.cpp.i
+.PHONY : src/map_optitrack.cpp.i
+
+src/map_optitrack.s: src/map_optitrack.cpp.s
+.PHONY : src/map_optitrack.s
+
+# target to generate assembly for a file
+src/map_optitrack.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/map_optitrack.dir/build.make CMakeFiles/map_optitrack.dir/src/map_optitrack.cpp.s
+.PHONY : src/map_optitrack.cpp.s
 
 src/menu.o: src/menu.cpp.o
 .PHONY : src/menu.o
@@ -584,6 +621,7 @@ help:
 	@echo "... helper_functions"
 	@echo "... keyboard_control"
 	@echo "... logger"
+	@echo "... map_optitrack"
 	@echo "... menu"
 	@echo "... optitrack"
 	@echo "... tello_controller"
@@ -603,6 +641,9 @@ help:
 	@echo "... src/main.o"
 	@echo "... src/main.i"
 	@echo "... src/main.s"
+	@echo "... src/map_optitrack.o"
+	@echo "... src/map_optitrack.i"
+	@echo "... src/map_optitrack.s"
 	@echo "... src/menu.o"
 	@echo "... src/menu.i"
 	@echo "... src/menu.s"

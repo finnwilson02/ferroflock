@@ -8,8 +8,63 @@
       "model": "Tello EDU",
       "mac": "34:d2:62:ed:f3:ce",
       "status": "online",
-      "discovered": "2025-03-07 14:02:37",
+      "discovered": "2025-03-07 17:03:14",
       "tracker_id": "Bird1"
+    },
+    {
+      "ip": "192.168.1.102",
+      "port": 8889,
+      "name": "Tello-2",
+      "type": "tello",
+      "model": "Tello EDU",
+      "mac": "34:d2:62:ed:f6:1a",
+      "status": "online",
+      "discovered": "2025-03-07 17:03:14",
+      "tracker_id": "Tracker2"
+    },
+    {
+      "ip": "192.168.1.108",
+      "port": 8889,
+      "name": "Tello-3",
+      "type": "tello",
+      "model": "Tello EDU",
+      "mac": "34:d2:62:ee:00:50",
+      "status": "online",
+      "discovered": "2025-03-07 17:03:14",
+      "tracker_id": "Tracker3"
+    },
+    {
+      "ip": "192.168.1.106",
+      "port": 8889,
+      "name": "Bird3",
+      "type": "tello",
+      "model": "Tello EDU",
+      "mac": "34:d2:62:ee:01:b4",
+      "status": "online",
+      "discovered": "2025-03-07 17:03:14",
+      "tracker_id": "Bird3"
+    },
+    {
+      "ip": "192.168.1.104",
+      "port": 8889,
+      "name": "Bird4",
+      "type": "tello",
+      "model": "Tello EDU",
+      "mac": "34:d2:62:ed:ff:bc",
+      "status": "online",
+      "discovered": "2025-03-07 17:03:14",
+      "tracker_id": "Bird4"
+    },
+    {
+      "ip": "192.168.1.107",
+      "port": 8889,
+      "name": "Bird5",
+      "type": "tello",
+      "model": "Tello EDU",
+      "mac": "34:d2:62:ed:f8:43",
+      "status": "online",
+      "discovered": "2025-03-07 17:03:14",
+      "tracker_id": "Bird5"
     }
   ]
 }

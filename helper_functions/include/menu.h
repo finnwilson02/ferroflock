@@ -109,6 +109,9 @@ private:
     // Keyboard control handler (not active by default)
     std::unique_ptr<KeyboardControl> keyboard_control_;
     
+    // Save drone data to JSON file
+    void saveDronesToJSON(const std::string& filename);
+    
     // Get user input with validation
     std::string getValidInput(const std::vector<std::string>& valid_inputs);
     

@@ -179,7 +179,7 @@ void TelloIMUHandler::parseStateData(const std::string& data) {
     if (imu_agx < -10.0 || imu_agx > 10.0 || 
         imu_agy < -10.0 || imu_agy > 10.0 || 
         imu_agz < -10.0 || imu_agz > 10.0) {
-        std::cerr << "[WARNING] IMU acceleration out of range for " << ip << std::endl;
+        // std::cerr << "[WARNING] IMU acceleration out of range for " << ip << std::endl;
     }
 }
 

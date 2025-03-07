@@ -13,6 +13,8 @@
 
 #include "../include/menu.h"
 #include "../include/logger.h"
+#include "../include/map_optitrack.h"
+#include <nlohmann/json.hpp>
 #include <iostream>
 #include <fstream>
 #include <sstream>
@@ -482,10 +484,7 @@ void Menu::handleNetworkScan() {
     display(); // Show main menu again
 }
 
-void Menu::handleMapOptiTrack() {
-    std::cout << "Manual OptiTrack mapping is not implemented yet.\n";
-    display(); // Show main menu again
-}
+// handleMapOptiTrack is implemented elsewhere in this file
 
 void Menu::handleCalibrateDrone() {
     // Display the list of available drones
@@ -550,6 +549,26 @@ void Menu::handleCalibrateDrone() {
     });
 }
 
+void Menu::handleMapOptiTrack() {
+    std::cout << "Starting OptiTrack to drone mapping process...\n";
+    OptiTrackMapper mapper(optitrack_, tello_controller_, drones_);
+    auto mapping = mapper.startMapping();
+    if (mapping) {
+        auto [ip, tracker_id] = *mapping;
+        for (auto& drone : drones_) {
+            if (drone.ip == ip) {
+                drone.tracker_id = tracker_id;
+                break;
+            }
+        }
+        saveDronesToJSON("../dji_devices.json");
+        std::cout << "Mapping " << tracker_id << " to " << ip << " saved.\n";
+    } else {
+        std::cout << "Mapping canceled or failed.\n";
+    }
+    display();
+}
+
 void Menu::handleRebootAllDrones() {
     rebootAllDrones(true, false);
     display(); // Show main menu again
@@ -564,4 +583,26 @@ void Menu::handleExit() {
     
     // Exit the program
     exit(0);
+}
+
+void Menu::saveDronesToJSON(const std::string& filename) {
+    nlohmann::json j;
+    j["devices"] = nlohmann::json::array();
+    for (const auto& drone : drones_) {
+        nlohmann::json device;
+        device["ip"] = drone.ip;
+        device["name"] = drone.name;
+        device["tracker_id"] = drone.tracker_id;
+        device["yaw_offset"] = drone.yaw_offset;
+        j["devices"].push_back(device);
+    }
+    std::ofstream file(filename);
+    if (file.is_open()) {
+        file << j.dump(4);
+        file.close();
+        LOG_INFO("Saved drone mappings to " + filename);
+    } else {
+        LOG_ERROR("Failed to save drones to " + filename);
+        std::cout << "Failed to save mappings.\n";
+    }
 }

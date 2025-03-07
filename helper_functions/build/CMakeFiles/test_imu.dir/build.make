@@ -98,6 +98,7 @@ test_imu: liblogger.a
 test_imu: libmenu.a
 test_imu: liboptitrack.a
 test_imu: libcalibration.a
+test_imu: libmap_optitrack.a
 test_imu: liboptitrack.a
 test_imu: /usr/lib/x86_64-linux-gnu/libopencv_stitching.so.4.6.0
 test_imu: /usr/lib/x86_64-linux-gnu/libopencv_alphamat.so.4.6.0

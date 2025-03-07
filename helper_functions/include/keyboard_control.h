@@ -21,17 +21,28 @@
 
 class KeyboardControl {
 public:
+    // Original constructor for controlling all drones
     KeyboardControl(TelloController& controller);
+    
+    // New constructor for controlling a specific drone by IP
+    KeyboardControl(TelloController& controller, const std::string& drone_ip);
+    
     ~KeyboardControl();
 
     void start();
     void stop();
+    
+    // Check if keyboard control is currently running
+    bool isRunning() const { return running_; }
 
 private:
     TelloController& controller_;
     std::thread keyboard_thread_;
     std::atomic<bool> running_;
     struct termios orig_termios_;
+    
+    // IP of the specific drone to control (empty = control all drones)
+    std::string drone_ip_;
     
     // Speed level tracking (-10 to 10 for each axis)
     int fb_level_{0};  // Forward-Backward

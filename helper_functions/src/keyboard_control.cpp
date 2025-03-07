@@ -22,10 +22,16 @@
 // External reference to global logger
 extern Logger* g_logger;
 
-// Constructor
+// Constructor for controlling all drones
 KeyboardControl::KeyboardControl(TelloController& controller)
-    : controller_(controller), running_(false) {
-    LOG_INFO("KeyboardControl initialized");
+    : controller_(controller), running_(false), drone_ip_("") {
+    LOG_INFO("KeyboardControl initialized for all drones");
+}
+
+// Constructor for controlling a specific drone by IP
+KeyboardControl::KeyboardControl(TelloController& controller, const std::string& drone_ip)
+    : controller_(controller), running_(false), drone_ip_(drone_ip) {
+    LOG_INFO("KeyboardControl initialized for drone " + drone_ip);
 }
 
 // Destructor
@@ -101,13 +107,21 @@ void KeyboardControl::keyboardLoop() {
                 break;
             } else if (key == 't') {
                 // Takeoff
-                controller_.sendCommandToAll("takeoff");
+                if (drone_ip_.empty()) {
+                    controller_.sendCommandToAll("takeoff");
+                } else {
+                    controller_.sendCommand(drone_ip_, "takeoff");
+                }
                 if (g_logger && g_logger->isOpen()) {
                     g_logger->logCommand("takeoff", 1.0, std::chrono::system_clock::to_time_t(std::chrono::system_clock::now()));
                 }
             } else if (key == 'l') {
                 // Land
-                controller_.sendCommandToAll("land");
+                if (drone_ip_.empty()) {
+                    controller_.sendCommandToAll("land");
+                } else {
+                    controller_.sendCommand(drone_ip_, "land");
+                }
                 if (g_logger && g_logger->isOpen()) {
                     g_logger->logCommand("land", 1.0, std::chrono::system_clock::to_time_t(std::chrono::system_clock::now()));
                 }
@@ -140,7 +154,11 @@ void KeyboardControl::keyboardLoop() {
                 resetSpeedLevels();
             } else if (key == '\n' || key == '\r') {
                 // Emergency stop
-                controller_.sendCommandToAll("emergency");
+                if (drone_ip_.empty()) {
+                    controller_.sendCommandToAll("emergency");
+                } else {
+                    controller_.sendCommand(drone_ip_, "emergency");
+                }
                 resetSpeedLevels();
                 if (g_logger && g_logger->isOpen()) {
                     g_logger->logCommand("emergency", 1.0, std::chrono::system_clock::to_time_t(std::chrono::system_clock::now()));
@@ -195,13 +213,19 @@ char KeyboardControl::getKey() {
     return -1; // No key pressed
 }
 
-// Send RC command to all drones
+// Send RC command to specific drone or all drones
 void KeyboardControl::sendRCCommand(int lr, int fb, int ud, int yaw) {
     std::string command = "rc " + std::to_string(lr) + " " + 
                                  std::to_string(fb) + " " + 
                                  std::to_string(ud) + " " + 
                                  std::to_string(yaw);
-    controller_.sendCommandToAll(command);
+    
+    // If drone_ip_ is empty, send to all drones, otherwise send to specific drone
+    if (drone_ip_.empty()) {
+        controller_.sendCommandToAll(command);
+    } else {
+        controller_.sendCommand(drone_ip_, command);
+    }
     
     // Don't log RC commands to avoid filling the log with frequent updates
 }
