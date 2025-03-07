@@ -71,7 +71,7 @@ public:
     DroneData* findDroneByIP(const std::string& ip);
     
     // Load drones from a JSON file
-    std::vector<DroneData> loadDronesFromJSON(const std::string& filename);
+    std::vector<DroneData> loadDronesFromJSON(const std::string& filename = "");
     
     // Initialize the menu system
     void initialize();
@@ -121,6 +121,7 @@ private:
     void handleMapOptiTrack();
     void handleCalibrateDrone();
     void handleRebootAllDrones();
+    void handleSetLoggingLevel();
     void handleExit();
 };
 

@@ -22,6 +22,10 @@
 #include <cmath>
 #include <filesystem>
 #include <limits>
+#include <cstdlib> // For getenv
+
+// Define a consistent path for the drone JSON file
+static const std::string JSON_PATH = std::string(getenv("HOME")) + "/ferroflock/dji_devices.json";
 
 // Constructor
 Menu::Menu(OptiTrack& optitrack, TelloController& tello_controller)
@@ -170,10 +174,13 @@ DroneData* Menu::findDroneByIP(const std::string& ip) {
 // Load drones from a JSON file
 std::vector<DroneData> Menu::loadDronesFromJSON(const std::string& filename) {
     std::vector<DroneData> drones;
-    std::ifstream json_file(filename);
     
+    // Use JSON_PATH as default if no filename provided
+    std::string actual_filename = filename.empty() ? JSON_PATH : filename;
+    
+    std::ifstream json_file(actual_filename);
     if (!json_file.is_open()) {
-        LOG_ERROR("Failed to open " + filename);
+        LOG_ERROR("Failed to open " + actual_filename);
         return drones;
     }
     
@@ -186,133 +193,65 @@ std::vector<DroneData> Menu::loadDronesFromJSON(const std::string& filename) {
         {"192.168.1.103", "Bird1"}
     };
     
-    // Read the entire file into a string
-    std::stringstream buffer;
-    buffer << json_file.rdbuf();
-    std::string content = buffer.str();
-    
-    // Try to parse as JSON first
+    // Use nlohmann/json to parse the file
     try {
-        LOG_INFO("Attempting to parse " + filename + " as JSON with devices array");
-        
-        // Look for the "devices" array in the JSON
-        std::regex devices_pattern("\"devices\"\\s*:\\s*\\[(.*?)\\]", std::regex::multiline);
-        std::smatch devices_match;
-        
-        if (std::regex_search(content, devices_match, devices_pattern) && devices_match.size() > 1) {
-            LOG_INFO("Found devices array in JSON");
-            
-            // Parse individual device objects
-            std::string devices_content = devices_match[1].str();
-            std::regex device_pattern("\\{(.*?)\\}", std::regex::multiline);
-            
-            auto device_begin = std::sregex_iterator(devices_content.begin(), devices_content.end(), device_pattern);
-            auto device_end = std::sregex_iterator();
-            
-            int drone_count = 0;
-            for (std::sregex_iterator i = device_begin; i != device_end; ++i) {
-                std::smatch match = *i;
-                if (match.size() > 1) {
-                    std::string device_str = match[0].str();
-                    
-                    // Extract IP
-                    std::regex ip_regex("\"ip\"\\s*:\\s*\"([^\"]+)\"");
-                    std::smatch ip_match;
-                    std::string ip;
-                    
-                    if (std::regex_search(device_str, ip_match, ip_regex) && ip_match.size() > 1) {
-                        ip = ip_match[1].str();
-                    } else {
-                        LOG_WARNING("Device without IP address found, skipping");
-                        continue;
-                    }
-                    
-                    // Extract tracker_id if present
-                    std::regex tracker_regex("\"tracker_id\"\\s*:\\s*\"([^\"]+)\"");
-                    std::smatch tracker_match;
-                    std::string tracker_id;
-                    
-                    if (std::regex_search(device_str, tracker_match, tracker_regex) && tracker_match.size() > 1) {
-                        tracker_id = tracker_match[1].str();
-                    }
-                    
-                    // Extract name if present
-                    std::regex name_regex("\"name\"\\s*:\\s*\"([^\"]+)\"");
-                    std::smatch name_match;
-                    std::string name;
-                    
-                    if (std::regex_search(device_str, name_match, name_regex) && name_match.size() > 1) {
-                        name = name_match[1].str();
-                    }
-                    
-                    DroneData drone;
-                    drone.ip = ip;
-                    
-                    // Set name (use extracted value or generate one)
-                    if (!name.empty()) {
-                        drone.name = name;
-                    } else {
-                        drone.name = "Drone " + std::to_string(++drone_count);
-                    }
-                    
-                    // Set tracker ID (use extracted value, lookup by IP, or generate one)
-                    if (!tracker_id.empty()) {
-                        drone.tracker_id = tracker_id;
-                    } else if (ipToOptitrackMap.find(ip) != ipToOptitrackMap.end()) {
-                        drone.tracker_id = ipToOptitrackMap[ip];
-                        // Also use the tracker name as the drone name for consistency
-                        drone.name = drone.tracker_id;
-                    } else {
-                        drone.tracker_id = "Bird" + std::to_string(drone_count);
-                    }
-                    
-                    LOG_INFO("Loaded drone: IP=" + drone.ip + 
-                           ", Name=" + drone.name +
-                           ", OptiTrack Name=" + drone.tracker_id);
-                    drones.push_back(drone);
-                }
-            }
-            
-            // If we found devices, return them
-            if (!drones.empty()) {
-                return drones;
-            }
+        LOG_INFO("Parsing " + actual_filename + " with nlohmann/json");
+        nlohmann::json j;
+        json_file >> j;
+
+        if (!j.contains("devices") || !j["devices"].is_array()) {
+            LOG_ERROR("JSON does not contain a 'devices' array in " + actual_filename);
+            return drones;
         }
-        
-        // If we failed to parse the devices array, fall back to the simple IP-based parsing
-        LOG_WARNING("Failed to parse devices array, falling back to IP extraction");
-    } catch (const std::exception& e) {
-        LOG_WARNING("Error parsing JSON: " + std::string(e.what()) + ". Falling back to IP extraction.");
-    }
-    
-    // Fallback: Just parse IP addresses from the file
-    std::regex ip_pattern("\"ip\"\\s*:\\s*\"([^\"]+)\"");
-    
-    auto ips_begin = std::sregex_iterator(content.begin(), content.end(), ip_pattern);
-    auto ips_end = std::sregex_iterator();
-    
-    int drone_count = 0;
-    for (std::sregex_iterator i = ips_begin; i != ips_end; ++i) {
-        std::smatch match = *i;
-        if (match.size() > 1) {
-            std::string ip = match[1].str();
+
+        int drone_count = 0;
+        for (const auto& device : j["devices"]) {
             DroneData drone;
-            drone.ip = ip;
-            drone.name = "Drone " + std::to_string(++drone_count);
             
-            // Assign OptiTrack name based on IP
-            if (ipToOptitrackMap.find(ip) != ipToOptitrackMap.end()) {
-                drone.tracker_id = ipToOptitrackMap[ip];
+            // Extract IP (required)
+            if (device.contains("ip") && device["ip"].is_string()) {
+                drone.ip = device["ip"].get<std::string>();
+            } else {
+                LOG_WARNING("Device without IP address, skipping");
+                continue;
+            }
+
+            // Extract name
+            if (device.contains("name") && device["name"].is_string()) {
+                drone.name = device["name"].get<std::string>();
+            } else {
+                drone.name = "Drone " + std::to_string(++drone_count);
+            }
+
+            // Extract tracker_id
+            if (device.contains("tracker_id") && device["tracker_id"].is_string() && 
+                !device["tracker_id"].get<std::string>().empty()) {
+                drone.tracker_id = device["tracker_id"].get<std::string>();
+            } else if (ipToOptitrackMap.find(drone.ip) != ipToOptitrackMap.end()) {
+                // Use hardcoded mapping as fallback
+                drone.tracker_id = ipToOptitrackMap[drone.ip];
+                // Also use tracker name as drone name for consistency
                 drone.name = drone.tracker_id;
             } else {
+                // Last resort
                 drone.tracker_id = "Bird" + std::to_string(drone_count);
             }
-            
+
+            // Extract yaw_offset
+            if (device.contains("yaw_offset") && device["yaw_offset"].is_number()) {
+                drone.yaw_offset = device["yaw_offset"].get<double>();
+            } else {
+                drone.yaw_offset = 0.0;
+            }
+
             LOG_INFO("Loaded drone: IP=" + drone.ip + 
-                   ", Name=" + drone.name +
-                   ", OptiTrack Name=" + drone.tracker_id);
+                     ", Name=" + drone.name + 
+                     ", Tracker=" + drone.tracker_id + 
+                     ", YawOffset=" + std::to_string(drone.yaw_offset));
             drones.push_back(drone);
         }
+    } catch (const nlohmann::json::exception& e) {
+        LOG_ERROR("JSON parsing error in " + actual_filename + ": " + e.what());
     }
     
     if (drones.empty()) {
@@ -329,14 +268,24 @@ std::vector<DroneData> Menu::loadDronesFromJSON(const std::string& filename) {
 void Menu::initialize() {
     LOG_INFO("Starting menu initialization");
     
-    LOG_INFO("Checking for drones in ../dji_devices.json");
-    if (std::filesystem::exists("../dji_devices.json")) {
-        drones_ = loadDronesFromJSON("../dji_devices.json");
+    LOG_INFO("Checking for drones in " + JSON_PATH);
+    if (std::filesystem::exists(JSON_PATH)) {
+        drones_ = loadDronesFromJSON(JSON_PATH);
+    } else {
+        // Try the old path as a fallback
+        if (std::filesystem::exists("../dji_devices.json")) {
+            LOG_INFO("Using fallback path: ../dji_devices.json");
+            drones_ = loadDronesFromJSON("../dji_devices.json");
+            // Save to the new path
+            saveDronesToJSON(JSON_PATH);
+        } else {
+            drones_ = loadDronesFromJSON();
+        }
     }
     
     // If no drones found, set up a default drone
     if (drones_.empty()) {
-        LOG_WARNING("No drones found in ../dji_devices.json, using default drone");
+        LOG_WARNING("No drones found in " + JSON_PATH + ", using default drone");
         DroneData default_drone;
         default_drone.name = "Default";
         default_drone.ip = "192.168.10.1";
@@ -358,6 +307,7 @@ void Menu::defineDefaultActions() {
     addOption("3", "Map OptiTrack to drones", [this]() { handleMapOptiTrack(); });
     addOption("4", "Calibrate drone orientation", [this]() { handleCalibrateDrone(); });
     addOption("5", "Reboot all drones", [this]() { handleRebootAllDrones(); });
+    addOption("6", "Set Logging Level", [this]() { handleSetLoggingLevel(); }, "Adjust verbosity of log messages");
     addOption("Q", "Quit", [this]() { handleExit(); });
     
     /*
@@ -470,8 +420,8 @@ void Menu::handleNetworkScan() {
     std::cout << "Network scan complete.\n";
     std::cout << "Loading updated drone information...\n";
     
-    // Load the updated drone information from the new location
-    drones_ = loadDronesFromJSON("../dji_devices.json");
+    // Load the updated drone information
+    drones_ = loadDronesFromJSON(JSON_PATH);
     
     // Update OptiTrack drone mapping
     optitrack_.setupDroneMapping(drones_);
@@ -561,7 +511,7 @@ void Menu::handleMapOptiTrack() {
                 break;
             }
         }
-        saveDronesToJSON("../dji_devices.json");
+        saveDronesToJSON(JSON_PATH);
         std::cout << "Mapping " << tracker_id << " to " << ip << " saved.\n";
     } else {
         std::cout << "Mapping canceled or failed.\n";
@@ -572,6 +522,40 @@ void Menu::handleMapOptiTrack() {
 void Menu::handleRebootAllDrones() {
     rebootAllDrones(true, false);
     display(); // Show main menu again
+}
+
+void Menu::handleSetLoggingLevel() {
+    std::cout << "\nCurrent Logging Level: ";
+    switch (g_log_level) {
+        case LOG_LEVEL_DEBUG: std::cout << "DEBUG"; break;
+        case LOG_LEVEL_INFO: std::cout << "INFO"; break;
+        case LOG_LEVEL_WARNING: std::cout << "WARNING"; break;
+        case LOG_LEVEL_ERROR: std::cout << "ERROR"; break;
+        case LOG_LEVEL_NONE: std::cout << "NONE"; break;
+    }
+    std::cout << "\nSelect new logging level:\n";
+    std::cout << "1. DEBUG - Show all messages\n";
+    std::cout << "2. INFO - Show info, warnings, and errors\n";
+    std::cout << "3. WARNING - Show warnings and errors\n";
+    std::cout << "4. ERROR - Show only errors\n";
+    std::cout << "5. NONE - Suppress all messages\n";
+    std::cout << "Q. Cancel\n";
+    std::cout << "Enter choice: ";
+
+    std::vector<std::string> valid_inputs = {"1", "2", "3", "4", "5", "Q"};
+    std::string input = getValidInput(valid_inputs);
+
+    if (input == "Q") {
+        std::cout << "Logging level unchanged.\n";
+    } else {
+        if (input == "1") g_log_level = LOG_LEVEL_DEBUG;
+        else if (input == "2") g_log_level = LOG_LEVEL_INFO;
+        else if (input == "3") g_log_level = LOG_LEVEL_WARNING;
+        else if (input == "4") g_log_level = LOG_LEVEL_ERROR;
+        else if (input == "5") g_log_level = LOG_LEVEL_NONE;
+        std::cout << "Logging level set to " << input << ".\n";
+    }
+    display();
 }
 
 void Menu::handleExit() {
@@ -586,21 +570,66 @@ void Menu::handleExit() {
 }
 
 void Menu::saveDronesToJSON(const std::string& filename) {
-    nlohmann::json j;
-    j["devices"] = nlohmann::json::array();
+    nlohmann::json j_existing;
+    
+    // Try to read existing file if it exists
+    if (std::filesystem::exists(filename)) {
+        std::ifstream json_file(filename);
+        if (json_file.is_open()) {
+            try {
+                json_file >> j_existing;
+                LOG_INFO("Merging with existing JSON file: " + filename);
+            } catch (const nlohmann::json::exception& e) {
+                LOG_WARNING("Failed to parse existing JSON " + filename + ": " + e.what() + ". Creating new file.");
+            }
+            json_file.close();
+        }
+    }
+
+    // Initialize devices array if it doesn't exist
+    if (!j_existing.contains("devices") || !j_existing["devices"].is_array()) {
+        j_existing["devices"] = nlohmann::json::array();
+    }
+
+    // Create a map of existing devices by IP for quick lookup
+    std::map<std::string, nlohmann::json> existing_devices;
+    for (const auto& device : j_existing["devices"]) {
+        if (device.contains("ip") && device["ip"].is_string()) {
+            existing_devices[device["ip"].get<std::string>()] = device;
+        }
+    }
+
+    // Update or add drones from drones_
     for (const auto& drone : drones_) {
         nlohmann::json device;
+        
+        // If device already exists, start with its existing data
+        if (existing_devices.find(drone.ip) != existing_devices.end()) {
+            device = existing_devices[drone.ip];
+        }
+        
+        // Update with current values
         device["ip"] = drone.ip;
         device["name"] = drone.name;
         device["tracker_id"] = drone.tracker_id;
         device["yaw_offset"] = drone.yaw_offset;
-        j["devices"].push_back(device);
+
+        // Store in our map
+        existing_devices[drone.ip] = device;
     }
+
+    // Rebuild the devices array with updated data
+    j_existing["devices"] = nlohmann::json::array();
+    for (const auto& [ip, device] : existing_devices) {
+        j_existing["devices"].push_back(device);
+    }
+
+    // Write the updated JSON to file
     std::ofstream file(filename);
     if (file.is_open()) {
-        file << j.dump(4);
+        file << j_existing.dump(4); // Pretty print with 4-space indentation
         file.close();
-        LOG_INFO("Saved drone mappings to " + filename);
+        LOG_INFO("Saved " + std::to_string(j_existing["devices"].size()) + " drones to " + filename);
     } else {
         LOG_ERROR("Failed to save drones to " + filename);
         std::cout << "Failed to save mappings.\n";

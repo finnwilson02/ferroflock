@@ -23,14 +23,26 @@
 #include <iostream>
 #include <mutex>
 
+// Define logging levels
+enum LogLevel {
+    LOG_LEVEL_DEBUG = 0,
+    LOG_LEVEL_INFO  = 1,
+    LOG_LEVEL_WARNING = 2,
+    LOG_LEVEL_ERROR = 3,
+    LOG_LEVEL_NONE  = 4  // Suppress all logs
+};
+
 // Global debug flag
 extern bool g_debug_enabled;
 
+// Global logging level (default to DEBUG to show all messages)
+extern LogLevel g_log_level;
+
 // Logging functions for consistent output
-#define LOG_INFO(msg) std::cout << "[INFO] " << msg << std::endl
-#define LOG_ERROR(msg) std::cerr << "[ERROR] " << msg << std::endl
-#define LOG_DEBUG(msg) if (g_debug_enabled) std::cout << "[DEBUG] " << msg << std::endl
-#define LOG_WARNING(msg) std::cout << "[WARNING] " << msg << std::endl
+#define LOG_INFO(msg) if (LOG_LEVEL_INFO >= g_log_level) std::cout << "[INFO] " << msg << std::endl
+#define LOG_ERROR(msg) if (LOG_LEVEL_ERROR >= g_log_level) std::cerr << "[ERROR] " << msg << std::endl
+#define LOG_DEBUG(msg) if (LOG_LEVEL_DEBUG >= g_log_level && g_debug_enabled) std::cout << "[DEBUG] " << msg << std::endl
+#define LOG_WARNING(msg) if (LOG_LEVEL_WARNING >= g_log_level) std::cout << "[WARNING] " << msg << std::endl
 
 // DataPoint structure to hold various types of data for logging
 struct DataPoint {

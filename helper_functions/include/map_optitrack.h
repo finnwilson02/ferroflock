@@ -40,7 +40,7 @@ public:
     std::optional<std::pair<std::string, std::string>> startMapping();
     
     // Save updated drone mappings to JSON file
-    bool saveDronesToJSON(const std::string& filename);
+    bool saveDronesToJSON(const std::string& filename = "");
 
 private:
     // References to system components

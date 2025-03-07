@@ -3,12 +3,12 @@
     {
       "ip": "192.168.1.103",
       "port": 8889,
-      "name": "Bird1",
+      "name": "USyd AeroEng #07",
       "type": "tello",
       "model": "Tello EDU",
       "mac": "34:d2:62:ed:f3:ce",
       "status": "online",
-      "discovered": "2025-03-07 17:03:14",
+      "discovered": "2025-03-07 17:22:24",
       "tracker_id": "Bird1"
     },
     {
@@ -19,7 +19,7 @@
       "model": "Tello EDU",
       "mac": "34:d2:62:ed:f6:1a",
       "status": "online",
-      "discovered": "2025-03-07 17:03:14",
+      "discovered": "2025-03-07 17:22:24",
       "tracker_id": "Tracker2"
     },
     {
@@ -30,7 +30,7 @@
       "model": "Tello EDU",
       "mac": "34:d2:62:ee:00:50",
       "status": "online",
-      "discovered": "2025-03-07 17:03:14",
+      "discovered": "2025-03-07 17:22:24",
       "tracker_id": "Tracker3"
     },
     {
@@ -41,18 +41,18 @@
       "model": "Tello EDU",
       "mac": "34:d2:62:ee:01:b4",
       "status": "online",
-      "discovered": "2025-03-07 17:03:14",
+      "discovered": "2025-03-07 17:22:24",
       "tracker_id": "Bird3"
     },
     {
       "ip": "192.168.1.104",
       "port": 8889,
-      "name": "Bird4",
+      "name": "USyd AeroEng #01 (DRIFTS LEFT)",
       "type": "tello",
       "model": "Tello EDU",
       "mac": "34:d2:62:ed:ff:bc",
       "status": "online",
-      "discovered": "2025-03-07 17:03:14",
+      "discovered": "2025-03-07 17:22:24",
       "tracker_id": "Bird4"
     },
     {
@@ -63,7 +63,7 @@
       "model": "Tello EDU",
       "mac": "34:d2:62:ed:f8:43",
       "status": "online",
-      "discovered": "2025-03-07 17:03:14",
+      "discovered": "2025-03-07 17:22:24",
       "tracker_id": "Bird5"
     }
   ]

@@ -18,6 +18,7 @@
 #include <fcntl.h>
 #include <chrono>
 #include <algorithm> // For std::min, std::max
+#include <termios.h> // Ensure this is included
 
 // External reference to global logger
 extern Logger* g_logger;
@@ -37,7 +38,16 @@ KeyboardControl::KeyboardControl(TelloController& controller, const std::string&
 // Destructor
 KeyboardControl::~KeyboardControl() {
     stop();
-    LOG_INFO("KeyboardControl destroyed");
+    if (keyboard_thread_.joinable()) {
+        keyboard_thread_.join();
+    }
+    // Ensure terminal is fully restored
+    struct termios term = orig_termios_;
+    term.c_lflag |= (ICANON | ECHO);
+    term.c_cc[VMIN] = 1;
+    term.c_cc[VTIME] = 0;
+    tcsetattr(STDIN_FILENO, TCSAFLUSH, &term);
+    LOG_INFO("KeyboardControl destroyed, terminal fully reset");
 }
 
 // Start keyboard control in a separate thread
@@ -50,11 +60,14 @@ void KeyboardControl::start() {
 
 // Stop keyboard control thread
 void KeyboardControl::stop() {
+    if (!running_) return;
     running_ = false;
     if (keyboard_thread_.joinable()) {
         keyboard_thread_.join();
     }
-    LOG_INFO("KeyboardControl stopped");
+    // Restore original terminal settings completely
+    tcsetattr(STDIN_FILENO, TCSAFLUSH, &orig_termios_);
+    LOG_DEBUG("KeyboardControl stopped, terminal restored to original settings");
 }
 
 // Reset all speed levels to zero

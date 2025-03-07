@@ -88,15 +88,22 @@ void printUsage(const char* programName) {
     std::cout << "Usage: " << programName << " [options]" << std::endl;
     std::cout << "Options:" << std::endl;
     std::cout << "  -d, --debug    Enable debug output" << std::endl;
+    std::cout << "  --silent       Suppress all but error messages" << std::endl;
     std::cout << "  -h, --help     Display this help message" << std::endl;
 }
 
 int main(int argc, char** argv) {
+    // Default logging level
+    g_log_level = LOG_LEVEL_DEBUG;
+    
     // Parse command-line arguments
     for (int i = 1; i < argc; i++) {
         if (strcmp(argv[i], "-d") == 0 || strcmp(argv[i], "--debug") == 0) {
             g_debug_enabled = true;
             std::cout << "Debug mode enabled" << std::endl;
+        } else if (strcmp(argv[i], "--silent") == 0) {
+            g_log_level = LOG_LEVEL_ERROR; // Suppress all but errors
+            std::cout << "Silent mode enabled (only errors will be logged)" << std::endl;
         } else if (strcmp(argv[i], "-h") == 0 || strcmp(argv[i], "--help") == 0) {
             printUsage(argv[0]);
             return 0;

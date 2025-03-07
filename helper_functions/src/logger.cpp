@@ -14,6 +14,9 @@
 
 #include "../include/logger.h"
 
+// Define global logging level
+LogLevel g_log_level = LOG_LEVEL_DEBUG; // Default to showing all messages
+
 // Constructor
 Logger::Logger(const std::string& filename) {
     LOG_INFO("Initializing logger with file: " + filename);
