@@ -71,10 +71,13 @@ all: CMakeFiles/calibration.dir/all
 all: CMakeFiles/keyboard_control.dir/all
 all: CMakeFiles/map_optitrack.dir/all
 all: CMakeFiles/menu.dir/all
+all: CMakeFiles/ukf.dir/all
 all: CMakeFiles/helper_functions.dir/all
 all: CMakeFiles/test_optitrack_logging.dir/all
 all: CMakeFiles/test_imu.dir/all
 all: CMakeFiles/test_keyboard_control.dir/all
+all: CMakeFiles/test_ukf.dir/all
+all: CMakeFiles/test_tello_controller.dir/all
 .PHONY : all
 
 # The main recursive "preinstall" target.
@@ -90,10 +93,13 @@ clean: CMakeFiles/calibration.dir/clean
 clean: CMakeFiles/keyboard_control.dir/clean
 clean: CMakeFiles/map_optitrack.dir/clean
 clean: CMakeFiles/menu.dir/clean
+clean: CMakeFiles/ukf.dir/clean
 clean: CMakeFiles/helper_functions.dir/clean
 clean: CMakeFiles/test_optitrack_logging.dir/clean
 clean: CMakeFiles/test_imu.dir/clean
 clean: CMakeFiles/test_keyboard_control.dir/clean
+clean: CMakeFiles/test_ukf.dir/clean
+clean: CMakeFiles/test_tello_controller.dir/clean
 .PHONY : clean
 
 #=============================================================================
@@ -316,6 +322,32 @@ CMakeFiles/menu.dir/clean:
 .PHONY : CMakeFiles/menu.dir/clean
 
 #=============================================================================
+# Target rules for target CMakeFiles/ukf.dir
+
+# All Build rule for target.
+CMakeFiles/ukf.dir/all:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/ukf.dir/build.make CMakeFiles/ukf.dir/depend
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/ukf.dir/build.make CMakeFiles/ukf.dir/build
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/finn/ferroflock/helper_functions/build/CMakeFiles --progress-num=30,31 "Built target ukf"
+.PHONY : CMakeFiles/ukf.dir/all
+
+# Build rule for subdir invocation for target.
+CMakeFiles/ukf.dir/rule: cmake_check_build_system
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/finn/ferroflock/helper_functions/build/CMakeFiles 2
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 CMakeFiles/ukf.dir/all
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/finn/ferroflock/helper_functions/build/CMakeFiles 0
+.PHONY : CMakeFiles/ukf.dir/rule
+
+# Convenience name for target.
+ukf: CMakeFiles/ukf.dir/rule
+.PHONY : ukf
+
+# clean rule for target.
+CMakeFiles/ukf.dir/clean:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/ukf.dir/build.make CMakeFiles/ukf.dir/clean
+.PHONY : CMakeFiles/ukf.dir/clean
+
+#=============================================================================
 # Target rules for target CMakeFiles/helper_functions.dir
 
 # All Build rule for target.
@@ -435,6 +467,59 @@ test_keyboard_control: CMakeFiles/test_keyboard_control.dir/rule
 CMakeFiles/test_keyboard_control.dir/clean:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_keyboard_control.dir/build.make CMakeFiles/test_keyboard_control.dir/clean
 .PHONY : CMakeFiles/test_keyboard_control.dir/clean
+
+#=============================================================================
+# Target rules for target CMakeFiles/test_ukf.dir
+
+# All Build rule for target.
+CMakeFiles/test_ukf.dir/all: CMakeFiles/ukf.dir/all
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_ukf.dir/build.make CMakeFiles/test_ukf.dir/depend
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_ukf.dir/build.make CMakeFiles/test_ukf.dir/build
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/finn/ferroflock/helper_functions/build/CMakeFiles --progress-num=28,29 "Built target test_ukf"
+.PHONY : CMakeFiles/test_ukf.dir/all
+
+# Build rule for subdir invocation for target.
+CMakeFiles/test_ukf.dir/rule: cmake_check_build_system
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/finn/ferroflock/helper_functions/build/CMakeFiles 4
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 CMakeFiles/test_ukf.dir/all
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/finn/ferroflock/helper_functions/build/CMakeFiles 0
+.PHONY : CMakeFiles/test_ukf.dir/rule
+
+# Convenience name for target.
+test_ukf: CMakeFiles/test_ukf.dir/rule
+.PHONY : test_ukf
+
+# clean rule for target.
+CMakeFiles/test_ukf.dir/clean:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_ukf.dir/build.make CMakeFiles/test_ukf.dir/clean
+.PHONY : CMakeFiles/test_ukf.dir/clean
+
+#=============================================================================
+# Target rules for target CMakeFiles/test_tello_controller.dir
+
+# All Build rule for target.
+CMakeFiles/test_tello_controller.dir/all: CMakeFiles/tello_controller.dir/all
+CMakeFiles/test_tello_controller.dir/all: CMakeFiles/logger.dir/all
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_tello_controller.dir/build.make CMakeFiles/test_tello_controller.dir/depend
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_tello_controller.dir/build.make CMakeFiles/test_tello_controller.dir/build
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/finn/ferroflock/helper_functions/build/CMakeFiles --progress-num=25,26,27 "Built target test_tello_controller"
+.PHONY : CMakeFiles/test_tello_controller.dir/all
+
+# Build rule for subdir invocation for target.
+CMakeFiles/test_tello_controller.dir/rule: cmake_check_build_system
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/finn/ferroflock/helper_functions/build/CMakeFiles 7
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 CMakeFiles/test_tello_controller.dir/all
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/finn/ferroflock/helper_functions/build/CMakeFiles 0
+.PHONY : CMakeFiles/test_tello_controller.dir/rule
+
+# Convenience name for target.
+test_tello_controller: CMakeFiles/test_tello_controller.dir/rule
+.PHONY : test_tello_controller
+
+# clean rule for target.
+CMakeFiles/test_tello_controller.dir/clean:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_tello_controller.dir/build.make CMakeFiles/test_tello_controller.dir/clean
+.PHONY : CMakeFiles/test_tello_controller.dir/clean
 
 #=============================================================================
 # Special targets to cleanup operation of make.

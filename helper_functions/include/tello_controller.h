@@ -28,6 +28,7 @@
 #include <netinet/in.h>
 #include <unistd.h>
 #include <fcntl.h>
+#include <queue>
 
 class TelloController {
 public:
@@ -67,11 +68,18 @@ private:
         struct sockaddr_in command_addr{};
         bool socket_valid{false};
         bool needs_reboot{true}; // Always reboot at first
+        bool flying{false};      // Indicates if the drone is flying
+        std::queue<std::string> command_queue; // Stores commands for the 100Hz loop
+        std::mutex queue_mutex;  // Protects the command queue
+        std::string last_command;// Tracks the last sent command for logging
+        std::thread control_thread; // Thread for the 100Hz control loop
+        bool running{true};      // Controls the thread lifecycle
         
         // Constructor with parameters
         TelloDevice(std::string ip_addr = "", int cmd_port = 8889, int loc_port = 8890)
             : ip(ip_addr), command_port(cmd_port), local_port(loc_port),
-              command_socket(-1), socket_valid(false), needs_reboot(false) {}
+              command_socket(-1), socket_valid(false), needs_reboot(false),
+              flying(false), last_command(""), running(true) {}
               
         // Move constructor
         TelloDevice(TelloDevice&& other) noexcept
@@ -81,19 +89,38 @@ private:
               command_socket(other.command_socket),
               command_addr(other.command_addr),
               socket_valid(other.socket_valid),
-              needs_reboot(other.needs_reboot) {
+              needs_reboot(other.needs_reboot),
+              flying(other.flying),
+              last_command(std::move(other.last_command)),
+              running(other.running) {
             std::cout << "[SOCKET] Moved socket " << command_socket << " from " << other.ip << std::endl;
             other.command_socket = -1;
             other.socket_valid = false;
+            other.flying = false;
+            
+            // Handle thread transfer
+            if (other.control_thread.joinable()) {
+                other.running = false;
+                other.control_thread.join();
+            }
         }
 
         // Move assignment operator
         TelloDevice& operator=(TelloDevice&& other) noexcept {
             if (this != &other) {
+                // Clean up existing resources
                 if (command_socket >= 0) {
                     std::cout << "[SOCKET] Closing socket " << command_socket << " for " << ip << std::endl;
                     close(command_socket);
                 }
+                
+                // Stop control thread if running
+                if (control_thread.joinable()) {
+                    running = false;
+                    control_thread.join();
+                }
+                
+                // Transfer resources
                 ip = std::move(other.ip);
                 command_port = other.command_port;
                 local_port = other.local_port;
@@ -101,14 +128,25 @@ private:
                 command_addr = other.command_addr;
                 socket_valid = other.socket_valid;
                 needs_reboot = other.needs_reboot;
+                flying = other.flying;
+                last_command = std::move(other.last_command);
+                running = other.running;
+                
                 std::cout << "[SOCKET] Moved socket " << command_socket << " from " << other.ip << std::endl;
                 other.command_socket = -1;
                 other.socket_valid = false;
+                other.flying = false;
+                
+                // Handle thread transfer
+                if (other.control_thread.joinable()) {
+                    other.running = false;
+                    other.control_thread.join();
+                }
             }
             return *this;
         }
         
-        // Destructor to close sockets
+        // Destructor to close sockets and stop threads
         ~TelloDevice();
         
         // Prevent copying
@@ -129,6 +167,14 @@ private:
         
         // Clean a command string to remove invalid characters
         std::string cleanCommand(const std::string& cmd);
+        
+        // Control loop for 100Hz command sending
+        void controlLoop();
+        
+        // Start the control loop thread
+        void startControlLoop();
+        
+    private:
     };
     
     // Map of IP addresses to TelloDevice objects

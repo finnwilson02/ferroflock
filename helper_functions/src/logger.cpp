@@ -14,9 +14,9 @@
 
 #include "../include/logger.h"
 
-// Define global logging variables (these are already defined in main.cpp)
-LogLevel g_log_level; // Defined in main.cpp
-// bool g_debug_enabled is defined in main.cpp
+// Define global logging variables as weak symbols
+__attribute__((weak)) LogLevel g_log_level = LOG_LEVEL_DEBUG;
+__attribute__((weak)) bool g_debug_enabled = false;
 
 // Constructor
 Logger::Logger(const std::string& filename) {

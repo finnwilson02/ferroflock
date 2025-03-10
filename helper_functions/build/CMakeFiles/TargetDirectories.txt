@@ -6,10 +6,13 @@
 /home/finn/ferroflock/helper_functions/build/CMakeFiles/keyboard_control.dir
 /home/finn/ferroflock/helper_functions/build/CMakeFiles/map_optitrack.dir
 /home/finn/ferroflock/helper_functions/build/CMakeFiles/menu.dir
+/home/finn/ferroflock/helper_functions/build/CMakeFiles/ukf.dir
 /home/finn/ferroflock/helper_functions/build/CMakeFiles/helper_functions.dir
 /home/finn/ferroflock/helper_functions/build/CMakeFiles/test_optitrack_logging.dir
 /home/finn/ferroflock/helper_functions/build/CMakeFiles/test_imu.dir
 /home/finn/ferroflock/helper_functions/build/CMakeFiles/test_keyboard_control.dir
+/home/finn/ferroflock/helper_functions/build/CMakeFiles/test_ukf.dir
+/home/finn/ferroflock/helper_functions/build/CMakeFiles/test_tello_controller.dir
 /home/finn/ferroflock/helper_functions/build/CMakeFiles/edit_cache.dir
 /home/finn/ferroflock/helper_functions/build/CMakeFiles/rebuild_cache.dir
 /home/finn/ferroflock/helper_functions/build/CMakeFiles/list_install_components.dir

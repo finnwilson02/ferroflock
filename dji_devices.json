@@ -1,7 +1,7 @@
 {
   "devices": [
     {
-      "discovered": "2025-03-10 18:34:00",
+      "discovered": "2025-03-10 20:15:13",
       "ip": "192.168.1.106",
       "mac": "34:d2:62:ed:f6:1a",
       "model": "Tello EDU",
@@ -43,7 +43,7 @@
       "model": "Tello EDU",
       "name": "USyd AeroEng #08",
       "port": 8889,
-      "status": "IP REFRESH NEEDED",
+      "status": "offline",
       "tracker_id": "Bird3",
       "type": "tello",
       "yaw_offset": 0.0

@@ -91,6 +91,7 @@ add_executable(test_optitrack_logging ${TEST_OPTITRACK_LOGGING_SOURCES})
 add_executable(test_imu ${TEST_IMU_SOURCES})
 add_executable(test_keyboard_control ${TEST_KEYBOARD_CONTROL_SOURCES})
 add_executable(test_ukf tests/test_ukf.cpp)
+add_executable(test_tello_controller tests/test_tello_controller.cpp tests/test_globals.cpp)
 
 # Set dependencies for libraries
 target_link_libraries(tello_imu_handler PRIVATE tello_controller)
@@ -157,11 +158,19 @@ target_link_libraries(test_ukf
     pthread
 )
 
+# Link libraries to test_tello_controller
+target_link_libraries(test_tello_controller
+    PRIVATE
+    tello_controller
+    logger
+    pthread
+)
+
 # Specify UKF dependencies
 target_link_libraries(ukf PRIVATE ${EIGEN3_LIBRARIES})
 
 # Install targets
-install(TARGETS helper_functions test_optitrack_logging test_imu test_keyboard_control test_ukf DESTINATION bin)
+install(TARGETS helper_functions test_optitrack_logging test_imu test_keyboard_control test_ukf test_tello_controller DESTINATION bin)
 
 # Copy configuration file to build directory
 configure_file(${CMAKE_SOURCE_DIR}/config.json ${CMAKE_BINARY_DIR}/config.json COPYONLY)

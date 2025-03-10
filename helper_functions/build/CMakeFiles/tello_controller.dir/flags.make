@@ -4,7 +4,7 @@
 # compile CXX with /usr/bin/c++
 CXX_DEFINES = 
 
-CXX_INCLUDES = -I/usr/include/opencv4 -I/home/finn/ferroflock/helper_functions/../libs/vrpn -I/home/finn/ferroflock/helper_functions/include -I/home/finn/ferroflock/helper_functions/.
+CXX_INCLUDES = -I/usr/include/opencv4 -I/usr/include/eigen3 -I/home/finn/ferroflock/helper_functions/../libs/vrpn -I/home/finn/ferroflock/helper_functions/include -I/home/finn/ferroflock/helper_functions/.
 
 CXX_FLAGS = -std=gnu++17
 

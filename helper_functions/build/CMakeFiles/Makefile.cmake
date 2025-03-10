@@ -11,6 +11,7 @@ set(CMAKE_MAKEFILE_DEPENDS
   "CMakeFiles/3.28.3/CMakeCCompiler.cmake"
   "CMakeFiles/3.28.3/CMakeCXXCompiler.cmake"
   "CMakeFiles/3.28.3/CMakeSystem.cmake"
+  "/home/finn/ferroflock/helper_functions/config.json"
   "/usr/lib/x86_64-linux-gnu/cmake/opencv4/OpenCVConfig-version.cmake"
   "/usr/lib/x86_64-linux-gnu/cmake/opencv4/OpenCVConfig.cmake"
   "/usr/lib/x86_64-linux-gnu/cmake/opencv4/OpenCVModules-release.cmake"
@@ -35,6 +36,9 @@ set(CMAKE_MAKEFILE_DEPENDS
   "/usr/share/cmake-3.28/Modules/Platform/Linux-Initialize.cmake"
   "/usr/share/cmake-3.28/Modules/Platform/Linux.cmake"
   "/usr/share/cmake-3.28/Modules/Platform/UnixPaths.cmake"
+  "/usr/share/eigen3/cmake/Eigen3Config.cmake"
+  "/usr/share/eigen3/cmake/Eigen3ConfigVersion.cmake"
+  "/usr/share/eigen3/cmake/Eigen3Targets.cmake"
   )
 
 # The corresponding makefile is:
@@ -45,6 +49,7 @@ set(CMAKE_MAKEFILE_OUTPUTS
 
 # Byproducts of CMake generate step:
 set(CMAKE_MAKEFILE_PRODUCTS
+  "config.json"
   "CMakeFiles/CMakeDirectoryInformation.cmake"
   )
 
@@ -58,8 +63,11 @@ set(CMAKE_DEPEND_INFO_FILES
   "CMakeFiles/keyboard_control.dir/DependInfo.cmake"
   "CMakeFiles/map_optitrack.dir/DependInfo.cmake"
   "CMakeFiles/menu.dir/DependInfo.cmake"
+  "CMakeFiles/ukf.dir/DependInfo.cmake"
   "CMakeFiles/helper_functions.dir/DependInfo.cmake"
   "CMakeFiles/test_optitrack_logging.dir/DependInfo.cmake"
   "CMakeFiles/test_imu.dir/DependInfo.cmake"
   "CMakeFiles/test_keyboard_control.dir/DependInfo.cmake"
+  "CMakeFiles/test_ukf.dir/DependInfo.cmake"
+  "CMakeFiles/test_tello_controller.dir/DependInfo.cmake"
   )

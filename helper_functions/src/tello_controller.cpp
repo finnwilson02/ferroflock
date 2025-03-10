@@ -34,6 +34,13 @@ TelloController::~TelloController() {
 
 // TelloDevice destructor
 TelloController::TelloDevice::~TelloDevice() {
+    // Stop the control thread if it's running
+    running = false;
+    if (control_thread.joinable()) {
+        control_thread.join();
+    }
+    
+    // Close the socket
     if (command_socket >= 0) {
         close(command_socket);
         command_socket = -1;
@@ -111,33 +118,90 @@ bool TelloController::TelloDevice::sendCommand(const std::string& cmd) {
     
     std::string clean_cmd = cleanCommand(cmd);
     
-    LOG_DEBUG("[SEND] IP: " + ip + " Port: " + std::to_string(local_port) + 
-            " Socket: " + std::to_string(command_socket) + 
-            " Command: " + clean_cmd);
-    
-    ssize_t sent = sendto(command_socket, clean_cmd.c_str(), clean_cmd.length(), 0,
-                        (struct sockaddr *)&command_addr, sizeof(command_addr));
-    
-    if (sent < 0) {
-        LOG_ERROR("Send failed for " + ip + ": " + strerror(errno) + ", socket: " + std::to_string(command_socket));
-        socket_valid = false;
-        return reinitializeAndSend(clean_cmd);
+    // If drone is flying, use the command queue for the 100Hz control loop
+    if (flying) {
+        // Special handling for critical commands (like emergency or land)
+        if (cmd == "emergency" || cmd == "land") {
+            // These commands should be sent immediately, not queued
+            LOG_DEBUG("[SEND_IMMEDIATE] Critical command '" + clean_cmd + "' to " + ip);
+            
+            ssize_t sent = sendto(command_socket, clean_cmd.c_str(), clean_cmd.length(), 0,
+                            (struct sockaddr *)&command_addr, sizeof(command_addr));
+                            
+            if (sent < 0) {
+                LOG_ERROR("Send failed for critical command to " + ip + ": " + strerror(errno));
+                socket_valid = false;
+                return reinitializeAndSend(clean_cmd);
+            }
+            
+            // For critical commands, log them immediately
+            if (g_logger && g_logger->isOpen()) {
+                static std::mutex logger_mutex;
+                std::lock_guard<std::mutex> lock(logger_mutex);
+                g_logger->logCommand(clean_cmd, std::chrono::system_clock::to_time_t(std::chrono::system_clock::now()));
+            }
+            
+            return true;
+        }
+        
+        // For regular commands during flight, enqueue for the 100Hz loop
+        {
+            std::lock_guard<std::mutex> lock(queue_mutex);
+            
+            // If it's an RC command, just update the queue (replacing any existing RC command)
+            if (cmd.substr(0, 2) == "rc") {
+                // Clear any existing RC commands
+                std::queue<std::string> temp;
+                while (!command_queue.empty()) {
+                    std::string queued_cmd = command_queue.front();
+                    command_queue.pop();
+                    if (queued_cmd.substr(0, 2) != "rc") {
+                        temp.push(queued_cmd);
+                    }
+                }
+                // Restore non-RC commands and add the new RC command
+                command_queue = std::move(temp);
+                command_queue.push(clean_cmd);
+            } else {
+                // For non-RC commands, just add to the queue
+                command_queue.push(clean_cmd);
+            }
+        }
+        
+        LOG_DEBUG("[QUEUED] Command '" + clean_cmd + "' queued for " + ip + " at 100Hz");
+        
+        // Command will be logged by controlLoop when it's sent (if it's different from the last command)
+        return true;
+    } else {
+        // For non-flying state, send command immediately (old behavior)
+        LOG_DEBUG("[SEND] IP: " + ip + " Port: " + std::to_string(local_port) + 
+                " Socket: " + std::to_string(command_socket) + 
+                " Command: " + clean_cmd);
+        
+        ssize_t sent = sendto(command_socket, clean_cmd.c_str(), clean_cmd.length(), 0,
+                            (struct sockaddr *)&command_addr, sizeof(command_addr));
+        
+        if (sent < 0) {
+            LOG_ERROR("Send failed for " + ip + ": " + strerror(errno) + ", socket: " + std::to_string(command_socket));
+            socket_valid = false;
+            return reinitializeAndSend(clean_cmd);
+        }
+        
+        LOG_DEBUG("[SUCCESS] Sent " + std::to_string(sent) + " bytes to " + ip);
+        LOG_DEBUG("[DEBUG] Command '" + clean_cmd + "' sent to " + ip + ", bytes: " + std::to_string(sent));
+        
+        // Log the command immediately when not flying
+        if (g_logger && g_logger->isOpen()) {
+            static std::mutex logger_mutex;
+            std::lock_guard<std::mutex> lock(logger_mutex);
+            g_logger->logCommand(clean_cmd, std::chrono::system_clock::to_time_t(std::chrono::system_clock::now()));
+        }
+        
+        // Don't wait for responses from Tellos - they're unreliable
+        // Just assume success if the send worked
+        
+        return true;
     }
-    
-    LOG_DEBUG("[SUCCESS] Sent " + std::to_string(sent) + " bytes to " + ip);
-    LOG_DEBUG("[DEBUG] Command '" + clean_cmd + "' sent to " + ip + ", bytes: " + std::to_string(sent));
-    
-    // Log the raw command string if logger is available
-    if (g_logger && g_logger->isOpen()) {
-        static std::mutex logger_mutex;
-        std::lock_guard<std::mutex> lock(logger_mutex);
-        g_logger->logCommand(clean_cmd, std::chrono::system_clock::to_time_t(std::chrono::system_clock::now()));
-    }
-    
-    // Don't wait for responses from Tellos - they're unreliable
-    // Just assume success if the send worked
-    
-    return true;
 }
 
 // Reinitialize sockets and send command
@@ -193,6 +257,75 @@ std::string TelloController::TelloDevice::cleanCommand(const std::string& cmd) {
         }
     }
     return clean;
+}
+
+// Control loop for 100Hz command sending
+void TelloController::TelloDevice::controlLoop() {
+    int counter = 0;
+    
+    LOG_INFO("Starting 100Hz control loop for " + ip);
+    
+    while (running) {
+        if (flying) {
+            // Get command from queue or use default hover command
+            std::string cmd;
+            {
+                std::lock_guard<std::mutex> lock(queue_mutex);
+                if (!command_queue.empty()) {
+                    cmd = command_queue.front();
+                    command_queue.pop();
+                } else {
+                    cmd = "rc 0 0 0 0"; // Default hover command
+                }
+            }
+            
+            // Only log and display if command changed
+            if (cmd != last_command) {
+                LOG_DEBUG("[SEND] Sending command: " + cmd + " to " + ip);
+                
+                // Log the command to the application log
+                if (g_logger && g_logger->isOpen()) {
+                    static std::mutex logger_mutex;
+                    std::lock_guard<std::mutex> lock(logger_mutex);
+                    g_logger->logCommand(cmd, std::chrono::system_clock::to_time_t(std::chrono::system_clock::now()));
+                }
+                
+                // Update last command
+                last_command = cmd;
+            }
+            
+            // Always send the command at 100Hz regardless of logging
+            if (socket_valid && command_socket >= 0) {
+                std::string clean_cmd = cleanCommand(cmd);
+                sendto(command_socket, clean_cmd.c_str(), clean_cmd.length(), 0,
+                       (struct sockaddr *)&command_addr, sizeof(command_addr));
+            }
+            
+            // Log every 100th iteration (approximately once per second) for debugging
+            if (++counter % 100 == 0) {
+                LOG_DEBUG("100Hz loop active for " + ip + ", iteration: " + std::to_string(counter) + 
+                         ", last command: " + last_command);
+            }
+        }
+        
+        // Sleep for 10ms to maintain 100Hz frequency
+        std::this_thread::sleep_for(std::chrono::milliseconds(10));
+    }
+    
+    LOG_INFO("Stopped 100Hz control loop for " + ip);
+}
+
+// Start the control loop thread
+void TelloController::TelloDevice::startControlLoop() {
+    // If thread is already running, stop it first
+    if (control_thread.joinable()) {
+        running = false;
+        control_thread.join();
+    }
+    
+    // Reset running flag and start new thread
+    running = true;
+    control_thread = std::thread(&TelloDevice::controlLoop, this);
 }
 
 // Initialize a drone with its IP address
@@ -267,6 +400,21 @@ bool TelloController::sendCommand(const std::string& ip, const std::string& comm
     bool result = devices[ip].sendCommand(command);
     if (!result) {
         LOG_ERROR("Failed to send command '" + command + "' to " + ip);
+    } else {
+        // Handle flight state transitions
+        if (command == "takeoff") {
+            // If takeoff command was successful, set flying to true and start control loop
+            LOG_INFO("Takeoff command sent successfully to " + ip + ", starting 100Hz control loop");
+            devices[ip].flying = true;
+            
+            // Call startControlLoop directly since it's now public
+            devices[ip].startControlLoop();
+        } 
+        else if (command == "land" || command == "emergency") {
+            // If land or emergency command was successful, set flying to false
+            LOG_INFO("Landing/emergency command sent to " + ip + ", stopping 100Hz control loop");
+            devices[ip].flying = false;
+        }
     }
     return result;
 }

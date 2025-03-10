@@ -266,6 +266,19 @@ menu/fast:
 .PHONY : menu/fast
 
 #=============================================================================
+# Target rules for targets named ukf
+
+# Build rule for target.
+ukf: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 ukf
+.PHONY : ukf
+
+# fast build rule for target.
+ukf/fast:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/ukf.dir/build.make CMakeFiles/ukf.dir/build
+.PHONY : ukf/fast
+
+#=============================================================================
 # Target rules for targets named helper_functions
 
 # Build rule for target.
@@ -316,6 +329,32 @@ test_keyboard_control: cmake_check_build_system
 test_keyboard_control/fast:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_keyboard_control.dir/build.make CMakeFiles/test_keyboard_control.dir/build
 .PHONY : test_keyboard_control/fast
+
+#=============================================================================
+# Target rules for targets named test_ukf
+
+# Build rule for target.
+test_ukf: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 test_ukf
+.PHONY : test_ukf
+
+# fast build rule for target.
+test_ukf/fast:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_ukf.dir/build.make CMakeFiles/test_ukf.dir/build
+.PHONY : test_ukf/fast
+
+#=============================================================================
+# Target rules for targets named test_tello_controller
+
+# Build rule for target.
+test_tello_controller: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 test_tello_controller
+.PHONY : test_tello_controller
+
+# fast build rule for target.
+test_tello_controller/fast:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_tello_controller.dir/build.make CMakeFiles/test_tello_controller.dir/build
+.PHONY : test_tello_controller/fast
 
 src/calibration.o: src/calibration.cpp.o
 .PHONY : src/calibration.o
@@ -533,6 +572,54 @@ src/tello_imu_handler.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/tello_imu_handler.dir/build.make CMakeFiles/tello_imu_handler.dir/src/tello_imu_handler.cpp.s
 .PHONY : src/tello_imu_handler.cpp.s
 
+src/ukf.o: src/ukf.cpp.o
+.PHONY : src/ukf.o
+
+# target to build an object file
+src/ukf.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/ukf.dir/build.make CMakeFiles/ukf.dir/src/ukf.cpp.o
+.PHONY : src/ukf.cpp.o
+
+src/ukf.i: src/ukf.cpp.i
+.PHONY : src/ukf.i
+
+# target to preprocess a source file
+src/ukf.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/ukf.dir/build.make CMakeFiles/ukf.dir/src/ukf.cpp.i
+.PHONY : src/ukf.cpp.i
+
+src/ukf.s: src/ukf.cpp.s
+.PHONY : src/ukf.s
+
+# target to generate assembly for a file
+src/ukf.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/ukf.dir/build.make CMakeFiles/ukf.dir/src/ukf.cpp.s
+.PHONY : src/ukf.cpp.s
+
+tests/test_globals.o: tests/test_globals.cpp.o
+.PHONY : tests/test_globals.o
+
+# target to build an object file
+tests/test_globals.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_tello_controller.dir/build.make CMakeFiles/test_tello_controller.dir/tests/test_globals.cpp.o
+.PHONY : tests/test_globals.cpp.o
+
+tests/test_globals.i: tests/test_globals.cpp.i
+.PHONY : tests/test_globals.i
+
+# target to preprocess a source file
+tests/test_globals.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_tello_controller.dir/build.make CMakeFiles/test_tello_controller.dir/tests/test_globals.cpp.i
+.PHONY : tests/test_globals.cpp.i
+
+tests/test_globals.s: tests/test_globals.cpp.s
+.PHONY : tests/test_globals.s
+
+# target to generate assembly for a file
+tests/test_globals.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_tello_controller.dir/build.make CMakeFiles/test_tello_controller.dir/tests/test_globals.cpp.s
+.PHONY : tests/test_globals.cpp.s
+
 tests/test_imu.o: tests/test_imu.cpp.o
 .PHONY : tests/test_imu.o
 
@@ -605,6 +692,54 @@ tests/test_optitrack_logging.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_optitrack_logging.dir/build.make CMakeFiles/test_optitrack_logging.dir/tests/test_optitrack_logging.cpp.s
 .PHONY : tests/test_optitrack_logging.cpp.s
 
+tests/test_tello_controller.o: tests/test_tello_controller.cpp.o
+.PHONY : tests/test_tello_controller.o
+
+# target to build an object file
+tests/test_tello_controller.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_tello_controller.dir/build.make CMakeFiles/test_tello_controller.dir/tests/test_tello_controller.cpp.o
+.PHONY : tests/test_tello_controller.cpp.o
+
+tests/test_tello_controller.i: tests/test_tello_controller.cpp.i
+.PHONY : tests/test_tello_controller.i
+
+# target to preprocess a source file
+tests/test_tello_controller.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_tello_controller.dir/build.make CMakeFiles/test_tello_controller.dir/tests/test_tello_controller.cpp.i
+.PHONY : tests/test_tello_controller.cpp.i
+
+tests/test_tello_controller.s: tests/test_tello_controller.cpp.s
+.PHONY : tests/test_tello_controller.s
+
+# target to generate assembly for a file
+tests/test_tello_controller.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_tello_controller.dir/build.make CMakeFiles/test_tello_controller.dir/tests/test_tello_controller.cpp.s
+.PHONY : tests/test_tello_controller.cpp.s
+
+tests/test_ukf.o: tests/test_ukf.cpp.o
+.PHONY : tests/test_ukf.o
+
+# target to build an object file
+tests/test_ukf.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_ukf.dir/build.make CMakeFiles/test_ukf.dir/tests/test_ukf.cpp.o
+.PHONY : tests/test_ukf.cpp.o
+
+tests/test_ukf.i: tests/test_ukf.cpp.i
+.PHONY : tests/test_ukf.i
+
+# target to preprocess a source file
+tests/test_ukf.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_ukf.dir/build.make CMakeFiles/test_ukf.dir/tests/test_ukf.cpp.i
+.PHONY : tests/test_ukf.cpp.i
+
+tests/test_ukf.s: tests/test_ukf.cpp.s
+.PHONY : tests/test_ukf.s
+
+# target to generate assembly for a file
+tests/test_ukf.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_ukf.dir/build.make CMakeFiles/test_ukf.dir/tests/test_ukf.cpp.s
+.PHONY : tests/test_ukf.cpp.s
+
 # Help Target
 help:
 	@echo "The following are some of the valid targets for this Makefile:"
@@ -629,6 +764,9 @@ help:
 	@echo "... test_imu"
 	@echo "... test_keyboard_control"
 	@echo "... test_optitrack_logging"
+	@echo "... test_tello_controller"
+	@echo "... test_ukf"
+	@echo "... ukf"
 	@echo "... src/calibration.o"
 	@echo "... src/calibration.i"
 	@echo "... src/calibration.s"
@@ -656,6 +794,12 @@ help:
 	@echo "... src/tello_imu_handler.o"
 	@echo "... src/tello_imu_handler.i"
 	@echo "... src/tello_imu_handler.s"
+	@echo "... src/ukf.o"
+	@echo "... src/ukf.i"
+	@echo "... src/ukf.s"
+	@echo "... tests/test_globals.o"
+	@echo "... tests/test_globals.i"
+	@echo "... tests/test_globals.s"
 	@echo "... tests/test_imu.o"
 	@echo "... tests/test_imu.i"
 	@echo "... tests/test_imu.s"
@@ -665,6 +809,12 @@ help:
 	@echo "... tests/test_optitrack_logging.o"
 	@echo "... tests/test_optitrack_logging.i"
 	@echo "... tests/test_optitrack_logging.s"
+	@echo "... tests/test_tello_controller.o"
+	@echo "... tests/test_tello_controller.i"
+	@echo "... tests/test_tello_controller.s"
+	@echo "... tests/test_ukf.o"
+	@echo "... tests/test_ukf.i"
+	@echo "... tests/test_ukf.s"
 .PHONY : help
 
 

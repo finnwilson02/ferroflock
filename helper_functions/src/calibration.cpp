@@ -369,11 +369,11 @@ void Calibration::runCalibrationRoutine(
         LOG_INFO("Calibration step 2: Moving upward for 3 seconds");
         std::cout << "Step 2: Moving upward for 3 seconds...\n";
         
-        // Log command start
+        // Log actual RC command instead of custom label
         {
             static std::mutex logger_mutex;
             std::lock_guard<std::mutex> lock(logger_mutex);
-            calibration_logger->logCommand("rc_upward_start", std::chrono::system_clock::to_time_t(std::chrono::system_clock::now()));
+            calibration_logger->logCommand("rc 0 0 50 0", std::chrono::system_clock::to_time_t(std::chrono::system_clock::now()));
         }
         
         // Send continuous upward commands while logging data
@@ -447,11 +447,11 @@ void Calibration::runCalibrationRoutine(
             std::this_thread::sleep_for(std::chrono::milliseconds(50));
         }
         
-        // Log command end
+        // Log actual RC command instead of custom label
         {
             static std::mutex logger_mutex;
             std::lock_guard<std::mutex> lock(logger_mutex);
-            calibration_logger->logCommand("rc_upward_stop", std::chrono::system_clock::to_time_t(std::chrono::system_clock::now()));
+            calibration_logger->logCommand("rc 0 0 0 0", std::chrono::system_clock::to_time_t(std::chrono::system_clock::now()));
         }
         
         // Log while stabilizing for 1 second
@@ -485,11 +485,11 @@ void Calibration::runCalibrationRoutine(
         LOG_INFO("Calibration step 3: Moving forward for 5 seconds");
         std::cout << "Step 3: Moving forward for 5 seconds...\n";
         
-        // Log command start
+        // Log actual RC command instead of custom label
         {
             static std::mutex logger_mutex;
             std::lock_guard<std::mutex> lock(logger_mutex);
-            calibration_logger->logCommand("rc_forward_start", std::chrono::system_clock::to_time_t(std::chrono::system_clock::now()));
+            calibration_logger->logCommand("rc 0 50 0 0", std::chrono::system_clock::to_time_t(std::chrono::system_clock::now()));
         }
         
         // Initialize variables to store yaw values
@@ -580,11 +580,11 @@ void Calibration::runCalibrationRoutine(
             std::this_thread::sleep_for(std::chrono::milliseconds(50));
         }
         
-        // Log command end
+        // Log actual RC command instead of custom label
         {
             static std::mutex logger_mutex;
             std::lock_guard<std::mutex> lock(logger_mutex);
-            calibration_logger->logCommand("rc_forward_stop", std::chrono::system_clock::to_time_t(std::chrono::system_clock::now()));
+            calibration_logger->logCommand("rc 0 0 0 0", std::chrono::system_clock::to_time_t(std::chrono::system_clock::now()));
         }
         
         // 4. Land the drone
