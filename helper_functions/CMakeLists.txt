@@ -4,12 +4,14 @@ project(helper_functions)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-# Find OpenCV
+# Find required packages
 find_package(OpenCV REQUIRED)
+find_package(Eigen3 REQUIRED) # Added for UKF
 
 # Include directories
 include_directories(
     ${OpenCV_INCLUDE_DIRS}
+    ${EIGEN3_INCLUDE_DIR} # Added for UKF
     /usr/include/opencv4
     ../libs/vrpn
     include
@@ -50,6 +52,10 @@ set(MENU_SOURCES
     src/menu.cpp
 )
 
+set(UKF_SOURCES
+    src/ukf.cpp
+)
+
 set(MAIN_SOURCES
     src/main.cpp
 )
@@ -75,6 +81,7 @@ add_library(calibration ${CALIBRATION_SOURCES})
 add_library(keyboard_control ${KEYBOARD_CONTROL_SOURCES})
 add_library(map_optitrack ${MAP_OPTITRACK_SOURCES})
 add_library(menu ${MENU_SOURCES})
+add_library(ukf ${UKF_SOURCES})
 
 # Create main executable
 add_executable(helper_functions ${MAIN_SOURCES})
@@ -83,6 +90,7 @@ add_executable(helper_functions ${MAIN_SOURCES})
 add_executable(test_optitrack_logging ${TEST_OPTITRACK_LOGGING_SOURCES})
 add_executable(test_imu ${TEST_IMU_SOURCES})
 add_executable(test_keyboard_control ${TEST_KEYBOARD_CONTROL_SOURCES})
+add_executable(test_ukf tests/test_ukf.cpp)
 
 # Set dependencies for libraries
 target_link_libraries(tello_imu_handler PRIVATE tello_controller)
@@ -142,8 +150,21 @@ target_link_libraries(test_keyboard_control
     pthread
 )
 
+# Link libraries to test_ukf
+target_link_libraries(test_ukf
+    PRIVATE
+    ukf
+    pthread
+)
+
+# Specify UKF dependencies
+target_link_libraries(ukf PRIVATE ${EIGEN3_LIBRARIES})
+
 # Install targets
-install(TARGETS helper_functions test_optitrack_logging test_imu test_keyboard_control DESTINATION bin)
+install(TARGETS helper_functions test_optitrack_logging test_imu test_keyboard_control test_ukf DESTINATION bin)
+
+# Copy configuration file to build directory
+configure_file(${CMAKE_SOURCE_DIR}/config.json ${CMAKE_BINARY_DIR}/config.json COPYONLY)
 
 # No need to copy configuration files to the build directory
 # Configuration files will be accessed relative to the executable
