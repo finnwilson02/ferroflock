@@ -22,6 +22,8 @@
 #include <filesystem>
 #include <iostream>
 #include <mutex>
+#include <queue>
+#include <thread>
 
 // Define logging levels
 enum LogLevel {
@@ -44,39 +46,14 @@ extern LogLevel g_log_level;
 
 // DataPoint structure to hold various types of data for logging
 struct DataPoint {
-    std::chrono::system_clock::time_point timestamp;
-    double x{0.0};
-    double y{0.0};
-    double z{0.0};
-    double qw{1.0};
-    double qx{0.0};
-    double qy{0.0};
-    double qz{0.0};
-    double yaw_raw{0.0};
-    double yaw_corrected{0.0};
-    double imu_yaw{0.0};
-    double imu_pitch{0.0};
-    double imu_roll{0.0};
-    double imu_agx{0.0};
-    double imu_agy{0.0};
-    double imu_agz{0.0};
-    double command_command{-1.0};    // SDK mode entry
-    double command_takeoff{-1.0};    // Takeoff command
-    double command_land{-1.0};       // Land command
-    double command_up{-1.0};         // Up movement (cm)
-    double command_down{-1.0};       // Down movement (cm)
-    double command_left{-1.0};       // Left movement (cm)
-    double command_right{-1.0};      // Right movement (cm)
-    double command_forward{-1.0};    // Forward movement (cm)
-    double command_back{-1.0};       // Backward movement (cm)
-    double command_cw{-1.0};         // Clockwise rotation (degrees)
-    double command_ccw{-1.0};        // Counterclockwise rotation (degrees)
-    double command_flip{-1.0};       // Flip direction (0-3 for l,r,f,b)
-    double command_speed{-1.0};      // Speed setting (cm/s)
-    double command_reboot{-1.0};     // Reboot command
-    double command_stop{-1.0};       // Stop command
-    double command_emergency{-1.0};  // Emergency stop
-    std::string tracker_id;
+    std::chrono::system_clock::time_point timestamp = std::chrono::system_clock::now();
+    double x = 0.0, y = 0.0, z = 0.0;
+    double qw = 0.0, qx = 0.0, qy = 0.0, qz = 0.0;
+    double yaw_raw = 0.0, yaw_corrected = 0.0;
+    double imu_yaw = 0.0, imu_pitch = 0.0, imu_roll = 0.0;
+    double imu_agx = 0.0, imu_agy = 0.0, imu_agz = 0.0;
+    std::string command_string; // Raw command string
+    std::string tracker_id = "Unknown";
     
     // Default constructor
     DataPoint() = default;
@@ -116,7 +93,7 @@ public:
     void logIMU(double imu_yaw, double timestamp);
     
     // Log command data
-    void logCommand(const std::string& command, double value, double timestamp);
+    void logCommand(const std::string& command, double timestamp);
     
     // Flush the log to disk
     void flush();
@@ -132,6 +109,11 @@ private:
     std::mutex file_mutex_;
     int write_count_{0};
     const int flush_interval_{10}; // Flush every 10 writes by default
+    std::queue<DataPoint> data_queue_; // New queue for async data
+    std::mutex queue_mutex_; // Protect the queue
+    std::thread log_thread_; // Dedicated logging thread
+    bool running_{false}; // Control logging thread
+    void logThreadFunc(); // Thread function
 };
 
 #endif // LOGGER_H

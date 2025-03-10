@@ -10,7 +10,7 @@
             "status": "offline",
             "tracker_id": "Tracker2",
             "type": "tello",
-            "yaw_offset": 0.0
+            "yaw_offset": 62.471423841953765
         },
         {
             "discovered": "2025-03-07 22:36:17",
@@ -32,9 +32,9 @@
             "name": "USyd AeroEng #01 (DRIFTS LEFT)",
             "port": 8889,
             "status": "online",
-            "tracker_id": "Bird4",
+            "tracker_id": "Bird1",
             "type": "tello",
-            "yaw_offset": 0.0
+            "yaw_offset": 4.626354615386674
         },
         {
             "discovered": "2025-03-07 22:24:22",
@@ -58,7 +58,7 @@
             "status": "offline",
             "tracker_id": "Tracker1",
             "type": "tello",
-            "yaw_offset": 0.0
+            "yaw_offset": 128.97065116193573
         },
         {
             "discovered": "2025-03-07 22:36:17",

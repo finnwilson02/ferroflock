@@ -122,6 +122,7 @@ private:
     void handleCalibrateDrone();
     void handleRebootAllDrones();
     void handleSetLoggingLevel();
+    void handleRunYawCalibrationScript();
     void handleExit();
 };
 

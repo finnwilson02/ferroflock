@@ -328,6 +328,8 @@ void Menu::defineDefaultActions() {
     addOption("4", "Calibrate drone orientation", [this]() { handleCalibrateDrone(); });
     addOption("5", "Reboot all drones", [this]() { handleRebootAllDrones(); });
     addOption("6", "Set Logging Level", [this]() { handleSetLoggingLevel(); }, "Adjust verbosity of log messages");
+    addOption("7", "Run Yaw Calibration Script", [this]() { handleRunYawCalibrationScript(); }, 
+              "Run the Python script to calculate yaw offsets from collected data");
     addOption("Q", "Quit", [this]() { handleExit(); });
     
     /*
@@ -575,6 +577,33 @@ void Menu::handleSetLoggingLevel() {
         else if (input == "5") g_log_level = LOG_LEVEL_NONE;
         std::cout << "Logging level set to " << input << ".\n";
     }
+    display();
+}
+
+void Menu::handleRunYawCalibrationScript() {
+    std::cout << "\nThis will run the Python script to calibrate yaw offsets using collected data.\n";
+    std::cout << "The script will ask you to select a CSV file from the data directory.\n";
+    std::cout << "After calculation, it may require you to manually copy the updated JSON file if permissions are insufficient.\n";
+    std::cout << "Do you want to proceed? (Y/N): ";
+    
+    std::vector<std::string> valid_inputs = {"Y", "N"};
+    std::string input = getValidInput(valid_inputs);
+    
+    if (input == "Y") {
+        std::cout << "Running yaw calibration script...\n";
+        // Command to activate virtual environment and run the Python script
+        std::string command = "bash -c 'source ~/drone_venv/bin/activate && python3 ../python/calibrate_yaw.py'";
+        int result = system(command.c_str());
+        if (result != 0) {
+            std::cout << "Error: Yaw calibration script failed with return code " << result << "\n";
+        } else {
+            std::cout << "Yaw calibration script completed successfully.\n";
+        }
+    } else {
+        std::cout << "Operation canceled.\n";
+    }
+    
+    // Return to main menu
     display();
 }
 

@@ -126,7 +126,7 @@ void KeyboardControl::keyboardLoop() {
                     controller_.sendCommand(drone_ip_, "takeoff");
                 }
                 if (g_logger && g_logger->isOpen()) {
-                    g_logger->logCommand("takeoff", 1.0, std::chrono::system_clock::to_time_t(std::chrono::system_clock::now()));
+                    g_logger->logCommand("takeoff", std::chrono::system_clock::to_time_t(std::chrono::system_clock::now()));
                 }
             } else if (key == 'l') {
                 // Land
@@ -136,7 +136,7 @@ void KeyboardControl::keyboardLoop() {
                     controller_.sendCommand(drone_ip_, "land");
                 }
                 if (g_logger && g_logger->isOpen()) {
-                    g_logger->logCommand("land", 1.0, std::chrono::system_clock::to_time_t(std::chrono::system_clock::now()));
+                    g_logger->logCommand("land", std::chrono::system_clock::to_time_t(std::chrono::system_clock::now()));
                 }
             } else if (key == 'w') {
                 // Increase forward speed
@@ -174,7 +174,7 @@ void KeyboardControl::keyboardLoop() {
                 }
                 resetSpeedLevels();
                 if (g_logger && g_logger->isOpen()) {
-                    g_logger->logCommand("emergency", 1.0, std::chrono::system_clock::to_time_t(std::chrono::system_clock::now()));
+                    g_logger->logCommand("emergency", std::chrono::system_clock::to_time_t(std::chrono::system_clock::now()));
                 }
             }
             

@@ -127,29 +127,11 @@ bool TelloController::TelloDevice::sendCommand(const std::string& cmd) {
     LOG_DEBUG("[SUCCESS] Sent " + std::to_string(sent) + " bytes to " + ip);
     LOG_DEBUG("[DEBUG] Command '" + clean_cmd + "' sent to " + ip + ", bytes: " + std::to_string(sent));
     
-    // Log the command using global logger if available, but skip 'rc' commands
-    // to avoid parsing errors and log flooding
-    if (clean_cmd.compare(0, 2, "rc") != 0 && g_logger && g_logger->isOpen()) {
-        try {
-            std::string command_name = clean_cmd;
-            double value = 1.0; // Default for commands without values
-            size_t space_pos = clean_cmd.find(' ');
-            if (space_pos != std::string::npos) {
-                command_name = clean_cmd.substr(0, space_pos);
-                try {
-                    value = std::stod(clean_cmd.substr(space_pos + 1));
-                } catch (const std::exception&) {
-                    value = 1.0; // Fallback if parsing fails
-                }
-            }
-            
-            // Use local mutex to protect g_logger access
-            static std::mutex logger_mutex;
-            std::lock_guard<std::mutex> lock(logger_mutex);
-            g_logger->logCommand(command_name, value, std::chrono::system_clock::to_time_t(std::chrono::system_clock::now()));
-        } catch (const std::exception& e) {
-            LOG_ERROR("Logger error in sendCommand: " + std::string(e.what()));
-        }
+    // Log the raw command string if logger is available
+    if (g_logger && g_logger->isOpen()) {
+        static std::mutex logger_mutex;
+        std::lock_guard<std::mutex> lock(logger_mutex);
+        g_logger->logCommand(clean_cmd, std::chrono::system_clock::to_time_t(std::chrono::system_clock::now()));
     }
     
     // Don't wait for responses from Tellos - they're unreliable

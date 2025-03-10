@@ -249,7 +249,7 @@ void Calibration::runCalibrationRoutine(
             static std::mutex logger_mutex;
             std::lock_guard<std::mutex> lock(logger_mutex);
             tello_controller_.sendCommand(drone_ip, "command");
-            calibration_logger->logCommand("command", 1.0, std::chrono::system_clock::to_time_t(std::chrono::system_clock::now()));
+            calibration_logger->logCommand("command", std::chrono::system_clock::to_time_t(std::chrono::system_clock::now()));
         }
         
         std::this_thread::sleep_for(std::chrono::milliseconds(500));
@@ -258,7 +258,7 @@ void Calibration::runCalibrationRoutine(
             static std::mutex logger_mutex;
             std::lock_guard<std::mutex> lock(logger_mutex);
             tello_controller_.sendCommand(drone_ip, "takeoff");
-            calibration_logger->logCommand("takeoff", 1.0, std::chrono::system_clock::to_time_t(std::chrono::system_clock::now()));
+            calibration_logger->logCommand("takeoff", std::chrono::system_clock::to_time_t(std::chrono::system_clock::now()));
         }
         
         // Wait for takeoff to complete while logging data
@@ -333,7 +333,7 @@ void Calibration::runCalibrationRoutine(
             
             // Try to land the drone
             tello_controller_.sendCommand(drone_ip, "land");
-            calibration_logger->logCommand("land", 1.0, std::chrono::system_clock::to_time_t(std::chrono::system_clock::now()));
+            calibration_logger->logCommand("land", std::chrono::system_clock::to_time_t(std::chrono::system_clock::now()));
             
             // Signal that the calibration is complete (with error)
             calibration_in_progress_ = false;
@@ -373,7 +373,7 @@ void Calibration::runCalibrationRoutine(
         {
             static std::mutex logger_mutex;
             std::lock_guard<std::mutex> lock(logger_mutex);
-            calibration_logger->logCommand("rc_upward_start", 50.0, std::chrono::system_clock::to_time_t(std::chrono::system_clock::now()));
+            calibration_logger->logCommand("rc_upward_start", std::chrono::system_clock::to_time_t(std::chrono::system_clock::now()));
         }
         
         // Send continuous upward commands while logging data
@@ -419,6 +419,8 @@ void Calibration::runCalibrationRoutine(
             data.imu_agy = imu_handler->getAgy();
             data.imu_agz = imu_handler->getAgz();
             
+            // No angular rate calculation needed - we use raw IMU values
+            
             {
                 static std::mutex logger_mutex;
                 std::lock_guard<std::mutex> lock(logger_mutex);
@@ -434,8 +436,8 @@ void Calibration::runCalibrationRoutine(
             }
             log_counter++;
             
-            // Send commands at 20Hz (50ms interval)
-            std::this_thread::sleep_for(std::chrono::milliseconds(50));
+            // Send commands at 100Hz (10ms interval)
+            std::this_thread::sleep_for(std::chrono::milliseconds(10));
         }
         
         // Stop movement
@@ -449,7 +451,7 @@ void Calibration::runCalibrationRoutine(
         {
             static std::mutex logger_mutex;
             std::lock_guard<std::mutex> lock(logger_mutex);
-            calibration_logger->logCommand("rc_upward_stop", 0.0, std::chrono::system_clock::to_time_t(std::chrono::system_clock::now()));
+            calibration_logger->logCommand("rc_upward_stop", std::chrono::system_clock::to_time_t(std::chrono::system_clock::now()));
         }
         
         // Log while stabilizing for 1 second
@@ -487,7 +489,7 @@ void Calibration::runCalibrationRoutine(
         {
             static std::mutex logger_mutex;
             std::lock_guard<std::mutex> lock(logger_mutex);
-            calibration_logger->logCommand("rc_forward_start", 50.0, std::chrono::system_clock::to_time_t(std::chrono::system_clock::now()));
+            calibration_logger->logCommand("rc_forward_start", std::chrono::system_clock::to_time_t(std::chrono::system_clock::now()));
         }
         
         // Initialize variables to store yaw values
@@ -544,6 +546,8 @@ void Calibration::runCalibrationRoutine(
             data.imu_agy = imu_handler->getAgy();
             data.imu_agz = imu_handler->getAgz();
             
+            // No angular rate calculation needed - we use raw IMU values
+            
             {
                 static std::mutex logger_mutex;
                 std::lock_guard<std::mutex> lock(logger_mutex);
@@ -565,8 +569,8 @@ void Calibration::runCalibrationRoutine(
             }
             log_counter++;
             
-            // Send commands at 20Hz (50ms interval)
-            std::this_thread::sleep_for(std::chrono::milliseconds(50));
+            // Send commands at 100Hz (10ms interval)
+            std::this_thread::sleep_for(std::chrono::milliseconds(10));
         }
         
         // Stop movement
@@ -580,7 +584,7 @@ void Calibration::runCalibrationRoutine(
         {
             static std::mutex logger_mutex;
             std::lock_guard<std::mutex> lock(logger_mutex);
-            calibration_logger->logCommand("rc_forward_stop", 0.0, std::chrono::system_clock::to_time_t(std::chrono::system_clock::now()));
+            calibration_logger->logCommand("rc_forward_stop", std::chrono::system_clock::to_time_t(std::chrono::system_clock::now()));
         }
         
         // 4. Land the drone
@@ -592,7 +596,7 @@ void Calibration::runCalibrationRoutine(
             static std::mutex logger_mutex;
             std::lock_guard<std::mutex> lock(logger_mutex);
             tello_controller_.sendCommand(drone_ip, "land");
-            calibration_logger->logCommand("land", 1.0, std::chrono::system_clock::to_time_t(std::chrono::system_clock::now()));
+            calibration_logger->logCommand("land", std::chrono::system_clock::to_time_t(std::chrono::system_clock::now()));
         }
         
         // Log data during landing process
@@ -635,6 +639,8 @@ void Calibration::runCalibrationRoutine(
             landing_data.imu_agy = imu_handler->getAgy();
             landing_data.imu_agz = imu_handler->getAgz();
             
+            // No angular rate calculation needed - we use raw IMU values
+            
             {
                 static std::mutex logger_mutex;
                 std::lock_guard<std::mutex> lock(logger_mutex);
@@ -650,7 +656,7 @@ void Calibration::runCalibrationRoutine(
             }
             log_counter++;
             
-            // Log at 10Hz during landing
+            // Log IMU data at 10Hz (100ms)
             std::this_thread::sleep_for(std::chrono::milliseconds(100));
         }
         
@@ -769,7 +775,7 @@ void Calibration::runCalibrationRoutine(
             static std::mutex logger_mutex;
             std::lock_guard<std::mutex> lock(logger_mutex);
             tello_controller_.sendCommand(drone_ip, "land");
-            calibration_logger->logCommand("land", 1.0, std::chrono::system_clock::to_time_t(std::chrono::system_clock::now()));
+            calibration_logger->logCommand("land", std::chrono::system_clock::to_time_t(std::chrono::system_clock::now()));
         }
         
         // Flush logger
